@@ -5,9 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CountUp from '../components/CountUp'
 import CTABand from '../components/CTABand'
 import DivisionCard from '../components/DivisionCard'
-import FloatingLogo from '../components/FloatingLogo'
 import HeroSlideshow from '../components/HeroSlideshow'
-import ProgressiveArt from '../components/ProgressiveArt'
+import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
 import EditableButton from '../cms/EditableButton'
@@ -54,14 +53,17 @@ const storyPanels = [
   {
     title: 'One group.',
     text: 'A single accountable partner — not a patchwork of vendors.',
+    art: 'nodes',
   },
   {
     title: 'Three divisions.',
     text: 'Events, creative & marketing, and golf — each with specialist depth.',
+    art: 'orbit',
   },
   {
     title: 'Multiple solutions.',
     text: 'Vision. Precision. Execution. Across every brief we take on.',
+    art: 'arcs',
   },
 ]
 
@@ -96,7 +98,7 @@ export default function Home() {
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
-        gsap.set('.story-panel', { clearProps: 'all', opacity: 1, position: 'relative' })
+        gsap.set('.story-panel, .story-art', { clearProps: 'all', opacity: 1, position: 'relative' })
         return
       }
 
@@ -130,10 +132,13 @@ export default function Home() {
 
       const story = pageRef.current?.querySelector('.story-pin')
       const panels = gsap.utils.toArray('.story-panel')
+      const arts = gsap.utils.toArray('.story-art')
       const bars = gsap.utils.toArray('.story-progress span i')
       if (story && panels.length) {
         gsap.set(panels, { opacity: 0, y: 28 })
         gsap.set(panels[0], { opacity: 1, y: 0 })
+        gsap.set(arts, { opacity: 0, scale: 0.92 })
+        if (arts[0]) gsap.set(arts[0], { opacity: 1, scale: 1.08 })
         gsap.set(bars[0], { width: '100%' })
 
         const storyTl = gsap.timeline({
@@ -153,11 +158,18 @@ export default function Home() {
           const prev = panels[i - 1]
           storyTl
             .to(prev, { opacity: 0, y: -24, duration: 0.45 }, i)
+            .to(arts[i - 1], { opacity: 0, scale: 1.16, duration: 0.45 }, i)
             .to(bars[i - 1], { width: '100%', duration: 0.2 }, i)
             .fromTo(
               panel,
               { opacity: 0, y: 32 },
               { opacity: 1, y: 0, duration: 0.45 },
+              i + 0.05,
+            )
+            .fromTo(
+              arts[i],
+              { opacity: 0, scale: 0.9 },
+              { opacity: 1, scale: 1.1, duration: 0.5 },
               i + 0.05,
             )
             .fromTo(
@@ -189,7 +201,6 @@ export default function Home() {
   return (
     <div ref={pageRef}>
       <HeroSlideshow slides={slides}>
-        <FloatingLogo tone="dark" />
         <EditableText
           contentKey="hero.eyebrow"
           as="p"
@@ -315,6 +326,14 @@ export default function Home() {
       </section>
 
       <section className="story-pin" aria-label="Brand statement">
+        <div className="story-pin-arts" aria-hidden="true">
+          {storyPanels.map((panel) => (
+            <div className="story-art" key={`art-${panel.title}`}>
+              <ArtDrawing variant={panel.art} />
+            </div>
+          ))}
+          <div className="story-pin-veil" />
+        </div>
         <div className="story-pin-inner">
           {storyPanels.map((panel, i) => (
             <div

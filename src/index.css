@@ -1274,10 +1274,37 @@ ul {
   position: relative;
   background: var(--ag-black);
   color: var(--ag-white);
+  overflow: hidden;
+}
+
+.story-pin-arts {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.story-art {
+  position: absolute;
+  inset: -8%;
+  opacity: 0;
+  color: rgba(255, 255, 255, 0.4);
+  display: grid;
+  place-items: center;
+}
+
+.story-pin-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(40, 40, 42, 0.25), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.72));
 }
 
 .story-pin-inner {
   position: relative;
+  z-index: 2;
   min-height: 100vh;
   display: grid;
   place-items: center;
