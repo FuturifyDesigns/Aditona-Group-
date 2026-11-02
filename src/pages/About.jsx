@@ -7,6 +7,7 @@ import CTABand from '../components/CTABand'
 import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
+import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -139,10 +140,7 @@ export default function About() {
             trigger: manifesto,
             start: 'top top',
             end: () => `+=${window.innerHeight * panels.length * 0.9}`,
-            pin: true,
-            scrub: 0.65,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+            ...pinOptions({ scrub: 0.65 }),
           },
         })
 
@@ -180,6 +178,7 @@ export default function About() {
         stagger: 0.08,
         duration: 0.75,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.about-moments', start: 'top 82%' },
       })
 
@@ -214,20 +213,22 @@ export default function About() {
           { y: 0, opacity: 1, stagger: 0.08, ease: 'none' },
           0.05,
         )
-        gsap.fromTo(
-          slide,
-          { y: i % 2 === 0 ? 40 : 60 },
-          {
-            y: i % 2 === 0 ? -20 : -40,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: slide,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
+        if (window.matchMedia('(min-width: 768px)').matches) {
+          gsap.fromTo(
+            slide,
+            { y: i % 2 === 0 ? 40 : 60 },
+            {
+              y: i % 2 === 0 ? -20 : -40,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: slide,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true,
+              },
             },
-          },
-        )
+          )
+        }
       })
 
       gsap.from('.value-row', {
@@ -236,6 +237,7 @@ export default function About() {
         stagger: 0.12,
         duration: 0.85,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.about-values', start: 'top 78%' },
       })
 
@@ -254,6 +256,7 @@ export default function About() {
         stagger: 0.14,
         duration: 0.75,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.about-method', start: 'top 78%' },
       })
 
@@ -302,7 +305,7 @@ export default function About() {
         })
       })
 
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      hardRefreshScroll(pageRef.current)
     },
     { scope: pageRef },
   )

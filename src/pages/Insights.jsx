@@ -7,6 +7,7 @@ import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
+import { hardRefreshScroll } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -90,7 +91,7 @@ export default function Insights() {
         })
       })
 
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      hardRefreshScroll(pageRef.current)
     },
     { scope: pageRef },
   )

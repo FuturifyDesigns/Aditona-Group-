@@ -1,14 +1,10 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import EditModeBar from '../cms/EditModeBar'
+import { hardRefreshScroll, setupScrollDefaults, softRefreshScroll } from '../lib/scroll'
 import Footer from './Footer'
 import Header from './Header'
 import WhatsAppFab from './WhatsAppFab'
-
-gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const WA_BY_PATH = {
   '/event-solutions':
@@ -27,28 +23,25 @@ export default function Layout() {
   const location = useLocation()
   const mainRef = useRef(null)
 
-  useGSAP(
-    () => {
-      window.scrollTo(0, 0)
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced || !mainRef.current) {
-        requestAnimationFrame(() => ScrollTrigger.refresh())
-        return
-      }
+  useEffect(() => {
+    setupScrollDefaults()
+  }, [])
 
-      gsap.fromTo(
-        mainRef.current,
-        { opacity: 0.4 },
-        {
-          opacity: 1,
-          duration: 0.45,
-          ease: 'power2.out',
-          onComplete: () => ScrollTrigger.refresh(),
-        },
-      )
-    },
-    { dependencies: [location.pathname], revertOnUpdate: true },
-  )
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    const root = mainRef.current || document
+    const id = window.setTimeout(() => {
+      hardRefreshScroll(root)
+    }, 40)
+
+    const onLoad = () => softRefreshScroll()
+    window.addEventListener('load', onLoad)
+
+    return () => {
+      window.clearTimeout(id)
+      window.removeEventListener('load', onLoad)
+    }
+  }, [location.pathname])
 
   const waMessage = WA_BY_PATH[location.pathname]
 

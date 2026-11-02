@@ -13,6 +13,7 @@ import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { cards, heroes } from '../lib/images'
+import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -126,6 +127,7 @@ export default function Home() {
         stagger: 0.14,
         duration: 0.95,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.division-grid', start: 'top 82%' },
       })
 
@@ -145,10 +147,7 @@ export default function Home() {
             trigger: story,
             start: 'top top',
             end: () => `+=${window.innerHeight * panels.length * 0.85}`,
-            pin: true,
-            scrub: 0.55,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+            ...pinOptions({ scrub: 0.55 }),
           },
         })
 
@@ -187,10 +186,11 @@ export default function Home() {
         stagger: 0.12,
         duration: 0.9,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.work-gallery', start: 'top 82%' },
       })
 
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      hardRefreshScroll(pageRef.current)
     },
     { scope: pageRef, dependencies: [divisions, workThumbs] },
   )

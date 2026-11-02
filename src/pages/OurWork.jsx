@@ -7,6 +7,7 @@ import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
+import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -107,19 +108,18 @@ export default function OurWork() {
               trigger: '.work-runway',
               start: 'top top',
               end: () => `+=${Math.max(track.scrollWidth * 0.7, window.innerHeight)}`,
-              pin: true,
-              scrub: 0.7,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-              onUpdate: (self) => {
-                if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
-                if (teaser) {
-                  gsap.set(teaser, {
-                    opacity: 0.45 + self.progress * 0.55,
-                    y: (1 - self.progress) * 12,
-                  })
-                }
-              },
+              ...pinOptions({
+                scrub: 0.7,
+                onUpdate: (self) => {
+                  if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
+                  if (teaser) {
+                    gsap.set(teaser, {
+                      opacity: 0.45 + self.progress * 0.55,
+                      y: (1 - self.progress) * 12,
+                    })
+                  }
+                },
+              }),
             },
           },
         )
@@ -186,7 +186,7 @@ export default function OurWork() {
         })
       })
 
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      hardRefreshScroll(pageRef.current)
     },
     { scope: pageRef, dependencies: [filter], revertOnUpdate: true },
   )

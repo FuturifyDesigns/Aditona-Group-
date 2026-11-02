@@ -35,6 +35,13 @@ body {
   background: var(--ag-white);
   color: var(--ag-black);
   -webkit-tap-highlight-color: transparent;
+  overflow-x: clip;
+}
+
+.page {
+  position: relative;
+  overflow-x: clip;
+  min-height: 60vh;
 }
 
 button,
@@ -100,8 +107,7 @@ ul {
 
 .has-art {
   position: relative;
-  overflow: clip;
-  isolation: isolate;
+  overflow: visible;
 }
 
 .has-art > .container,
@@ -503,10 +509,6 @@ ul {
 .mobile-nav a.active {
   color: var(--ag-ink);
   font-weight: 600;
-}
-
-.page {
-  min-height: 60vh;
 }
 
 .hero {
@@ -1300,7 +1302,7 @@ ul {
   position: relative;
   background: var(--ag-black);
   color: #fff;
-  overflow: hidden;
+  overflow: visible;
   padding: 3rem 0 2.5rem;
   min-height: 100vh;
   min-height: 100dvh;
@@ -1329,6 +1331,7 @@ ul {
   width: max-content;
   padding: 0 1.25rem 0.75rem;
   will-change: transform;
+  overflow: visible;
 }
 
 .work-runway-card {
@@ -1538,7 +1541,7 @@ ul {
   position: relative;
   background: var(--ag-black);
   color: var(--ag-white);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .story-pin-arts {
@@ -1546,6 +1549,7 @@ ul {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .story-art {
@@ -1726,7 +1730,7 @@ ul {
   background: var(--ag-black);
   color: #fff;
   min-height: 100vh;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .about-manifesto-arts {
@@ -1734,6 +1738,7 @@ ul {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .manifesto-art {
@@ -2537,7 +2542,7 @@ body.cms-edit-mode {
   position: relative;
   background: var(--ag-black);
   color: #fff;
-  overflow: hidden;
+  overflow: visible;
   padding: 3rem 0 1.5rem;
   min-height: 100vh;
   min-height: 100dvh;

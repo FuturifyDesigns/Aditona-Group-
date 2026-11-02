@@ -8,6 +8,7 @@ import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
+import { hardRefreshScroll } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -105,6 +106,7 @@ export default function CreativeMarketing() {
         stagger: 0.1,
         duration: 0.8,
         ease: 'power3.out',
+        clearProps: 'transform',
         scrollTrigger: { trigger: '.creative-services', start: 'top 82%' },
       })
 
@@ -129,7 +131,7 @@ export default function CreativeMarketing() {
         })
       })
 
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      hardRefreshScroll(pageRef.current)
     },
     { scope: pageRef },
   )
