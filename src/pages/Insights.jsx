@@ -51,10 +51,11 @@ export default function Insights() {
       if (reduced) return
       gsap.from('.insight-card', {
         opacity: 0,
-        y: 28,
-        stagger: 0.1,
-        duration: 0.7,
-        ease: 'power2.out',
+        y: 42,
+        scale: 0.94,
+        stagger: 0.12,
+        duration: 0.85,
+        ease: 'power3.out',
         scrollTrigger: { trigger: '.grid-cards', start: 'top 85%' },
       })
     },

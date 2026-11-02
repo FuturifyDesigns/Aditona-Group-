@@ -2,11 +2,12 @@ import { useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Footer from './Footer'
 import Header from './Header'
 import WhatsAppFab from './WhatsAppFab'
 
-gsap.registerPlugin(useGSAP)
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const WA_BY_PATH = {
   '/event-solutions':
@@ -29,12 +30,20 @@ export default function Layout() {
     () => {
       window.scrollTo(0, 0)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced || !mainRef.current) return
+      if (reduced || !mainRef.current) {
+        requestAnimationFrame(() => ScrollTrigger.refresh())
+        return
+      }
 
       gsap.fromTo(
         mainRef.current,
-        { opacity: 0.55 },
-        { opacity: 1, duration: 0.45, ease: 'power2.out' },
+        { opacity: 0.4 },
+        {
+          opacity: 1,
+          duration: 0.45,
+          ease: 'power2.out',
+          onComplete: () => ScrollTrigger.refresh(),
+        },
       )
     },
     { dependencies: [location.pathname], revertOnUpdate: true },

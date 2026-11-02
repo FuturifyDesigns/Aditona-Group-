@@ -60,70 +60,113 @@ const workThumbs = [
   'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=1600&q=80',
 ]
 
+const storyPanels = [
+  {
+    title: 'One group.',
+    text: 'A single accountable partner — not a patchwork of vendors.',
+  },
+  {
+    title: 'Three divisions.',
+    text: 'Events, creative & marketing, and golf — each with specialist depth.',
+  },
+  {
+    title: 'Multiple solutions.',
+    text: 'Vision. Precision. Execution. Across every brief we take on.',
+  },
+]
+
 export default function Home() {
   const pageRef = useRef(null)
 
   useGSAP(
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) return
+      if (reduced) {
+        gsap.set('.story-panel', { clearProps: 'all', opacity: 1, position: 'relative' })
+        return
+      }
 
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.from('.hero-content .eyebrow', { opacity: 0, y: 16, duration: 0.6 })
-        .from('.hero-content h1', { opacity: 0, y: 28, duration: 0.8 }, '-=0.35')
-        .from('.hero-content p', { opacity: 0, y: 18, duration: 0.6 }, '-=0.45')
-        .from('.hero-content .btn-row', { opacity: 0, y: 14, duration: 0.55 }, '-=0.35')
-        .from('.hero-tag', { opacity: 0, duration: 0.5 }, '-=0.25')
+      tl.from('.hero-content .eyebrow', { opacity: 0, y: 18, duration: 0.55 })
+        .from('.hero-content h1', { opacity: 0, y: 36, duration: 0.85 }, '-=0.3')
+        .from('.hero-content p', { opacity: 0, y: 20, duration: 0.55 }, '-=0.45')
+        .from('.hero-content .btn-row', { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
+        .from('.hero-tag', { opacity: 0, duration: 0.45 }, '-=0.2')
 
       gsap.from('.trust-item', {
         opacity: 0,
-        y: 22,
+        y: 28,
+        scale: 0.97,
         stagger: 0.1,
-        duration: 0.7,
+        duration: 0.75,
         ease: 'power2.out',
         scrollTrigger: { trigger: '.trust-grid', start: 'top 85%' },
       })
 
       gsap.from('.division-card', {
         opacity: 0,
-        y: 36,
-        stagger: 0.12,
-        duration: 0.8,
+        y: 56,
+        scale: 0.92,
+        rotateX: 8,
+        transformOrigin: '50% 100%',
+        stagger: 0.14,
+        duration: 0.95,
         ease: 'power3.out',
         scrollTrigger: { trigger: '.division-grid', start: 'top 82%' },
       })
 
-      const pinSection = pageRef.current?.querySelector('.pin-statement')
-      const pinTitle = pageRef.current?.querySelector('.pin-statement h2')
-      const pinSub = pageRef.current?.querySelector('.pin-statement p')
-      if (pinSection && pinTitle) {
-        const pinTl = gsap.timeline({
+      const story = pageRef.current?.querySelector('.story-pin')
+      const panels = gsap.utils.toArray('.story-panel')
+      const bars = gsap.utils.toArray('.story-progress span i')
+      if (story && panels.length) {
+        gsap.set(panels, { opacity: 0, y: 28 })
+        gsap.set(panels[0], { opacity: 1, y: 0 })
+        gsap.set(bars[0], { width: '100%' })
+
+        const storyTl = gsap.timeline({
           scrollTrigger: {
-            trigger: pinSection,
+            trigger: story,
             start: 'top top',
-            end: '+=120%',
+            end: () => `+=${window.innerHeight * panels.length * 0.85}`,
             pin: true,
-            scrub: 0.65,
+            scrub: 0.55,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
           },
         })
-        pinTl
-          .fromTo(pinTitle, { opacity: 0.12, y: 36 }, { opacity: 1, y: 0, ease: 'none' })
-          .fromTo(
-            pinSub,
-            { opacity: 0, y: 24 },
-            { opacity: 0.78, y: 0, ease: 'none' },
-            0.25,
-          )
+
+        panels.forEach((panel, i) => {
+          if (i === 0) return
+          const prev = panels[i - 1]
+          storyTl
+            .to(prev, { opacity: 0, y: -24, duration: 0.45 }, i)
+            .to(bars[i - 1], { width: '100%', duration: 0.2 }, i)
+            .fromTo(
+              panel,
+              { opacity: 0, y: 32 },
+              { opacity: 1, y: 0, duration: 0.45 },
+              i + 0.05,
+            )
+            .fromTo(
+              bars[i],
+              { width: '0%' },
+              { width: '100%', duration: 0.45 },
+              i + 0.05,
+            )
+        })
       }
 
       gsap.from('.work-thumb', {
         opacity: 0,
-        y: 40,
+        y: 48,
+        scale: 0.94,
         stagger: 0.12,
-        duration: 0.85,
+        duration: 0.9,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.work-gallery', start: 'top 80%' },
+        scrollTrigger: { trigger: '.work-gallery', start: 'top 82%' },
       })
+
+      requestAnimationFrame(() => ScrollTrigger.refresh())
     },
     { scope: pageRef },
   )
@@ -213,13 +256,26 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="pin-statement" aria-label="Statement">
-        <div>
-          <h2>One group. Three divisions. Multiple solutions.</h2>
-          <p style={{ marginTop: '1rem', maxWidth: '32rem', marginInline: 'auto', lineHeight: 1.6 }}>
-            Events, creative, and golf — delivered with the same standard of vision,
-            precision, and execution.
-          </p>
+      <section className="story-pin" aria-label="Brand statement">
+        <div className="story-pin-inner">
+          {storyPanels.map((panel, i) => (
+            <div
+              className={`story-panel${i === 0 ? ' is-first' : ''}`}
+              key={panel.title}
+            >
+              <div>
+                <h2>{panel.title}</h2>
+                <p>{panel.text}</p>
+              </div>
+            </div>
+          ))}
+          <div className="story-progress" aria-hidden="true">
+            {storyPanels.map((panel) => (
+              <span key={panel.title}>
+                <i />
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -239,12 +295,12 @@ export default function Home() {
           </Reveal>
           <div className="work-gallery">
             {workThumbs.map((src) => (
-              <Reveal key={src} className="work-thumb">
+              <div key={src} className="work-thumb">
                 <img src={src} alt="" loading="lazy" />
-              </Reveal>
+              </div>
             ))}
           </div>
-          <Reveal>
+          <Reveal delay={0.1}>
             <Link to="/our-work" className="btn btn-ghost">
               View all work
             </Link>

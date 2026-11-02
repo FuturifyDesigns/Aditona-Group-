@@ -46,12 +46,13 @@ export default function CreativeMarketing() {
 
       gsap.from('.service-item', {
         opacity: 0,
-        scale: 0.92,
-        clipPath: 'inset(12% 8% 12% 8%)',
-        stagger: 0.09,
-        duration: 0.85,
+        scale: 0.88,
+        y: 40,
+        clipPath: 'inset(18% 12% 18% 12% round 12px)',
+        stagger: 0.11,
+        duration: 0.95,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.service-list', start: 'top 80%' },
+        scrollTrigger: { trigger: '.service-list', start: 'top 82%' },
       })
     },
     { scope: pageRef },

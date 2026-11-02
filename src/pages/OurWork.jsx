@@ -70,10 +70,13 @@ export default function OurWork() {
       if (reduced) return
       gsap.from('.project-card', {
         opacity: 0,
-        y: 30,
-        stagger: 0.08,
-        duration: 0.65,
-        ease: 'power2.out',
+        y: 50,
+        scale: 0.92,
+        rotateX: 6,
+        transformOrigin: '50% 100%',
+        stagger: 0.1,
+        duration: 0.85,
+        ease: 'power3.out',
         scrollTrigger: { trigger: '.grid-cards', start: 'top 85%' },
       })
     },

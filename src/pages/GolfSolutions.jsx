@@ -65,10 +65,14 @@ export default function GolfSolutions() {
 
       gsap.from('.service-item', {
         opacity: 0,
-        y: 28,
-        stagger: 0.08,
-        duration: 0.7,
-        ease: 'power2.out',
+        y: 48,
+        scale: 0.94,
+        stagger: {
+          each: 0.1,
+          from: 'center',
+        },
+        duration: 0.85,
+        ease: 'power3.out',
         scrollTrigger: { trigger: '.service-list', start: 'top 82%' },
       })
     },

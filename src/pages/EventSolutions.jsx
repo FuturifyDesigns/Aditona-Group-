@@ -46,11 +46,13 @@ export default function EventSolutions() {
 
       gsap.from('.service-item', {
         opacity: 0,
-        x: 48,
-        stagger: 0.08,
-        duration: 0.7,
+        x: 64,
+        rotateY: -12,
+        transformOrigin: 'left center',
+        stagger: 0.1,
+        duration: 0.85,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.service-list', start: 'top 80%' },
+        scrollTrigger: { trigger: '.service-list', start: 'top 82%' },
       })
     },
     { scope: pageRef },
@@ -71,7 +73,7 @@ export default function EventSolutions() {
 
       <section className="section section--tight">
         <div className="container">
-          <Reveal className="work-thumb" style={{ maxHeight: 360 }}>
+          <Reveal className="work-thumb" style={{ maxHeight: 360 }} y={50} scale={0.94}>
             <img
               src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80"
               alt="Event stage with audience"
@@ -103,7 +105,7 @@ export default function EventSolutions() {
 
       <section className="section section--soft">
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <Reveal>
+          <Reveal y={36} scale={0.97}>
             <p className="eyebrow">Engage</p>
             <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
               How to work with us
