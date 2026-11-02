@@ -109,12 +109,12 @@ export default function Home() {
 
       gsap.from('.trust-item', {
         opacity: 0,
-        y: 28,
-        scale: 0.97,
+        y: 18,
         stagger: 0.1,
-        duration: 0.75,
+        duration: 0.7,
         ease: 'power2.out',
-        scrollTrigger: { trigger: '.trust-grid', start: 'top 85%' },
+        clearProps: 'transform',
+        scrollTrigger: { trigger: '.trust-grid', start: 'top 88%' },
       })
 
       gsap.from('.division-card', {

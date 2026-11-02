@@ -227,7 +227,7 @@ export default function EnquiryForm({ type = 'enquiry' }) {
               </div>
 
               <div className="field">
-                <label htmlFor="budget">Budget range</label>
+                <label htmlFor="budget">Budget range (Pula)</label>
                 <select
                   id="budget"
                   name="budget"
@@ -235,10 +235,10 @@ export default function EnquiryForm({ type = 'enquiry' }) {
                   onChange={onChange}
                 >
                   <option value="">Prefer not to say</option>
-                  <option value="Under R50k">Under R50k</option>
-                  <option value="R50k – R150k">R50k – R150k</option>
-                  <option value="R150k – R500k">R150k – R500k</option>
-                  <option value="R500k+">R500k+</option>
+                  <option value="Under P50k">Under P50k</option>
+                  <option value="P50k – P150k">P50k – P150k</option>
+                  <option value="P150k – P500k">P150k – P500k</option>
+                  <option value="P500k+">P500k+</option>
                 </select>
               </div>
             </>

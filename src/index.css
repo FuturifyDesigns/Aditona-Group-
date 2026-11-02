@@ -129,7 +129,7 @@ ul {
 
 .trust-bar.has-art {
   position: relative;
-  overflow: clip;
+  overflow: visible;
 }
 
 .progressive-art {
@@ -637,13 +637,16 @@ ul {
 .trust-bar {
   background: var(--ag-bg);
   border-bottom: 1px solid var(--ag-muted);
+  padding: 0.5rem 0 1.75rem;
+  overflow: visible;
 }
 
 .trust-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
-  padding: 1.5rem 0;
+  gap: 1rem;
+  padding: 1.25rem 0 0.5rem;
+  overflow: visible;
 }
 
 .trust-item {
@@ -651,6 +654,13 @@ ul {
   grid-template-columns: 36px 1fr;
   gap: 0.85rem;
   align-items: start;
+  background: var(--ag-white);
+  border: 1px solid var(--ag-muted);
+  border-radius: 14px;
+  padding: 1.15rem 1.1rem 1.25rem;
+  min-height: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 .trust-item svg {
@@ -659,17 +669,19 @@ ul {
   stroke: var(--ag-charcoal);
   fill: none;
   stroke-width: 1.6;
+  flex-shrink: 0;
 }
 
 .trust-item h3 {
   font-size: 0.95rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
 }
 
 .trust-item p {
   color: var(--ag-mid);
   font-size: 0.88rem;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .division-grid {
@@ -1916,6 +1928,14 @@ ul {
 @media (min-width: 1024px) {
   .nav {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.05rem;
+  }
+
+  .nav a {
+    padding: 0.4rem 0.45rem;
+    font-size: 0.8rem;
   }
 
   .header-cta {
@@ -1928,6 +1948,7 @@ ul {
 
   .trust-grid {
     grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
   }
 
   .division-grid {
@@ -1952,6 +1973,171 @@ ul {
 
   .tree-branches {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1023px) {
+  .nav {
+    gap: 0;
+  }
+
+  .nav a {
+    padding: 0.4rem 0.4rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --header-h: 64px;
+  }
+
+  .container {
+    width: min(100% - 1.25rem, var(--container));
+  }
+
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  .section--tight {
+    padding: 1.75rem 0;
+  }
+
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .stats-strip {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+    text-align: left;
+  }
+
+  .stat-item {
+    text-align: left;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.35rem 0;
+  }
+
+  .stat-item .stat-num {
+    font-size: 2rem;
+    margin-bottom: 0;
+    min-width: 4.5rem;
+  }
+
+  .trust-bar {
+    padding: 0.25rem 0 1.5rem;
+  }
+
+  .trust-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 1rem 0 0.25rem;
+  }
+
+  .trust-item {
+    padding: 1rem 0.95rem 1.1rem;
+  }
+
+  .hero {
+    min-height: min(78vh, 640px);
+  }
+
+  .hero-content {
+    margin-bottom: 2rem;
+    width: min(100% - 1.25rem, var(--container));
+  }
+
+  .hero h1 {
+    font-size: clamp(1.75rem, 8vw, 2.35rem);
+  }
+
+  .btn-row {
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .btn-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-hero {
+    padding: 3.5rem 0 2rem;
+  }
+
+  .page-hero--media {
+    min-height: min(52vh, 420px);
+    padding: 4.5rem 0 2rem;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(1.7rem, 8vw, 2.4rem);
+  }
+
+  .division-grid,
+  .work-gallery,
+  .grid-cards,
+  .values-grid,
+  .creative-chips,
+  .golf-service-grid,
+  .about-moments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-case,
+  .insight-row,
+  .service-panel,
+  .contact-split {
+    grid-template-columns: 1fr;
+  }
+
+  .events-rail-card {
+    width: min(82vw, 320px);
+  }
+
+  .events-rail-track {
+    padding: 0 1rem 1rem;
+  }
+
+  .contact-form-panel {
+    padding: 1.1rem;
+  }
+
+  .contact-visual,
+  .contact-visual img {
+    min-height: 260px;
+  }
+
+  .form-grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .wa-fab {
+    right: 0.85rem;
+    bottom: 0.85rem;
+  }
+
+  .story-pin {
+    min-height: auto;
+  }
+
+  .mobile-nav {
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
