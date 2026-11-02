@@ -510,10 +510,6 @@ ul {
   text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
 }
 
-.hero-content {
-  position: relative;
-}
-
 .floating-logo {
   position: absolute;
   z-index: 3;
