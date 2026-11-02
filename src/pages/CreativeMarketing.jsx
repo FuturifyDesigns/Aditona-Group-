@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -105,7 +106,8 @@ export default function CreativeMarketing() {
         }
       />
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt image={gallery.creative.workshop} opacity={0.14} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -127,7 +129,8 @@ export default function CreativeMarketing() {
         </div>
       </section>
 
-      <section className="section section--soft creative-services">
+      <section className="section section--soft creative-services has-art">
+        <ProgressiveArt image={gallery.creative.install} opacity={0.17} />
         <div className="container">
           <div className="section-head">
             <div>

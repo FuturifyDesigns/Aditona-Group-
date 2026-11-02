@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -108,7 +109,8 @@ export default function Insights() {
         }
       />
 
-      <section className="section insights-feed">
+      <section className="section insights-feed has-art">
+        <ProgressiveArt image={gallery.insights.debrief} opacity={0.13} />
         <div className="container insights-feed-layout">
           <div className="insights-spine" aria-hidden="true" />
           <div className="insights-rows">

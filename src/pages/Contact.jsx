@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { config, waLink } from '../lib/config'
 import { gallery, heroes } from '../lib/images'
@@ -106,7 +107,8 @@ export default function Contact() {
         }
       />
 
-      <section className="section section--tight">
+      <section className="section section--tight has-art">
+        <ProgressiveArt image={gallery.about.planning} opacity={0.12} />
         <div className="container contact-channels">
           {channels.map((c) => (
             <a className="contact-channel" key={c.label} href={c.href}>
@@ -118,7 +120,8 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="section contact-split-section">
+      <section className="section contact-split-section has-art">
+        <ProgressiveArt image={gallery.work.summit} opacity={0.1} />
         <div className="container contact-split">
           <div className="contact-visual">
             <img src={gallery.about.briefing} alt="" loading="lazy" />

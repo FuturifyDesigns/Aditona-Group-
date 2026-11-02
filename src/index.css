@@ -98,6 +98,70 @@ ul {
   background: var(--ag-bg);
 }
 
+.has-art {
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.has-art > .container,
+.has-art > .about-divisions-head,
+.has-art .section-head,
+.has-art .service-list,
+.has-art .grid-cards,
+.has-art .creative-mosaic,
+.has-art .golf-steps,
+.has-art .value-rows,
+.has-art .method-grid,
+.has-art .contact-channels,
+.has-art .contact-split,
+.has-art .about-moments-grid,
+.has-art .insights-feed-layout,
+.has-art .chip-row,
+.has-art .btn-row {
+  position: relative;
+  z-index: 1;
+}
+
+.progressive-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.progressive-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35) contrast(1.05) brightness(1.05);
+  transform-origin: center center;
+}
+
+.progressive-art-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.9) 100%),
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.35), transparent 55%);
+}
+
+.section--soft .progressive-art-veil {
+  background:
+    linear-gradient(180deg, rgba(244, 244, 244, 0.9) 0%, rgba(244, 244, 244, 0.75) 50%, rgba(244, 244, 244, 0.92) 100%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.4), transparent 50%);
+}
+
+.progressive-art--dark .progressive-art-veil {
+  background:
+    linear-gradient(180deg, rgba(26, 26, 27, 0.82) 0%, rgba(26, 26, 27, 0.7) 50%, rgba(26, 26, 27, 0.88) 100%);
+}
+
+.progressive-art--dark img {
+  filter: grayscale(0.2) contrast(1.08) brightness(0.75);
+}
+
 .eyebrow {
   display: inline-block;
   font-size: 0.72rem;
@@ -1157,13 +1221,46 @@ ul {
 }
 
 .about-manifesto {
+  position: relative;
   background: var(--ag-black);
   color: #fff;
   min-height: 100vh;
+  overflow: hidden;
+}
+
+.about-manifesto-arts {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.manifesto-art {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.manifesto-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.25) contrast(1.05) brightness(0.55);
+  transform: scale(1.04);
+}
+
+.about-manifesto-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(110deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.58) 48%, rgba(0, 0, 0, 0.72) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
 }
 
 .about-manifesto-inner {
   position: relative;
+  z-index: 2;
   width: min(100% - 2rem, var(--container));
   margin-inline: auto;
   min-height: 100vh;
@@ -1622,10 +1719,17 @@ body.cms-edit-mode {
 
 /* ——— Page: Events rail ——— */
 .events-rail {
+  position: relative;
   background: var(--ag-black);
   color: #fff;
   overflow: hidden;
   padding: 3rem 0 2.5rem;
+}
+
+.events-rail .events-rail-head,
+.events-rail .events-rail-track {
+  position: relative;
+  z-index: 1;
 }
 
 .events-rail-head {

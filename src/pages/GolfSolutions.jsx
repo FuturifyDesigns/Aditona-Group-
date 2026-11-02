@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -82,7 +83,8 @@ export default function GolfSolutions() {
         }
       />
 
-      <section className="section golf-journey">
+      <section className="section golf-journey has-art">
+        <ProgressiveArt image={gallery.golf.foursome} opacity={0.13} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -107,7 +109,8 @@ export default function GolfSolutions() {
         </div>
       </section>
 
-      <section className="section section--soft golf-services">
+      <section className="section section--soft golf-services has-art">
+        <ProgressiveArt image={gallery.golf.prize} opacity={0.16} />
         <div className="container">
           <div className="section-head">
             <div>

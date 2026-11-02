@@ -6,12 +6,13 @@ import CountUp from '../components/CountUp'
 import CTABand from '../components/CTABand'
 import DivisionCard from '../components/DivisionCard'
 import HeroSlideshow from '../components/HeroSlideshow'
+import ProgressiveArt from '../components/ProgressiveArt'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
 import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
-import { cards, heroes } from '../lib/images'
+import { cards, gallery, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -282,7 +283,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt image={gallery.about.planning} opacity={0.14} />
         <div className="container">
           <div className="section-head">
             <div>

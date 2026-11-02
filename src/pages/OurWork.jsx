@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -120,7 +121,8 @@ export default function OurWork() {
         }
       />
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt image={gallery.work.campaign} opacity={0.14} />
         <div className="container">
           <div className="chip-row" role="tablist" aria-label="Filter projects">
             {FILTERS.map((chip) => (

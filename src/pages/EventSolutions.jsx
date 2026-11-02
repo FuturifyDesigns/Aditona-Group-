@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -119,7 +120,8 @@ export default function EventSolutions() {
         }
       />
 
-      <section className="events-rail" aria-label="Production moments">
+      <section className="events-rail has-art" aria-label="Production moments">
+        <ProgressiveArt image={gallery.events.lighting} opacity={0.35} dark />
         <div className="events-rail-head container">
           <p className="eyebrow">On the floor</p>
           <h2>Production in motion</h2>
@@ -134,7 +136,8 @@ export default function EventSolutions() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt image={gallery.events.gala} opacity={0.15} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -153,7 +156,8 @@ export default function EventSolutions() {
         </div>
       </section>
 
-      <section className="section section--soft">
+      <section className="section section--soft has-art">
+        <ProgressiveArt image={gallery.events.outdoor} opacity={0.18} />
         <div className="container" style={{ maxWidth: '40rem' }}>
           <p className="eyebrow">Engage</p>
           <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
