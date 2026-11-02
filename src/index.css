@@ -2224,6 +2224,11 @@ ul {
 
   .about-hero-copy {
     margin-top: 0;
+    padding: 0.5rem 0 1.25rem;
+  }
+
+  .about-scroll-cue {
+    margin-top: 1.5rem;
   }
 
   .pin-teaser {
