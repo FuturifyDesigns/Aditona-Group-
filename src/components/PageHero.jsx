@@ -1,3 +1,5 @@
+import FloatingLogo from './FloatingLogo'
+
 export default function PageHero({
   eyebrow,
   title,
@@ -13,6 +15,7 @@ export default function PageHero({
     >
       <div className="page-hero-media" aria-hidden="true" />
       <div className="page-hero-scrim" aria-hidden="true" />
+      <FloatingLogo tone="dark" />
       <div className="container page-hero-content">
         {eyebrow}
         {title}

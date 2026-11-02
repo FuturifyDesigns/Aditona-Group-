@@ -36,7 +36,7 @@ export default function GolfSolutions() {
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
-        gsap.set('.golf-step, .service-item', { clearProps: 'all', opacity: 1, y: 0 })
+        gsap.set('.golf-step, .golf-service-card', { clearProps: 'all', opacity: 1, y: 0 })
         return
       }
 
@@ -55,13 +55,38 @@ export default function GolfSolutions() {
           .fromTo(copy, { y: 36, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.06, ease: 'none' }, 0.05)
       })
 
-      gsap.from('.service-item', {
+      gsap.from('.golf-service-card', {
         opacity: 0,
-        y: 40,
+        y: 50,
+        scale: 0.94,
         stagger: { each: 0.1, from: 'center' },
-        duration: 0.8,
+        duration: 0.85,
         ease: 'power3.out',
         scrollTrigger: { trigger: '.golf-services', start: 'top 82%' },
+      })
+
+      gsap.utils.toArray('.golf-service-card').forEach((card) => {
+        const mark = card.querySelector('.golf-service-mark')
+        card.addEventListener('pointerenter', () => {
+          gsap.to(card, {
+            y: -10,
+            scale: 1.02,
+            duration: 0.35,
+            ease: 'power2.out',
+          })
+          if (mark) {
+            gsap.to(mark, {
+              scale: 1.15,
+              rotation: 8,
+              duration: 0.4,
+              ease: 'back.out(1.6)',
+            })
+          }
+        })
+        card.addEventListener('pointerleave', () => {
+          gsap.to(card, { y: 0, scale: 1, duration: 0.4, ease: 'power2.out' })
+          if (mark) gsap.to(mark, { scale: 1, rotation: 0, duration: 0.35, ease: 'power2.out' })
+        })
       })
 
       requestAnimationFrame(() => ScrollTrigger.refresh())
@@ -76,7 +101,7 @@ export default function GolfSolutions() {
         eyebrow={<p className="eyebrow">Division</p>}
         title={<SplitHeadline text="Golf Solutions" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Corporate golf days and hospitality planned with the same precision we
             bring to stages and campaigns — calm, polished, memorable.
           </p>
@@ -118,9 +143,12 @@ export default function GolfSolutions() {
               <h2>On and around the course</h2>
             </div>
           </div>
-          <div className="service-list">
-            {services.map((s) => (
-              <article className="service-item" key={s.title}>
+          <div className="golf-service-grid">
+            {services.map((s, i) => (
+              <article className="golf-service-card" key={s.title}>
+                <span className="golf-service-mark" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
               </article>
@@ -129,7 +157,8 @@ export default function GolfSolutions() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt variant="fairway" peak={0.4} />
         <div className="container" style={{ maxWidth: '40rem' }}>
           <p className="eyebrow">Engage</p>
           <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>

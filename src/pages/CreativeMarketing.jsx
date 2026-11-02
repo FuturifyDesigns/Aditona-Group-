@@ -36,33 +36,41 @@ export default function CreativeMarketing() {
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
-        gsap.set('.creative-frame, .service-item', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
+        gsap.set('.creative-frame, .creative-chip', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
         return
       }
 
+      gsap.from('.page-creative .page-hero-content > *', {
+        opacity: 0,
+        y: 28,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: 'power3.out',
+      })
+
       gsap.utils.toArray('.creative-frame').forEach((frame, i) => {
+        const media = frame.querySelector('.creative-frame-media')
         const img = frame.querySelector('img')
+        const copy = frame.querySelectorAll('h3, p')
+
         gsap.fromTo(
           frame,
-          {
-            opacity: 0,
-            y: 60,
-            clipPath: 'inset(12% 8% 12% 8% round 16px)',
-          },
+          { opacity: 0, y: 70, rotateX: 8 },
           {
             opacity: 1,
             y: 0,
-            clipPath: 'inset(0% 0% 0% 0% round 16px)',
-            duration: 1,
-            delay: (i % 3) * 0.05,
+            rotateX: 0,
+            duration: 0.95,
+            delay: (i % 3) * 0.06,
             ease: 'power3.out',
             scrollTrigger: { trigger: frame, start: 'top 88%' },
           },
         )
+
         if (img) {
           gsap.fromTo(
             img,
-            { scale: 1.16 },
+            { scale: 1.18 },
             {
               scale: 1,
               ease: 'none',
@@ -75,16 +83,50 @@ export default function CreativeMarketing() {
             },
           )
         }
+
+        frame.addEventListener('pointerenter', () => {
+          gsap.to(frame, { y: -10, duration: 0.35, ease: 'power2.out' })
+          if (media) gsap.to(media, { scale: 1.03, duration: 0.45, ease: 'power2.out' })
+          gsap.to(copy, { y: -4, duration: 0.35, stagger: 0.04, ease: 'power2.out' })
+        })
+        frame.addEventListener('pointerleave', () => {
+          gsap.to(frame, { y: 0, duration: 0.45, ease: 'power2.out' })
+          if (media) gsap.to(media, { scale: 1, duration: 0.5, ease: 'power2.out' })
+          gsap.to(copy, { y: 0, duration: 0.4, ease: 'power2.out' })
+        })
       })
 
-      gsap.from('.service-item', {
+      gsap.from('.creative-chip', {
         opacity: 0,
-        scale: 0.9,
-        y: 28,
+        y: 36,
+        scale: 0.92,
+        rotateY: -10,
+        transformOrigin: 'left center',
         stagger: 0.1,
-        duration: 0.75,
-        ease: 'back.out(1.2)',
+        duration: 0.8,
+        ease: 'power3.out',
         scrollTrigger: { trigger: '.creative-services', start: 'top 82%' },
+      })
+
+      gsap.utils.toArray('.creative-chip').forEach((chip) => {
+        chip.addEventListener('pointerenter', () => {
+          gsap.to(chip, {
+            y: -8,
+            scale: 1.02,
+            borderColor: '#1a1a1b',
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        })
+        chip.addEventListener('pointerleave', () => {
+          gsap.to(chip, {
+            y: 0,
+            scale: 1,
+            borderColor: '#e8e8e8',
+            duration: 0.35,
+            ease: 'power2.out',
+          })
+        })
       })
 
       requestAnimationFrame(() => ScrollTrigger.refresh())
@@ -99,7 +141,7 @@ export default function CreativeMarketing() {
         eyebrow={<p className="eyebrow">Division</p>}
         title={<SplitHeadline text="Creative & Marketing" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Brand systems, campaigns, and content that feel considered — sharp across
             every channel, never loud for the sake of it.
           </p>
@@ -138,9 +180,10 @@ export default function CreativeMarketing() {
               <h2>Creative capabilities</h2>
             </div>
           </div>
-          <div className="grid-cards">
-            {services.map((s) => (
-              <article className="service-item" key={s.title}>
+          <div className="creative-chips">
+            {services.map((s, i) => (
+              <article className="creative-chip" key={s.title}>
+                <span>0{i + 1}</span>
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
               </article>
@@ -149,7 +192,8 @@ export default function CreativeMarketing() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt variant="orbit" peak={0.4} />
         <div className="container" style={{ maxWidth: '40rem' }}>
           <p className="eyebrow">Engage</p>
           <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>

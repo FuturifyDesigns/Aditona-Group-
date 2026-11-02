@@ -54,7 +54,7 @@ export default function EventSolutions() {
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
-        gsap.set('.events-rail-track, .events-rail-card, .service-item', {
+        gsap.set('.events-rail-track, .events-rail-card, .service-panel', {
           clearProps: 'all',
           opacity: 1,
           x: 0,
@@ -92,13 +92,50 @@ export default function EventSolutions() {
         })
       }
 
-      gsap.from('.service-item', {
-        opacity: 0,
-        x: -48,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.service-list', start: 'top 82%' },
+      gsap.utils.toArray('.service-panel').forEach((panel) => {
+        const line = panel.querySelector('.service-panel-line')
+        const num = panel.querySelector('.service-panel-num')
+        const copy = panel.querySelectorAll('h3, p')
+
+        gsap.set(line, { scaleX: 0, transformOrigin: 'left center' })
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: panel,
+            start: 'top 86%',
+            end: 'top 45%',
+            scrub: 0.65,
+          },
+        })
+
+        tl.fromTo(
+          panel,
+          { opacity: 0.25, y: 48, scale: 0.97 },
+          { opacity: 1, y: 0, scale: 1, ease: 'none' },
+          0,
+        )
+          .to(line, { scaleX: 1, ease: 'none' }, 0)
+          .fromTo(num, { opacity: 0.2, x: -12 }, { opacity: 1, x: 0, ease: 'none' }, 0)
+          .fromTo(copy, { y: 18, opacity: 0.35 }, { y: 0, opacity: 1, stagger: 0.05, ease: 'none' }, 0.05)
+
+        panel.addEventListener('pointerenter', () => {
+          gsap.to(panel, {
+            y: -6,
+            boxShadow: '0 18px 40px rgba(0,0,0,0.08)',
+            duration: 0.35,
+            ease: 'power2.out',
+          })
+          gsap.to(line, { backgroundColor: '#1a1a1b', duration: 0.3 })
+        })
+        panel.addEventListener('pointerleave', () => {
+          gsap.to(panel, {
+            y: 0,
+            boxShadow: '0 0 0 rgba(0,0,0,0)',
+            duration: 0.4,
+            ease: 'power2.out',
+          })
+          gsap.to(line, { backgroundColor: '#c2c2c2', duration: 0.3 })
+        })
       })
 
       requestAnimationFrame(() => ScrollTrigger.refresh())
@@ -113,7 +150,7 @@ export default function EventSolutions() {
         eyebrow={<p className="eyebrow">Division</p>}
         title={<SplitHeadline text="Event Solutions" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             From intimate briefings to multi-day conferences — we plan, produce, and
             deliver events with precision and presence.
           </p>
@@ -145,11 +182,15 @@ export default function EventSolutions() {
               <h2>What we deliver</h2>
             </div>
           </div>
-          <div className="service-list">
-            {services.map((s) => (
-              <article className="service-item" key={s.title}>
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
+          <div className="service-panels">
+            {services.map((s, i) => (
+              <article className="service-panel" key={s.title}>
+                <span className="service-panel-num">0{i + 1}</span>
+                <div className="service-panel-body">
+                  <h3>{s.title}</h3>
+                  <p>{s.text}</p>
+                  <i className="service-panel-line" aria-hidden="true" />
+                </div>
               </article>
             ))}
           </div>

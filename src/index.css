@@ -500,19 +500,62 @@ ul {
   margin-bottom: 1rem;
 }
 
-.hero p {
-  color: rgba(255, 255, 255, 0.84);
+.hero p,
+.hero-lead {
+  color: rgba(255, 255, 255, 0.92);
   max-width: 36rem;
-  line-height: 1.6;
+  line-height: 1.65;
   margin-bottom: 1.35rem;
+  font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
 }
 
-.hero-tag {
-  margin-top: 1.75rem;
-  letter-spacing: 0.28em;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.72);
+.hero-content {
+  position: relative;
+}
+
+.floating-logo {
+  position: absolute;
+  z-index: 3;
+  width: clamp(72px, 12vw, 110px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.floating-logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.28));
+}
+
+.floating-logo--dark {
+  right: max(1rem, calc((100vw - var(--container)) / 2));
+  bottom: 1.5rem;
+}
+
+.hero-content--home .floating-logo {
+  position: absolute;
+  right: 0;
+  bottom: -0.25rem;
+}
+
+.page-hero .floating-logo {
+  right: max(1rem, calc((100vw - var(--container)) / 2 + 0.5rem));
+  bottom: 1.75rem;
+}
+
+@media (max-width: 767px) {
+  .floating-logo {
+    width: 64px;
+    opacity: 0.9;
+  }
+
+  .page-hero .floating-logo,
+  .floating-logo--dark {
+    right: 1rem;
+    bottom: 1rem;
+  }
 }
 
 .page-hero {
@@ -546,27 +589,31 @@ ul {
   inset: 0;
   background: linear-gradient(
     105deg,
-    rgba(0, 0, 0, 0.78) 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    rgba(0, 0, 0, 0.25) 100%
+    rgba(0, 0, 0, 0.84) 0%,
+    rgba(0, 0, 0, 0.55) 52%,
+    rgba(0, 0, 0, 0.35) 100%
   );
 }
 
 .page-hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  max-width: 44rem;
+  padding-bottom: 0.5rem;
 }
 
 .page-hero--dark .eyebrow {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .page-hero--dark h1 {
   color: #fff;
 }
 
-.page-hero--dark p {
-  color: rgba(255, 255, 255, 0.8);
+.page-hero--dark p,
+.page-hero--dark .hero-lead {
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
 }
 
 .page-hero h1 {
@@ -576,10 +623,12 @@ ul {
   margin-bottom: 0.75rem;
 }
 
-.page-hero p {
+.page-hero p,
+.page-hero .hero-lead {
   max-width: 40rem;
   color: var(--ag-mid);
-  line-height: 1.6;
+  line-height: 1.65;
+  font-size: clamp(1.02rem, 1.45vw, 1.14rem);
 }
 
 .trust-bar {
@@ -973,6 +1022,160 @@ ul {
   color: var(--ag-mid);
   font-size: 0.92rem;
   line-height: 1.5;
+}
+
+.service-panels {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.service-panel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.15rem 1.2rem;
+  border: 1px solid var(--ag-muted);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  will-change: transform;
+}
+
+.service-panel-num {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: var(--ag-mid);
+  padding-top: 0.2rem;
+}
+
+.service-panel-body h3 {
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.service-panel-body p {
+  color: var(--ag-mid);
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.service-panel-line {
+  display: block;
+  height: 2px;
+  width: 100%;
+  margin-top: 0.9rem;
+  background: var(--ag-silver);
+  transform-origin: left center;
+}
+
+.creative-chips {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1fr;
+}
+
+.creative-chip {
+  border: 1px solid var(--ag-muted);
+  border-radius: 16px;
+  padding: 1.15rem 1.2rem;
+  background: rgba(255, 255, 255, 0.94);
+  will-change: transform;
+}
+
+.creative-chip span {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--ag-mid);
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.creative-chip h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.creative-chip p {
+  color: var(--ag-mid);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+
+.creative-frame {
+  cursor: default;
+  will-change: transform;
+}
+
+.creative-frame-media {
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.golf-service-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1fr;
+}
+
+.golf-service-card {
+  position: relative;
+  border: 1px solid var(--ag-muted);
+  border-radius: 16px;
+  padding: 1.25rem 1.2rem 1.2rem;
+  background: rgba(255, 255, 255, 0.94);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.golf-service-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: var(--ag-ink);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.golf-service-card h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.golf-service-card p {
+  color: var(--ag-mid);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+
+@media (min-width: 768px) {
+  .creative-chips,
+  .golf-service-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .creative-chips,
+  .golf-service-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .service-panel {
+    gap: 1.35rem;
+    padding: 1.35rem 1.5rem;
+  }
 }
 
 .grid-cards {

@@ -64,7 +64,7 @@ export default function HeroSlideshow({ slides = [], children }) {
         ))}
       </div>
       <div className="hero-overlay" />
-      <div className="hero-content">{children}</div>
+      <div className="hero-content hero-content--home">{children}</div>
     </section>
   )
 }
