@@ -36,8 +36,16 @@ export default function CopyAdmin() {
 
   return (
     <div className="admin-panel">
+      <div className="admin-help">
+        <strong>How to use this page</strong>
+        <p>
+          Each row is a piece of text on the live website. Edit the box, then click
+          <em> Save</em>. Keys like <code>hero.headline</code> control the home page.
+        </p>
+      </div>
+
       <div className="admin-panel-head">
-        <h1>Site copy</h1>
+        <h2>Editable text</h2>
         <button type="button" className="btn btn-soft" onClick={() => refresh()}>
           Refresh
         </button>

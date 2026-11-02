@@ -105,8 +105,16 @@ export default function ProjectsAdmin() {
 
   return (
     <div className="admin-panel">
+      <div className="admin-help">
+        <strong>How to use this page</strong>
+        <p>
+          Add portfolio projects with a title, short summary, and image. These can
+          power the Work page when connected in the CMS.
+        </p>
+      </div>
+
       <div className="admin-panel-head">
-        <h1>Projects</h1>
+        <h2>Projects</h2>
         <button type="button" className="btn btn-soft" onClick={load}>
           Refresh
         </button>

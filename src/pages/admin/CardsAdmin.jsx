@@ -20,6 +20,13 @@ const blank = {
   published: true,
 }
 
+const COLLECTION_LABELS = {
+  home_divisions: 'Home — divisions',
+  home_work: 'Home — work thumbs',
+  portfolio: 'Our Work page',
+  insights: 'Insights page',
+}
+
 export default function CardsAdmin() {
   const { refresh } = useCms()
   const [collection, setCollection] = useState('home_divisions')
@@ -125,8 +132,16 @@ export default function CardsAdmin() {
 
   return (
     <div className="admin-panel">
+      <div className="admin-help">
+        <strong>How to use this page</strong>
+        <p>
+          Choose a section below, then add or edit a card. Upload an image, fill the
+          title, and click Save. Cards appear on the live site after refresh.
+        </p>
+      </div>
+
       <div className="admin-panel-head">
-        <h1>CMS cards</h1>
+        <h2>Cards</h2>
         <select
           value={collection}
           onChange={(e) => setCollection(e.target.value)}
@@ -134,7 +149,7 @@ export default function CardsAdmin() {
         >
           {COLLECTIONS.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {COLLECTION_LABELS[c] || c}
             </option>
           ))}
         </select>

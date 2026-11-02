@@ -5,7 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import SplitHeadline from '../components/SplitHeadline'
-import { heroes } from '../lib/images'
+import { gallery, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -27,27 +27,36 @@ const manifesto = [
   },
 ]
 
+const moments = [
+  { image: gallery.about.leadership, label: 'Leadership review' },
+  { image: gallery.about.briefing, label: 'Client briefing' },
+  { image: gallery.about.venue, label: 'Venue recce' },
+  { image: gallery.about.quality, label: 'Quality control' },
+  { image: gallery.about.huddle, label: 'Team huddle' },
+  { image: gallery.about.planning, label: 'Integrated planning' },
+]
+
 const divisions = [
   {
     index: '01',
     title: 'Event Solutions',
     text: 'Planning, production, and on-site ownership for conferences, launches, and brand experiences.',
     to: '/event-solutions',
-    image: heroes.events,
+    image: gallery.about.venue,
   },
   {
     index: '02',
     title: 'Creative & Marketing',
     text: 'Brand systems, campaigns, photography, and digital storytelling that stay sharp everywhere.',
     to: '/creative-marketing',
-    image: heroes.creative,
+    image: gallery.about.planning,
   },
   {
     index: '03',
     title: 'Golf Solutions',
     text: 'Corporate golf days, hospitality, and course activations planned with polish and pace.',
     to: '/golf-solutions',
-    image: heroes.golf,
+    image: gallery.about.quality,
   },
 ]
 
@@ -85,7 +94,7 @@ export default function About() {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
         gsap.set(
-          '.about-hero-media, .about-hero-copy > *, .manifesto-panel, .division-slide, .value-row, .method-step, .about-line',
+          '.about-hero-media, .about-hero-copy > *, .manifesto-panel, .about-moment, .division-slide, .value-row, .method-step, .about-line',
           { clearProps: 'all', opacity: 1, y: 0, x: 0, scale: 1 },
         )
         return
@@ -149,6 +158,16 @@ export default function About() {
             )
         })
       }
+
+      gsap.from('.about-moment', {
+        opacity: 0,
+        y: 48,
+        scale: 0.94,
+        stagger: 0.08,
+        duration: 0.75,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.about-moments', start: 'top 82%' },
+      })
 
       gsap.from('.about-divisions-head > *', {
         opacity: 0,
@@ -280,6 +299,25 @@ export default function About() {
               <span key={panel.kicker}>
                 <i />
               </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section about-moments">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="eyebrow">How we work</p>
+              <h2>Moments from the room</h2>
+            </div>
+          </div>
+          <div className="about-moments-grid">
+            {moments.map((m) => (
+              <figure className="about-moment" key={m.label}>
+                <img src={m.image} alt="" loading="lazy" />
+                <figcaption>{m.label}</figcaption>
+              </figure>
             ))}
           </div>
         </div>

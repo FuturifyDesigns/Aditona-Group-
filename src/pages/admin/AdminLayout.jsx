@@ -1,21 +1,40 @@
-import { NavLink, Navigate, Outlet } from 'react-router-dom'
+import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useCms } from '../../cms/CmsContext'
 
 const tabs = [
-  { to: '/admin/enquiries', label: 'Enquiries' },
-  { to: '/admin/copy', label: 'Copy' },
-  { to: '/admin/cards', label: 'Cards' },
-  { to: '/admin/projects', label: 'Projects' },
+  {
+    to: '/admin/enquiries',
+    label: 'Enquiries',
+    hint: 'Messages from the website',
+  },
+  {
+    to: '/admin/copy',
+    label: 'Website text',
+    hint: 'Headlines and button labels',
+  },
+  {
+    to: '/admin/cards',
+    label: 'Cards & images',
+    hint: 'Home and portfolio cards',
+  },
+  {
+    to: '/admin/projects',
+    label: 'Projects',
+    hint: 'Work page entries',
+  },
 ]
 
 export default function AdminLayout() {
   const { isAuthenticated, loading } = useCms()
+  const location = useLocation()
 
   if (loading) {
     return (
       <div className="admin-shell">
-        <p className="admin-muted">Loading…</p>
+        <div className="admin-loading">
+          <p>Loading admin…</p>
+        </div>
       </div>
     )
   }
@@ -28,33 +47,51 @@ export default function AdminLayout() {
     await supabase.auth.signOut()
   }
 
+  const active = tabs.find((t) => location.pathname.startsWith(t.to))
+
   return (
     <div className="admin-shell">
-      <header className="admin-header">
+      <aside className="admin-sidebar">
         <div className="admin-brand">
           <strong>Aditona Admin</strong>
-          <NavLink to="/" className="admin-site-link">
-            ← View site
-          </NavLink>
+          <span>Simple tools for the live site</span>
         </div>
-        <nav className="admin-tabs" aria-label="Admin">
+        <nav className="admin-nav" aria-label="Admin">
           {tabs.map((tab) => (
             <NavLink
               key={tab.to}
               to={tab.to}
-              className={({ isActive }) => (isActive ? 'active' : undefined)}
+              className={({ isActive }) =>
+                `admin-nav-link${isActive ? ' active' : ''}`
+              }
             >
-              {tab.label}
+              <span className="admin-nav-label">{tab.label}</span>
+              <span className="admin-nav-hint">{tab.hint}</span>
             </NavLink>
           ))}
         </nav>
-        <button type="button" className="btn btn-soft" onClick={logout}>
-          Log out
-        </button>
-      </header>
-      <main className="admin-main">
-        <Outlet />
-      </main>
+        <div className="admin-sidebar-foot">
+          <NavLink to="/" className="admin-site-link">
+            ← View live website
+          </NavLink>
+          <button type="button" className="btn btn-soft admin-logout" onClick={logout}>
+            Log out
+          </button>
+        </div>
+      </aside>
+
+      <div className="admin-content">
+        <header className="admin-topbar">
+          <div>
+            <p className="eyebrow">Admin portal</p>
+            <h1>{active?.label || 'Dashboard'}</h1>
+            <p className="admin-muted">{active?.hint}</p>
+          </div>
+        </header>
+        <main className="admin-main">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

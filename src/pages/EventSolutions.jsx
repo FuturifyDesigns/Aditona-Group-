@@ -5,11 +5,19 @@ import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
-import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
-import { cards, heroes } from '../lib/images'
+import { gallery, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+const moments = [
+  { image: gallery.events.showCaller, label: 'Show calling' },
+  { image: gallery.events.registration, label: 'Registration' },
+  { image: gallery.events.livestream, label: 'Livestream' },
+  { image: gallery.events.lighting, label: 'Stage build' },
+  { image: gallery.events.gala, label: 'Gala prep' },
+  { image: gallery.events.outdoor, label: 'Outdoor activation' },
+]
 
 const services = [
   {
@@ -44,24 +52,61 @@ export default function EventSolutions() {
   useGSAP(
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) return
+      if (reduced) {
+        gsap.set('.events-rail-track, .events-rail-card, .service-item', {
+          clearProps: 'all',
+          opacity: 1,
+          x: 0,
+        })
+        return
+      }
+
+      const track = pageRef.current?.querySelector('.events-rail-track')
+      if (track) {
+        const getScroll = () => -(track.scrollWidth - window.innerWidth + 48)
+        gsap.fromTo(
+          track,
+          { x: 40 },
+          {
+            x: () => getScroll(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: '.events-rail',
+              start: 'top top',
+              end: () => `+=${track.scrollWidth * 0.85}`,
+              pin: true,
+              scrub: 0.7,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          },
+        )
+        gsap.from('.events-rail-card', {
+          opacity: 0,
+          y: 40,
+          stagger: 0.08,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: '.events-rail', start: 'top 80%' },
+        })
+      }
 
       gsap.from('.service-item', {
         opacity: 0,
-        x: 64,
-        rotateY: -12,
-        transformOrigin: 'left center',
+        x: -48,
         stagger: 0.1,
-        duration: 0.85,
+        duration: 0.8,
         ease: 'power3.out',
         scrollTrigger: { trigger: '.service-list', start: 'top 82%' },
       })
+
+      requestAnimationFrame(() => ScrollTrigger.refresh())
     },
     { scope: pageRef },
   )
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="page-events">
       <PageHero
         image={heroes.events}
         eyebrow={<p className="eyebrow">Division</p>}
@@ -74,16 +119,18 @@ export default function EventSolutions() {
         }
       />
 
-      <section className="section section--tight">
-        <div className="container">
-          <Reveal className="work-thumb" style={{ maxHeight: 360 }} y={50} scale={0.94}>
-            <img
-              src={cards.eventsProductReveal}
-              alt="Event stage with audience"
-              loading="lazy"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </Reveal>
+      <section className="events-rail" aria-label="Production moments">
+        <div className="events-rail-head container">
+          <p className="eyebrow">On the floor</p>
+          <h2>Production in motion</h2>
+        </div>
+        <div className="events-rail-track">
+          {moments.map((m) => (
+            <figure className="events-rail-card" key={m.label}>
+              <img src={m.image} alt="" loading="lazy" />
+              <figcaption>{m.label}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 
@@ -108,25 +155,23 @@ export default function EventSolutions() {
 
       <section className="section section--soft">
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <Reveal y={36} scale={0.97}>
-            <p className="eyebrow">Engage</p>
-            <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
-              How to work with us
-            </h2>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
-              Share your date, audience size, venue preferences, and success measures.
-              We respond with a scoped proposal covering creative direction, production,
-              and on-site staffing.
-            </p>
-            <div className="btn-row">
-              <Link to="/request-quote" className="btn btn-primary">
-                Request a Quote
-              </Link>
-              <Link to="/enquiry" className="btn btn-soft">
-                Make an Enquiry
-              </Link>
-            </div>
-          </Reveal>
+          <p className="eyebrow">Engage</p>
+          <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
+            How to work with us
+          </h2>
+          <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
+            Share your date, audience size, venue preferences, and success measures.
+            We respond with a scoped proposal covering creative direction, production,
+            and on-site staffing.
+          </p>
+          <div className="btn-row">
+            <Link to="/request-quote" className="btn btn-primary">
+              Request a Quote
+            </Link>
+            <Link to="/enquiry" className="btn btn-soft">
+              Make an Enquiry
+            </Link>
+          </div>
         </div>
       </section>
 

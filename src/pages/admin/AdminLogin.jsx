@@ -36,9 +36,20 @@ export default function AdminLogin() {
   return (
     <div className="admin-login">
       <form className="admin-login-card" onSubmit={onSubmit}>
-        <p className="eyebrow">Aditona Group</p>
-        <h1>Admin sign in</h1>
-        <p className="admin-muted">Manage enquiries, copy, and cards.</p>
+        <div className="admin-login-brand">
+          <p className="eyebrow">Aditona Group</p>
+          <h1>Admin sign in</h1>
+          <p className="admin-muted">
+            Manage website enquiries, text, and cards in one place.
+          </p>
+        </div>
+
+        <ol className="admin-login-steps">
+          <li>Enter your admin email and password</li>
+          <li>Review new enquiries first</li>
+          <li>Update website text or cards when needed</li>
+        </ol>
+
         <label className="cms-field">
           <span>Email</span>
           <input

@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
-import { cards, heroes } from '../lib/images'
+import { gallery, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -13,40 +13,40 @@ const FILTERS = ['All', 'Events', 'Creative', 'Golf']
 
 const projects = [
   {
-    title: 'Summit Stage Production',
+    title: 'Leadership Summit',
     category: 'Events',
-    text: 'Two-day leadership conference with keynote staging and livestream integration.',
-    image: cards.eventsSummitStage,
+    text: 'Stage, livestream, and hospitality for a two-day executive conference.',
+    image: gallery.work.summit,
   },
   {
-    title: 'Product Reveal Night',
+    title: 'Product Reveal',
     category: 'Events',
-    text: 'Launch experience with controlled reveal sequence and press hospitality.',
-    image: cards.eventsProductReveal,
+    text: 'Controlled unveil sequence with press environment and guest journey.',
+    image: gallery.work.reveal,
   },
   {
-    title: 'Brand System Refresh',
+    title: 'Integrated Campaign',
     category: 'Creative',
-    text: 'Identity update, guidelines, and campaign toolkit for a national retailer.',
-    image: cards.creativeBrandSystem,
+    text: 'Brand system, content, and experiential install working as one story.',
+    image: gallery.work.campaign,
   },
   {
-    title: 'Always-On Content Engine',
+    title: 'Business Interview Series',
     category: 'Creative',
-    text: 'Monthly content production and social cadence for a services brand.',
-    image: cards.creativeContentEngine,
+    text: 'On-camera leadership content produced for always-on channels.',
+    image: gallery.work.interview,
   },
   {
-    title: 'Executive Golf Day',
+    title: 'Golf Hospitality Day',
     category: 'Golf',
-    text: '36-player corporate day with branded holes and clubhouse hosting.',
-    image: cards.golfExecutiveDay,
+    text: 'Corporate foursomes, course ops, and clubhouse hosting end to end.',
+    image: gallery.work.hospitality,
   },
   {
-    title: 'Charity Scramble',
+    title: 'Charity Auction Evening',
     category: 'Golf',
-    text: 'Fundraising scramble with auction support and player gift programme.',
-    image: cards.golfCharityScramble,
+    text: 'Sunset auction and fundraising programme on the terrace.',
+    image: gallery.work.auction,
   },
 ]
 
@@ -63,32 +63,59 @@ export default function OurWork() {
   useGSAP(
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) return
-      gsap.from('.project-card', {
-        opacity: 0,
-        y: 50,
-        scale: 0.92,
-        rotateX: 6,
-        transformOrigin: '50% 100%',
-        stagger: 0.1,
-        duration: 0.85,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.grid-cards', start: 'top 85%' },
+      if (reduced) {
+        gsap.set('.project-card', { clearProps: 'all', opacity: 1, y: 0 })
+        return
+      }
+
+      gsap.fromTo(
+        '.project-card',
+        {
+          opacity: 0,
+          y: 64,
+          clipPath: 'inset(0 0 100% 0)',
+        },
+        {
+          opacity: 1,
+          y: 0,
+          clipPath: 'inset(0 0 0% 0)',
+          stagger: 0.12,
+          duration: 0.95,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: '.work-grid', start: 'top 85%' },
+        },
+      )
+
+      gsap.utils.toArray('.project-card img').forEach((img) => {
+        gsap.fromTo(
+          img,
+          { scale: 1.12 },
+          {
+            scale: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: img.closest('.project-card'),
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          },
+        )
       })
     },
     { scope: pageRef, dependencies: [filter], revertOnUpdate: true },
   )
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="page-work">
       <PageHero
         image={heroes.work}
         eyebrow={<p className="eyebrow">Portfolio</p>}
         title={<SplitHeadline text="Our Work" as="h1" />}
         body={
           <p>
-            A selection of engagements across events, creative, and golf — placeholder
-            case studies while live work is prepared.
+            Selected engagements across events, creative, and golf — each delivered
+            with one accountable team.
           </p>
         }
       />
@@ -108,7 +135,7 @@ export default function OurWork() {
             ))}
           </div>
 
-          <div className="grid-cards">
+          <div className="grid-cards work-grid">
             {visible.map((project) => (
               <article className="project-card" key={project.title}>
                 <img src={project.image} alt="" loading="lazy" />

@@ -1,13 +1,99 @@
-import Reveal from '../components/Reveal'
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
-import { config } from '../lib/config'
-import { heroes } from '../lib/images'
+import { config, waLink } from '../lib/config'
+import { gallery, heroes } from '../lib/images'
+
+gsap.registerPlugin(useGSAP, ScrollTrigger)
+
+const channels = [
+  {
+    label: 'General',
+    value: config.emails.info,
+    href: `mailto:${config.emails.info}`,
+    hint: 'Company questions and introductions',
+  },
+  {
+    label: 'Enquiries',
+    value: config.emails.enquiries,
+    href: `mailto:${config.emails.enquiries}`,
+    hint: 'New briefs and capability questions',
+  },
+  {
+    label: 'Operations',
+    value: config.emails.operations,
+    href: `mailto:${config.emails.operations}`,
+    hint: 'Live jobs, vendors, and day-of coordination',
+  },
+  {
+    label: 'Accounts',
+    value: config.emails.accounts,
+    href: `mailto:${config.emails.accounts}`,
+    hint: 'Invoices and payment follow-ups',
+  },
+]
 
 export default function Contact() {
+  const pageRef = useRef(null)
+
+  useGSAP(
+    () => {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reduced) {
+        gsap.set('.contact-channel, .contact-visual, .contact-form-panel', {
+          clearProps: 'all',
+          opacity: 1,
+          y: 0,
+          x: 0,
+        })
+        return
+      }
+
+      gsap.from('.contact-channel', {
+        opacity: 0,
+        y: 28,
+        stagger: 0.1,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.contact-channels', start: 'top 85%' },
+      })
+
+      gsap.from('.contact-visual', {
+        opacity: 0,
+        clipPath: 'inset(8% 8% 8% 8% round 18px)',
+        duration: 1.05,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.contact-split', start: 'top 80%' },
+      })
+
+      gsap.from('.contact-form-panel', {
+        opacity: 0,
+        x: 36,
+        duration: 0.85,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.contact-split', start: 'top 78%' },
+      })
+
+      gsap.to('.contact-visual img', {
+        yPercent: 8,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.contact-split',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      })
+    },
+    { scope: pageRef },
+  )
+
   return (
-    <>
+    <div ref={pageRef} className="page-contact">
       <PageHero
         image={heroes.contact}
         eyebrow={<p className="eyebrow">Contact</p>}
@@ -20,48 +106,45 @@ export default function Contact() {
         }
       />
 
-      <section className="section">
-        <div
-          className="container"
-          style={{
-            display: 'grid',
-            gap: '1.75rem',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            alignItems: 'start',
-          }}
-        >
-          <Reveal>
-            <h2 style={{ fontSize: '1.35rem', marginBottom: '1rem' }}>Details</h2>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.8 }}>
-              General:{' '}
-              <a href={`mailto:${config.emails.info}`}>{config.emails.info}</a>
-            </p>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.8 }}>
-              Enquiries:{' '}
-              <a href={`mailto:${config.emails.enquiries}`}>
-                {config.emails.enquiries}
-              </a>
-            </p>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.8 }}>
-              Operations:{' '}
-              <a href={`mailto:${config.emails.operations}`}>
-                {config.emails.operations}
-              </a>
-            </p>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.8 }}>
-              Accounts:{' '}
-              <a href={`mailto:${config.emails.accounts}`}>
-                {config.emails.accounts}
-              </a>
-            </p>
-            <p style={{ color: 'var(--ag-mid)', lineHeight: 1.8, marginTop: '1rem' }}>
-              Prefer WhatsApp? Use the green button — we respond during business hours.
-            </p>
-          </Reveal>
-
-          <EnquiryForm type="contact" />
+      <section className="section section--tight">
+        <div className="container contact-channels">
+          {channels.map((c) => (
+            <a className="contact-channel" key={c.label} href={c.href}>
+              <span className="eyebrow">{c.label}</span>
+              <strong>{c.value}</strong>
+              <span>{c.hint}</span>
+            </a>
+          ))}
         </div>
       </section>
-    </>
+
+      <section className="section contact-split-section">
+        <div className="container contact-split">
+          <div className="contact-visual">
+            <img src={gallery.about.briefing} alt="" loading="lazy" />
+            <div className="contact-visual-card">
+              <p className="eyebrow">Prefer WhatsApp?</p>
+              <p>Message the team during business hours for a faster first reply.</p>
+              <a
+                className="btn btn-primary"
+                href={waLink('Hello Aditona Group — I would like to get in touch.')}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open WhatsApp
+              </a>
+            </div>
+          </div>
+          <div className="contact-form-panel">
+            <p className="eyebrow">Send a message</p>
+            <h2>Tell us what you need</h2>
+            <p className="contact-form-lead">
+              Share a short brief and we will route it to Events, Creative, or Golf.
+            </p>
+            <EnquiryForm type="contact" />
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }

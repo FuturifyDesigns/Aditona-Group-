@@ -69,10 +69,31 @@ export default function EnquiriesAdmin() {
 
   if (loading) return <p className="admin-muted">Loading enquiries…</p>
 
+  const newCount = rows.filter((r) => (r.status || 'new') === 'new').length
+
   return (
     <div className="admin-panel">
+      <div className="admin-help">
+        <strong>How to use this page</strong>
+        <p>
+          Click <em>Open</em> on a row to update status, follow-up date, and notes.
+          Start with anything marked <em>new</em>.
+        </p>
+      </div>
+
+      <div className="admin-stats">
+        <div className="admin-stat">
+          <span>{rows.length}</span>
+          <p>Total enquiries</p>
+        </div>
+        <div className="admin-stat">
+          <span>{newCount}</span>
+          <p>Needs attention</p>
+        </div>
+      </div>
+
       <div className="admin-panel-head">
-        <h1>Enquiries</h1>
+        <h2>All messages</h2>
         <button type="button" className="btn btn-soft" onClick={load}>
           Refresh
         </button>
