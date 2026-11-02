@@ -12,7 +12,7 @@ export default function Enquiry() {
         eyebrow={<p className="eyebrow">Enquiry</p>}
         title={<SplitHeadline text="Make an Enquiry" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Not ready for a full brief? Send a short enquiry and we will follow up with
             next steps.
           </p>

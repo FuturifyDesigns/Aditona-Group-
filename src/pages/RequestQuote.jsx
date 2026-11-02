@@ -12,7 +12,7 @@ export default function RequestQuote() {
         eyebrow={<p className="eyebrow">Quote</p>}
         title={<SplitHeadline text="Request a Quote" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Share as much as you can about scope, timing, and budget. We will return a
             clear proposal from the right division.
           </p>

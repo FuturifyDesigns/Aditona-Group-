@@ -58,7 +58,7 @@ export default function SplitHeadline({
           className="split-line"
           key={`${word}-${i}`}
           aria-hidden="true"
-          style={{ display: 'inline-block', verticalAlign: 'top' }}
+          style={{ display: 'inline-block', verticalAlign: 'bottom' }}
         >
           <span>
             {word}

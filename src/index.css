@@ -495,14 +495,15 @@ ul {
 
 .hero h1 {
   font-size: clamp(2.1rem, 5vw, 3.6rem);
-  line-height: 1.05;
+  line-height: 1.18;
   letter-spacing: -0.04em;
   margin-bottom: 1rem;
+  overflow: visible;
 }
 
 .hero p,
-.hero-lead {
-  color: rgba(255, 255, 255, 0.92);
+.hero .hero-lead {
+  color: rgba(255, 255, 255, 0.97);
   max-width: 36rem;
   line-height: 1.65;
   margin-bottom: 1.35rem;
@@ -595,7 +596,8 @@ ul {
   position: relative;
   z-index: 2;
   max-width: 44rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  overflow: visible;
 }
 
 .page-hero--dark .eyebrow {
@@ -606,17 +608,12 @@ ul {
   color: #fff;
 }
 
-.page-hero--dark p,
-.page-hero--dark .hero-lead {
-  color: rgba(255, 255, 255, 0.94);
-  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
-}
-
 .page-hero h1 {
   font-size: clamp(2rem, 4vw, 3rem);
   letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 0.75rem;
+  line-height: 1.2;
+  margin-bottom: 0.85rem;
+  overflow: visible;
 }
 
 .page-hero p,
@@ -625,6 +622,14 @@ ul {
   color: var(--ag-mid);
   line-height: 1.65;
   font-size: clamp(1.02rem, 1.45vw, 1.14rem);
+}
+
+.page-hero--dark p,
+.page-hero--dark .hero-lead,
+.page-hero--media .page-hero-content > p,
+.page-hero--media .page-hero-content .hero-lead {
+  color: rgba(255, 255, 255, 0.97);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
 }
 
 .trust-bar {
@@ -1402,13 +1407,18 @@ ul {
 }
 
 .split-line {
-  display: block;
+  display: inline-block;
   overflow: hidden;
+  padding-bottom: 0.28em;
+  margin-bottom: -0.12em;
+  line-height: 1.2;
+  vertical-align: bottom;
 }
 
 .split-line > span {
   display: block;
   transform: translateY(110%);
+  padding-bottom: 0.08em;
 }
 
 .reveal {
@@ -1576,18 +1586,20 @@ ul {
 
 .about-hero-title {
   font-size: clamp(2.4rem, 6vw, 4.6rem);
-  line-height: 1.02;
+  line-height: 1.18;
   letter-spacing: -0.045em;
   font-weight: 700;
   max-width: 12ch;
+  overflow: visible;
 }
 
 .about-hero-body {
   margin-top: 1.25rem;
   max-width: 34rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.97);
   font-size: clamp(1rem, 1.5vw, 1.15rem);
   line-height: 1.6;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
 }
 
 .about-scroll-cue {
@@ -2854,4 +2866,128 @@ body.cms-edit-mode {
 
 body.cms-edit-mode .site-header {
   top: 44px;
+}
+
+/* ——— Interactive cards (sitewide hover) ——— */
+.project-card,
+.insight-card,
+.insight-row,
+.service-item,
+.service-panel,
+.creative-chip,
+.creative-frame,
+.golf-service-card,
+.work-case,
+.work-thumb,
+.work-runway-card,
+.contact-channel,
+.trust-item,
+.value-card,
+.about-moment,
+.events-rail-card,
+.division-card,
+.stat-item,
+.manifesto-panel {
+  transition:
+    transform 0.4s var(--ease),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+}
+
+.project-card img,
+.insight-card img,
+.insight-row-media img,
+.creative-frame-media img,
+.about-moment img,
+.events-rail-card img,
+.work-case-media img,
+.work-thumb img,
+.work-runway-card img,
+.golf-service-card img {
+  transition: transform 0.6s var(--ease);
+}
+
+.project-card:hover,
+.insight-card:hover,
+.service-item:hover,
+.service-panel:hover,
+.creative-chip:hover,
+.golf-service-card:hover,
+.work-case:hover,
+.work-runway-card:hover,
+.contact-channel:hover,
+.trust-item:hover,
+.value-card:hover,
+.about-moment:hover,
+.events-rail-card:hover,
+.stat-item:hover,
+.manifesto-panel:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+}
+
+.insight-row:hover {
+  transform: translateY(-4px);
+}
+
+.insight-row:hover .insight-row-media img,
+.project-card:hover img,
+.insight-card:hover img,
+.creative-frame:hover .creative-frame-media img,
+.about-moment:hover img,
+.events-rail-card:hover img,
+.work-case:hover .work-case-media img,
+.work-thumb:hover img,
+.work-runway-card:hover img,
+.golf-service-card:hover img {
+  transform: scale(1.05);
+}
+
+.creative-frame:hover {
+  transform: translateY(-6px);
+}
+
+.division-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card:hover,
+  .insight-card:hover,
+  .insight-row:hover,
+  .service-item:hover,
+  .service-panel:hover,
+  .creative-chip:hover,
+  .creative-frame:hover,
+  .golf-service-card:hover,
+  .work-case:hover,
+  .work-thumb:hover,
+  .work-runway-card:hover,
+  .contact-channel:hover,
+  .trust-item:hover,
+  .value-card:hover,
+  .about-moment:hover,
+  .events-rail-card:hover,
+  .division-card:hover,
+  .stat-item:hover,
+  .manifesto-panel:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .project-card:hover img,
+  .insight-card:hover img,
+  .insight-row:hover .insight-row-media img,
+  .creative-frame:hover .creative-frame-media img,
+  .about-moment:hover img,
+  .events-rail-card:hover img,
+  .work-case:hover .work-case-media img,
+  .work-thumb:hover img,
+  .work-runway-card:hover img,
+  .golf-service-card:hover img,
+  .division-card:hover img,
+  .division-card:hover .card-bg {
+    transform: none;
+  }
 }

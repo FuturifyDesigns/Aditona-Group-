@@ -102,7 +102,7 @@ export default function Insights() {
         eyebrow={<p className="eyebrow">Thinking</p>}
         title={<SplitHeadline text="Insights" as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Notes from the field — delivery lessons across events, creative, and golf
             hospitality.
           </p>

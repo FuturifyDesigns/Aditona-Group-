@@ -100,7 +100,7 @@ export default function Contact() {
         eyebrow={<p className="eyebrow">Contact</p>}
         title={<SplitHeadline text="Let’s talk." as="h1" />}
         body={
-          <p>
+          <p className="hero-lead">
             Reach the right inbox — or send a message and we will route it to the
             right division.
           </p>
