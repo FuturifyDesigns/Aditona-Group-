@@ -103,8 +103,7 @@ export default function Home() {
       }
 
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.from('.hero-content .eyebrow', { opacity: 0, y: 18, duration: 0.55 })
-        .from('.hero-content h1', { opacity: 0, y: 36, duration: 0.85 }, '-=0.3')
+      tl.from('.hero-content h1', { opacity: 0, y: 36, duration: 0.85 })
         .from('.hero-content > p', { opacity: 0, y: 20, duration: 0.55 }, '-=0.45')
         .from('.hero-content .btn-row', { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
 
@@ -201,12 +200,6 @@ export default function Home() {
   return (
     <div ref={pageRef}>
       <HeroSlideshow slides={slides}>
-        <EditableText
-          contentKey="hero.eyebrow"
-          as="p"
-          className="eyebrow"
-          style={{ color: 'rgba(255,255,255,0.78)' }}
-        />
         <EditableText contentKey="hero.headline" as="h1" />
         <EditableText
           contentKey="hero.body"

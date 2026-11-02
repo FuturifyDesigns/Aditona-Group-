@@ -4,6 +4,7 @@ import EditableButton from '../cms/EditableButton'
 import { config } from '../lib/config'
 
 const links = [
+  { to: '/', label: 'Home', end: true },
   { to: '/about', label: 'About' },
   { to: '/event-solutions', label: 'Events' },
   { to: '/creative-marketing', label: 'Creative' },
@@ -44,6 +45,7 @@ export default function Header() {
             <NavLink
               key={link.to}
               to={link.to}
+              end={link.end}
               className={({ isActive }) => (isActive ? 'active' : undefined)}
             >
               {link.label}
@@ -77,6 +79,7 @@ export default function Header() {
           <NavLink
             key={link.to}
             to={link.to}
+            end={link.end}
             className={({ isActive }) => (isActive ? 'active' : undefined)}
             onClick={closeMenu}
           >

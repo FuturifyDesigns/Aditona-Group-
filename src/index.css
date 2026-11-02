@@ -494,11 +494,13 @@ ul {
 }
 
 .hero h1 {
+  color: #fff;
   font-size: clamp(2.1rem, 5vw, 3.6rem);
   line-height: 1.18;
   letter-spacing: -0.04em;
   margin-bottom: 1rem;
   overflow: visible;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
 .hero p,

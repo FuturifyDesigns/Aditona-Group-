@@ -3,7 +3,6 @@ import { config } from '../lib/config'
 /** Fallback copy when a site_content key is missing. */
 export const DEFAULTS = {
   'nav.cta': 'Request a Quote',
-  'hero.eyebrow': 'MULTI-DISCIPLINARY SOLUTIONS COMPANY',
   'hero.headline': config.headline,
   'hero.body':
     'Aditona Group unites Event Solutions, Creative & Marketing, and Golf Solutions — one accountable partner from brief to delivery.',
