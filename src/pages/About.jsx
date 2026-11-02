@@ -375,7 +375,9 @@ export default function About() {
           <div className="about-moments-grid">
             {moments.map((m) => (
               <figure className="about-moment" key={m.label}>
-                <img src={m.image} alt="" loading="lazy" />
+                <div className="about-moment-media">
+                  <img src={m.image} alt="" loading="lazy" />
+                </div>
                 <figcaption>{m.label}</figcaption>
               </figure>
             ))}
