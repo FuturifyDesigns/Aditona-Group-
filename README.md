@@ -22,11 +22,15 @@ Open the URL Vite prints (base path is `/Aditona-Group-/`).
 
 ## Deploy
 
+GitHub Actions builds and deploys `dist/` on every push to `main` (`.github/workflows/deploy.yml`).
+
+In the repo: **Settings → Pages → Source → GitHub Actions**.
+
+Manual local publish (optional):
+
 ```bash
 npm run deploy
 ```
-
-Builds to `dist/`, copies `404.html` for SPA routes, pushes to `gh-pages`.
 
 ## Config
 
