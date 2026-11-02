@@ -1,21 +1,24 @@
 import Reveal from '../components/Reveal'
 import EnquiryForm from '../components/EnquiryForm'
+import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
 import { config } from '../lib/config'
+import { heroes } from '../lib/images'
 
 export default function Contact() {
   return (
     <>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Contact</p>
-          <SplitHeadline text="Let’s talk." as="h1" />
+      <PageHero
+        image={heroes.contact}
+        eyebrow={<p className="eyebrow">Contact</p>}
+        title={<SplitHeadline text="Let’s talk." as="h1" />}
+        body={
           <p>
             Reach the right inbox — or send a message and we will route it to the
             right division.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section">
         <div

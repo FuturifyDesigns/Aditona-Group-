@@ -4,8 +4,10 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -81,23 +83,24 @@ export default function GolfSolutions() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Division</p>
-          <SplitHeadline text="Golf Solutions" as="h1" />
+      <PageHero
+        image={heroes.golf}
+        eyebrow={<p className="eyebrow">Division</p>}
+        title={<SplitHeadline text="Golf Solutions" as="h1" />}
+        body={
           <p>
             Corporate golf days and hospitality planned with the same precision we
             bring to stages and campaigns — calm, polished, memorable.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section section--tight golf-hero-strip">
         <div className="container">
           <div className="work-thumb" style={{ maxHeight: 380, overflow: 'hidden' }}>
             <img
               ref={heroImgRef}
-              src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1600&q=80"
+              src={cards.golfExecutiveDay}
               alt="Golf course landscape"
               loading="lazy"
               style={{ width: '100%', height: '120%', objectFit: 'cover' }}

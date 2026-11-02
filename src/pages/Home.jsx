@@ -11,25 +11,14 @@ import SplitHeadline from '../components/SplitHeadline'
 import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const slides = [
-  {
-    image:
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80',
-    alt: 'Corporate event stage lighting',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80',
-    alt: 'Creative studio workspace',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1600&q=80',
-    alt: 'Golf course fairway',
-  },
+  { image: heroes.home, alt: 'Luxury event venue at sunset' },
+  { image: heroes.events, alt: 'Event production stage setup' },
+  { image: heroes.golf, alt: 'Golf hospitality at golden hour' },
 ]
 
 const FALLBACK_DIVISIONS = [
@@ -37,29 +26,26 @@ const FALLBACK_DIVISIONS = [
     to: '/event-solutions',
     title: 'Event Solutions',
     text: 'End-to-end planning, production, and on-site delivery for conferences, launches, and brand experiences.',
-    image:
-      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80',
+    image: heroes.events,
   },
   {
     to: '/creative-marketing',
     title: 'Creative & Marketing',
     text: 'Brand systems, campaigns, content, and digital storytelling that stay sharp across every channel.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
+    image: heroes.creative,
   },
   {
     to: '/golf-solutions',
     title: 'Golf Solutions',
     text: 'Corporate golf days, hospitality, and course activations planned with precision and polish.',
-    image:
-      'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1600&q=80',
+    image: heroes.golf,
   },
 ]
 
 const FALLBACK_WORK = [
-  'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&q=80',
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80',
-  'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=1600&q=80',
+  cards.eventsSummitStage,
+  cards.creativeBrandSystem,
+  cards.golfExecutiveDay,
 ]
 
 const storyPanels = [

@@ -3,7 +3,9 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -14,43 +16,37 @@ const projects = [
     title: 'Summit Stage Production',
     category: 'Events',
     text: 'Two-day leadership conference with keynote staging and livestream integration.',
-    image:
-      'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&q=80',
+    image: cards.eventsSummitStage,
   },
   {
     title: 'Product Reveal Night',
     category: 'Events',
     text: 'Launch experience with controlled reveal sequence and press hospitality.',
-    image:
-      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80',
+    image: cards.eventsProductReveal,
   },
   {
     title: 'Brand System Refresh',
     category: 'Creative',
     text: 'Identity update, guidelines, and campaign toolkit for a national retailer.',
-    image:
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80',
+    image: cards.creativeBrandSystem,
   },
   {
     title: 'Always-On Content Engine',
     category: 'Creative',
     text: 'Monthly content production and social cadence for a services brand.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
+    image: cards.creativeContentEngine,
   },
   {
     title: 'Executive Golf Day',
     category: 'Golf',
     text: '36-player corporate day with branded holes and clubhouse hosting.',
-    image:
-      'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1600&q=80',
+    image: cards.golfExecutiveDay,
   },
   {
     title: 'Charity Scramble',
     category: 'Golf',
     text: 'Fundraising scramble with auction support and player gift programme.',
-    image:
-      'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=1600&q=80',
+    image: cards.golfCharityScramble,
   },
 ]
 
@@ -85,16 +81,17 @@ export default function OurWork() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Portfolio</p>
-          <SplitHeadline text="Our Work" as="h1" />
+      <PageHero
+        image={heroes.work}
+        eyebrow={<p className="eyebrow">Portfolio</p>}
+        title={<SplitHeadline text="Our Work" as="h1" />}
+        body={
           <p>
             A selection of engagements across events, creative, and golf — placeholder
             case studies while live work is prepared.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section">
         <div className="container">

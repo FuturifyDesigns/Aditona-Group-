@@ -4,8 +4,10 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -60,22 +62,23 @@ export default function EventSolutions() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Division</p>
-          <SplitHeadline text="Event Solutions" as="h1" />
+      <PageHero
+        image={heroes.events}
+        eyebrow={<p className="eyebrow">Division</p>}
+        title={<SplitHeadline text="Event Solutions" as="h1" />}
+        body={
           <p>
             From intimate briefings to multi-day conferences — we plan, produce, and
             deliver events with precision and presence.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section section--tight">
         <div className="container">
           <Reveal className="work-thumb" style={{ maxHeight: 360 }} y={50} scale={0.94}>
             <img
-              src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80"
+              src={cards.eventsProductReveal}
               alt="Event stage with audience"
               loading="lazy"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}

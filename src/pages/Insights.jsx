@@ -3,7 +3,9 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -12,32 +14,28 @@ const articles = [
     title: 'Run-of-show discipline: why events feel calm',
     excerpt:
       'The difference between a good event and a great one is rarely the décor — it is the invisible timing system behind every cue.',
-    image:
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600&q=80',
+    image: cards.eventsSummitStage,
     tag: 'Events',
   },
   {
     title: 'Brand systems that survive the real world',
     excerpt:
       'Guidelines that only look good in a PDF fail on site. We design systems for stages, screens, and social — together.',
-    image:
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80',
+    image: cards.creativeBrandSystem,
     tag: 'Creative',
   },
   {
     title: 'Planning a corporate golf day that guests remember',
     excerpt:
       'From shotgun logistics to prize-giving pacing — the details that keep players engaged without feeling over-produced.',
-    image:
-      'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1600&q=80',
+    image: cards.golfExecutiveDay,
     tag: 'Golf',
   },
   {
     title: 'One brief, three divisions',
     excerpt:
       'How multidisciplinary briefs save time when your launch needs a campaign, an event, and a hospitality day.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
+    image: heroes.home,
     tag: 'Group',
   },
 ]
@@ -64,16 +62,17 @@ export default function Insights() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Thinking</p>
-          <SplitHeadline text="Insights" as="h1" />
+      <PageHero
+        image={heroes.insights}
+        eyebrow={<p className="eyebrow">Thinking</p>}
+        title={<SplitHeadline text="Insights" as="h1" />}
+        body={
           <p>
             Notes from the field — delivery lessons across events, creative, and golf
             hospitality.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section">
         <div className="container grid-cards">

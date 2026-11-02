@@ -4,7 +4,9 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import SplitHeadline from '../components/SplitHeadline'
+import { heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -80,7 +82,7 @@ export default function About() {
         return
       }
 
-      gsap.from('.about-hero-copy > *', {
+      gsap.from('.page-hero-content > *', {
         opacity: 0,
         y: 28,
         stagger: 0.1,
@@ -171,16 +173,17 @@ export default function About() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container about-hero-copy">
-          <p className="eyebrow">About</p>
-          <SplitHeadline text="Built as one group. Delivered as specialists." as="h1" />
+      <PageHero
+        image={heroes.about}
+        eyebrow={<p className="eyebrow">About</p>}
+        title={<SplitHeadline text="Built as one group. Delivered as specialists." as="h1" />}
+        body={
           <p>
             Scroll the story of Aditona Group — from one root organisation into three
             specialist divisions, shared values, and a clear way of working.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section section--soft about-tree-stage">
         <div className="container">

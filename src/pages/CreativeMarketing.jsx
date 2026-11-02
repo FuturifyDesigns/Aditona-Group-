@@ -4,8 +4,10 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
+import PageHero from '../components/PageHero'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -60,22 +62,23 @@ export default function CreativeMarketing() {
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero">
-        <div className="container">
-          <p className="eyebrow">Division</p>
-          <SplitHeadline text="Creative & Marketing" as="h1" />
+      <PageHero
+        image={heroes.creative}
+        eyebrow={<p className="eyebrow">Division</p>}
+        title={<SplitHeadline text="Creative & Marketing" as="h1" />}
+        body={
           <p>
             Brand systems, campaigns, and content that feel considered — sharp across
             every channel, never loud for the sake of it.
           </p>
-        </div>
-      </section>
+        }
+      />
 
       <section className="section section--tight">
         <div className="container">
           <Reveal className="work-thumb" style={{ maxHeight: 360 }}>
             <img
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80"
+              src={cards.creativeBrandSystem}
               alt="Creative workspace"
               loading="lazy"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}

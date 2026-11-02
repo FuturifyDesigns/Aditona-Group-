@@ -443,9 +443,57 @@ ul {
 }
 
 .page-hero {
+  position: relative;
   padding: 4.5rem 0 2.5rem;
   background: linear-gradient(180deg, var(--ag-bg), var(--ag-white));
   border-bottom: 1px solid var(--ag-muted);
+  overflow: hidden;
+}
+
+.page-hero--media {
+  min-height: min(58vh, 520px);
+  display: grid;
+  align-items: end;
+  padding: 5.5rem 0 2.75rem;
+  border-bottom: 0;
+  background: var(--ag-black);
+}
+
+.page-hero-media {
+  position: absolute;
+  inset: 0;
+  background-image: var(--page-hero-image);
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.04);
+}
+
+.page-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(0, 0, 0, 0.78) 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+}
+
+.page-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.page-hero--dark .eyebrow {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.page-hero--dark h1 {
+  color: #fff;
+}
+
+.page-hero--dark p {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .page-hero h1 {
