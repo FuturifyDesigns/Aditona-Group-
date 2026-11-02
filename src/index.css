@@ -239,9 +239,16 @@ ul {
   font-size: 0.82rem;
 }
 
-.brand img {
-  width: 36px;
-  height: 36px;
+.brand-logo {
+  width: auto;
+  height: 52px;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .brand-logo {
+    height: 42px;
+  }
 }
 
 .nav {

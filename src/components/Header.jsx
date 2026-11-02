@@ -16,7 +16,7 @@ export default function Header() {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`
+  const logoSrc = `${import.meta.env.BASE_URL}logo.png`
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -35,8 +35,7 @@ export default function Header() {
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}`}>
       <div className="header-inner">
         <Link to="/" className="brand" onClick={closeMenu} aria-label={config.brand}>
-          <img src={logoSrc} alt="" width="36" height="36" />
-          <span>ADITONA</span>
+          <img src={logoSrc} alt="Aditona Group" className="brand-logo" />
         </Link>
 
         <nav className="nav" aria-label="Primary">
