@@ -84,6 +84,8 @@ export default function OurWork() {
       })
 
       const track = pageRef.current?.querySelector('.work-runway-track')
+      const teaserBar = pageRef.current?.querySelector('.work-runway .pin-teaser-bar > b')
+      const teaser = pageRef.current?.querySelector('.work-runway .pin-teaser')
       if (track) {
         gsap.from('.work-runway-card', {
           opacity: 0,
@@ -109,6 +111,15 @@ export default function OurWork() {
               scrub: 0.7,
               anticipatePin: 1,
               invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
+                if (teaser) {
+                  gsap.set(teaser, {
+                    opacity: 0.45 + self.progress * 0.55,
+                    y: (1 - self.progress) * 12,
+                  })
+                }
+              },
             },
           },
         )
@@ -232,6 +243,14 @@ export default function OurWork() {
             </figure>
           ))}
         </div>
+        <aside className="pin-teaser" aria-hidden="true">
+          <p className="eyebrow">Up next</p>
+          <strong>Filter the portfolio</strong>
+          <span>Keep scrolling to browse the archive</span>
+          <i className="pin-teaser-bar">
+            <b />
+          </i>
+        </aside>
       </section>
 
       <section className="section has-art">

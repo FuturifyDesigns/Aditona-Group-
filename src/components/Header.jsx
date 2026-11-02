@@ -63,14 +63,16 @@ export default function Header() {
 
         <button
           type="button"
-          className="menu-toggle"
+          className={`menu-toggle${open ? ' is-open' : ''}`}
           aria-expanded={open}
           aria-label={open ? 'Close menu' : 'Open menu'}
           onClick={() => setOpen((v) => !v)}
         >
-          <span />
-          <span />
-          <span />
+          <span className="menu-toggle-box" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
       </div>
 

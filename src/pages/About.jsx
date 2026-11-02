@@ -265,6 +265,43 @@ export default function About() {
         scrollTrigger: { trigger: '.about-method', start: 'top 75%' },
       })
 
+      gsap.utils.toArray('.value-row').forEach((row) => {
+        const accent = row.querySelector('.value-accent')
+        const arrow = row.querySelector('.value-arrow')
+        row.addEventListener('pointerenter', () => {
+          gsap.to(row, { y: -4, duration: 0.35, ease: 'power2.out' })
+          if (accent) gsap.to(accent, { scaleX: 1, duration: 0.4, ease: 'power2.out' })
+          if (arrow) gsap.to(arrow, { x: 6, opacity: 1, duration: 0.3 })
+        })
+        row.addEventListener('pointerleave', () => {
+          gsap.to(row, { y: 0, duration: 0.4, ease: 'power2.out' })
+          if (accent) gsap.to(accent, { scaleX: 0, duration: 0.3 })
+          if (arrow) gsap.to(arrow, { x: 0, opacity: 0.35, duration: 0.3 })
+        })
+      })
+
+      gsap.utils.toArray('.method-step').forEach((step) => {
+        const mark = step.querySelector('.method-step-mark')
+        step.addEventListener('pointerenter', () => {
+          gsap.to(step, {
+            y: -6,
+            boxShadow: '0 18px 40px rgba(0,0,0,0.08)',
+            duration: 0.35,
+            ease: 'power2.out',
+          })
+          if (mark) gsap.to(mark, { backgroundColor: '#1a1a1b', color: '#fff', duration: 0.3 })
+        })
+        step.addEventListener('pointerleave', () => {
+          gsap.to(step, {
+            y: 0,
+            boxShadow: '0 0 0 rgba(0,0,0,0)',
+            duration: 0.4,
+            ease: 'power2.out',
+          })
+          if (mark) gsap.to(mark, { backgroundColor: '#f4f4f4', color: '#1a1a1b', duration: 0.3 })
+        })
+      })
+
       requestAnimationFrame(() => ScrollTrigger.refresh())
     },
     { scope: pageRef },
@@ -390,11 +427,17 @@ export default function About() {
           <div className="about-line" aria-hidden="true" />
           <div className="value-rows">
             {values.map((v, i) => (
-              <div className="value-row" key={v.title}>
+              <article className="value-row" key={v.title}>
+                <i className="value-accent" aria-hidden="true" />
                 <span className="value-num">0{i + 1}</span>
-                <h3>{v.title}</h3>
-                <p>{v.text}</p>
-              </div>
+                <div className="value-row-main">
+                  <h3>{v.title}</h3>
+                  <p>{v.text}</p>
+                </div>
+                <span className="value-arrow" aria-hidden="true">
+                  →
+                </span>
+              </article>
             ))}
           </div>
         </div>
@@ -412,11 +455,11 @@ export default function About() {
           <div className="method-track" aria-hidden="true" />
           <div className="method-grid">
             {steps.map((step, i) => (
-              <div className="method-step" key={step.title}>
-                <span>0{i + 1}</span>
+              <article className="method-step" key={step.title}>
+                <span className="method-step-mark">0{i + 1}</span>
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
-              </div>
+              </article>
             ))}
           </div>
           <div className="btn-row" style={{ marginTop: '2rem' }}>

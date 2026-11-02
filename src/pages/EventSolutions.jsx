@@ -63,6 +63,8 @@ export default function EventSolutions() {
       }
 
       const track = pageRef.current?.querySelector('.events-rail-track')
+      const teaserBar = pageRef.current?.querySelector('.pin-teaser-bar > b')
+      const teaser = pageRef.current?.querySelector('.events-rail .pin-teaser')
       if (track) {
         const getScroll = () => -(track.scrollWidth - window.innerWidth + 48)
         gsap.fromTo(
@@ -79,6 +81,15 @@ export default function EventSolutions() {
               scrub: 0.7,
               anticipatePin: 1,
               invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
+                if (teaser) {
+                  gsap.set(teaser, {
+                    opacity: 0.45 + self.progress * 0.55,
+                    y: (1 - self.progress) * 12,
+                  })
+                }
+              },
             },
           },
         )
@@ -171,6 +182,14 @@ export default function EventSolutions() {
             </figure>
           ))}
         </div>
+        <aside className="pin-teaser" aria-hidden="true">
+          <p className="eyebrow">Up next</p>
+          <strong>What we deliver</strong>
+          <span>Keep scrolling to reveal services</span>
+          <i className="pin-teaser-bar">
+            <b />
+          </i>
+        </aside>
       </section>
 
       <section className="section has-art">
