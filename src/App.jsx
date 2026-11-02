@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -11,6 +11,12 @@ import Insights from './pages/Insights'
 import NotFound from './pages/NotFound'
 import OurWork from './pages/OurWork'
 import RequestQuote from './pages/RequestQuote'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminLogin from './pages/admin/AdminLogin'
+import CardsAdmin from './pages/admin/CardsAdmin'
+import CopyAdmin from './pages/admin/CopyAdmin'
+import EnquiriesAdmin from './pages/admin/EnquiriesAdmin'
+import ProjectsAdmin from './pages/admin/ProjectsAdmin'
 
 export default function App() {
   return (
@@ -27,6 +33,15 @@ export default function App() {
         <Route path="/request-quote" element={<RequestQuote />} />
         <Route path="/enquiry" element={<Enquiry />} />
         <Route path="*" element={<NotFound />} />
+      </Route>
+
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="enquiries" replace />} />
+        <Route path="enquiries" element={<EnquiriesAdmin />} />
+        <Route path="copy" element={<CopyAdmin />} />
+        <Route path="cards" element={<CardsAdmin />} />
+        <Route path="projects" element={<ProjectsAdmin />} />
       </Route>
     </Routes>
   )

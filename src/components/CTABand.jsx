@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
 import Reveal from './Reveal'
 
 export default function CTABand() {
@@ -6,18 +7,23 @@ export default function CTABand() {
     <section className="section">
       <div className="container cta-band">
         <Reveal>
-          <h2>Have a project in mind?</h2>
-          <p>
-            Tell us what you need — we will route it to the right division and
-            respond with a clear next step.
-          </p>
+          <EditableText contentKey="cta.title" as="h2" />
+          <EditableText contentKey="cta.body" as="p" multiline />
           <div className="btn-row" style={{ justifyContent: 'center' }}>
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton
+              to="/request-quote"
+              contentKey="cta.quote"
+              className="btn btn-primary"
+            >
               Request a Quote
-            </Link>
-            <Link to="/enquiry" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton
+              to="/enquiry"
+              contentKey="cta.enquiry"
+              className="btn btn-soft"
+            >
               Make an Enquiry
-            </Link>
+            </EditableButton>
           </div>
         </Reveal>
       </div>

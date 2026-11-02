@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import EditableButton from '../cms/EditableButton'
 import { config } from '../lib/config'
 
 const links = [
@@ -16,7 +17,7 @@ export default function Header() {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const logoSrc = `${import.meta.env.BASE_URL}logo.png`
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -50,9 +51,13 @@ export default function Header() {
           ))}
         </nav>
 
-        <Link to="/request-quote" className="btn btn-primary header-cta">
+        <EditableButton
+          to="/request-quote"
+          contentKey="nav.cta"
+          className="btn btn-primary header-cta"
+        >
           Request a Quote
-        </Link>
+        </EditableButton>
 
         <button
           type="button"
@@ -78,9 +83,14 @@ export default function Header() {
             {link.label}
           </NavLink>
         ))}
-        <Link to="/request-quote" className="btn btn-primary" onClick={closeMenu}>
+        <EditableButton
+          to="/request-quote"
+          contentKey="nav.cta"
+          className="btn btn-primary"
+          onClick={closeMenu}
+        >
           Request a Quote
-        </Link>
+        </EditableButton>
       </nav>
     </header>
   )

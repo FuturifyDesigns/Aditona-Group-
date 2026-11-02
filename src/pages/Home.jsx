@@ -1,14 +1,16 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import CountUp from '../components/CountUp'
 import CTABand from '../components/CTABand'
 import DivisionCard from '../components/DivisionCard'
 import HeroSlideshow from '../components/HeroSlideshow'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
-import { config } from '../lib/config'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import { useCms } from '../cms/CmsContext'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -30,7 +32,7 @@ const slides = [
   },
 ]
 
-const divisions = [
+const FALLBACK_DIVISIONS = [
   {
     to: '/event-solutions',
     title: 'Event Solutions',
@@ -54,7 +56,7 @@ const divisions = [
   },
 ]
 
-const workThumbs = [
+const FALLBACK_WORK = [
   'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1600&q=80',
   'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=80',
   'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=1600&q=80',
@@ -77,6 +79,30 @@ const storyPanels = [
 
 export default function Home() {
   const pageRef = useRef(null)
+  const { cardsByCollection, get } = useCms()
+
+  const divisions = useMemo(() => {
+    const fromCms = cardsByCollection('home_divisions')
+    if (fromCms.length) {
+      return fromCms.map((c) => ({
+        to: c.link_url || '/',
+        title: c.title,
+        text: c.body || '',
+        image: c.image_url || FALLBACK_DIVISIONS[0].image,
+      }))
+    }
+    return FALLBACK_DIVISIONS
+  }, [cardsByCollection])
+
+  const workThumbs = useMemo(() => {
+    const fromCms = cardsByCollection('home_work')
+    if (fromCms.length) {
+      return fromCms
+        .map((c) => c.image_url)
+        .filter(Boolean)
+    }
+    return FALLBACK_WORK
+  }, [cardsByCollection])
 
   useGSAP(
     () => {
@@ -168,30 +194,63 @@ export default function Home() {
 
       requestAnimationFrame(() => ScrollTrigger.refresh())
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [divisions, workThumbs] },
   )
+
+  const divisionsTitle = get('home.divisions_title')
 
   return (
     <div ref={pageRef}>
       <HeroSlideshow slides={slides}>
-        <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          MULTI-DISCIPLINARY SOLUTIONS COMPANY
-        </p>
-        <h1>{config.headline}</h1>
-        <p>
-          Aditona Group unites Event Solutions, Creative &amp; Marketing, and Golf
-          Solutions — one accountable partner from brief to delivery.
-        </p>
+        <EditableText
+          contentKey="hero.eyebrow"
+          as="p"
+          className="eyebrow"
+          style={{ color: 'rgba(255,255,255,0.7)' }}
+        />
+        <EditableText contentKey="hero.headline" as="h1" />
+        <EditableText contentKey="hero.body" as="p" multiline />
         <div className="btn-row">
-          <Link to="/request-quote" className="btn btn-light">
+          <EditableButton
+            to="/request-quote"
+            contentKey="hero.cta_quote"
+            className="btn btn-light"
+          >
             Request a Quote
-          </Link>
-          <Link to="/enquiry" className="btn btn-ghost">
+          </EditableButton>
+          <EditableButton
+            to="/enquiry"
+            contentKey="hero.cta_enquiry"
+            className="btn btn-ghost"
+          >
             Make an Enquiry
-          </Link>
+          </EditableButton>
         </div>
-        <p className="hero-tag">{config.tagline}</p>
+        <EditableText contentKey="hero.tagline" as="p" className="hero-tag" />
       </HeroSlideshow>
+
+      <section className="section section--tight">
+        <div className="container stats-strip">
+          <div className="stat-item">
+            <span className="stat-num">
+              <CountUp to={3} />
+            </span>
+            <p>Specialist divisions</p>
+          </div>
+          <div className="stat-item">
+            <span className="stat-num">
+              <CountUp to={1} />
+            </span>
+            <p>Accountable group</p>
+          </div>
+          <div className="stat-item">
+            <span className="stat-num">
+              <CountUp to={100} suffix="%" />
+            </span>
+            <p>Delivery ownership</p>
+          </div>
+        </div>
+      </section>
 
       <section className="trust-bar">
         <div className="container trust-grid">
@@ -241,16 +300,20 @@ export default function Home() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Capabilities</p>
-              <SplitHeadline text="Our Divisions" as="h2" />
+              <EditableText contentKey="home.divisions_eyebrow" as="p" className="eyebrow" />
+              <SplitHeadline text={divisionsTitle} as="h2" />
             </div>
-            <Link to="/about" className="section-link">
+            <EditableButton
+              to="/about"
+              contentKey="home.divisions_link"
+              className="section-link"
+            >
               How we work →
-            </Link>
+            </EditableButton>
           </div>
           <div className="division-grid">
             {divisions.map((d) => (
-              <DivisionCard key={d.to} {...d} />
+              <DivisionCard key={`${d.to}-${d.title}`} {...d} />
             ))}
           </div>
         </div>
@@ -282,16 +345,31 @@ export default function Home() {
       <section className="section section--dark">
         <div className="container work-layout">
           <Reveal>
-            <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              Selected
-            </p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)', letterSpacing: '-0.03em' }}>
-              Featured Work
-            </h2>
-            <p style={{ color: 'rgba(255,255,255,0.72)', marginTop: '0.75rem', maxWidth: '28rem', lineHeight: 1.55 }}>
-              A snapshot of recent productions, campaigns, and golf hospitality
-              engagements across the group.
-            </p>
+            <EditableText
+              contentKey="home.work_eyebrow"
+              as="p"
+              className="eyebrow"
+              style={{ color: 'rgba(255,255,255,0.55)' }}
+            />
+            <EditableText
+              contentKey="home.work_title"
+              as="h2"
+              style={{
+                fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)',
+                letterSpacing: '-0.03em',
+              }}
+            />
+            <EditableText
+              contentKey="home.work_body"
+              as="p"
+              multiline
+              style={{
+                color: 'rgba(255,255,255,0.72)',
+                marginTop: '0.75rem',
+                maxWidth: '28rem',
+                lineHeight: 1.55,
+              }}
+            />
           </Reveal>
           <div className="work-gallery">
             {workThumbs.map((src) => (
@@ -301,9 +379,13 @@ export default function Home() {
             ))}
           </div>
           <Reveal delay={0.1}>
-            <Link to="/our-work" className="btn btn-ghost">
+            <EditableButton
+              to="/our-work"
+              contentKey="home.work_cta"
+              className="btn btn-ghost"
+            >
               View all work
-            </Link>
+            </EditableButton>
           </Reveal>
         </div>
       </section>

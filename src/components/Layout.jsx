@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import EditModeBar from '../cms/EditModeBar'
 import Footer from './Footer'
 import Header from './Header'
 import WhatsAppFab from './WhatsAppFab'
@@ -53,6 +54,7 @@ export default function Layout() {
 
   return (
     <>
+      <EditModeBar />
       <Header />
       <main className="page" ref={mainRef}>
         <Outlet context={{ waMessage }} />

@@ -1,5 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-  <rect width="64" height="64" rx="10" fill="#1A1A1B"/>
-  <path d="M14 46 L26 14 H34 L46 46 H38.5 L35.8 38 H24.2 L21.5 46 H14ZM26.2 33.2 H33.8 L30 22.5 L26.2 33.2Z" fill="#F4F4F4"/>
-  <path d="M36 46 V30.5 C36 25.8 39.2 23 44.2 23 C46.8 23 48.8 23.8 50.2 25.2 L46.8 29.2 C46.1 28.5 45.2 28.1 44.1 28.1 C42.2 28.1 41 29.3 41 31.2 V46 H36Z" fill="#C2C2C2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" fill="none" role="img" aria-label="Aditona Group">
+  <!-- AG monogram (no circle) -->
+  <path
+    d="M78 128 L118 28 H148 L188 128 H162 L152 100 H114 L104 128 H78ZM122 78 H144 L133 48 L122 78Z"
+    fill="#1A1A1B"
+  />
+  <path
+    d="M168 128 V78 C168 54 184 40 210 40 C224 40 236 45 244 54 L228 70 C224 65 218 62 210 62 C198 62 192 70 192 82 V128 H168Z"
+    fill="#1A1A1B"
+  />
+  <text
+    x="140"
+    y="168"
+    text-anchor="middle"
+    fill="#1A1A1B"
+    font-family="Inter, Arial, sans-serif"
+    font-size="28"
+    font-weight="700"
+    letter-spacing="0.28em"
+  >ADITONA</text>
+  <text
+    x="140"
+    y="198"
+    text-anchor="middle"
+    fill="#1A1A1B"
+    font-family="Inter, Arial, sans-serif"
+    font-size="14"
+    font-weight="500"
+    letter-spacing="0.55em"
+  >GROUP</text>
 </svg>
