@@ -84,7 +84,7 @@ export default function GolfSolutions() {
       />
 
       <section className="section golf-journey has-art">
-        <ProgressiveArt image={gallery.golf.foursome} opacity={0.13} />
+        <ProgressiveArt variant="fairway" peak={0.5} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -110,7 +110,7 @@ export default function GolfSolutions() {
       </section>
 
       <section className="section section--soft golf-services has-art">
-        <ProgressiveArt image={gallery.golf.prize} opacity={0.16} />
+        <ProgressiveArt variant="rings" peak={0.5} />
         <div className="container">
           <div className="section-head">
             <div>

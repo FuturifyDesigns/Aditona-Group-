@@ -121,7 +121,7 @@ export default function EventSolutions() {
       />
 
       <section className="events-rail has-art" aria-label="Production moments">
-        <ProgressiveArt image={gallery.events.lighting} opacity={0.35} dark />
+        <ProgressiveArt variant="grid" peak={0.45} dark />
         <div className="events-rail-head container">
           <p className="eyebrow">On the floor</p>
           <h2>Production in motion</h2>
@@ -137,7 +137,7 @@ export default function EventSolutions() {
       </section>
 
       <section className="section has-art">
-        <ProgressiveArt image={gallery.events.gala} opacity={0.15} />
+        <ProgressiveArt variant="blueprint" peak={0.5} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -157,7 +157,7 @@ export default function EventSolutions() {
       </section>
 
       <section className="section section--soft has-art">
-        <ProgressiveArt image={gallery.events.outdoor} opacity={0.18} />
+        <ProgressiveArt variant="arcs" peak={0.5} />
         <div className="container" style={{ maxWidth: '40rem' }}>
           <p className="eyebrow">Engage</p>
           <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>

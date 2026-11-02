@@ -12,7 +12,7 @@ import SplitHeadline from '../components/SplitHeadline'
 import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
-import { cards, gallery, heroes } from '../lib/images'
+import { cards, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -216,7 +216,8 @@ export default function Home() {
         <EditableText contentKey="hero.tagline" as="p" className="hero-tag" />
       </HeroSlideshow>
 
-      <section className="section section--tight">
+      <section className="section section--tight has-art">
+        <ProgressiveArt variant="rings" peak={0.42} />
         <div className="container stats-strip">
           <div className="stat-item">
             <span className="stat-num">
@@ -239,7 +240,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="trust-bar">
+      <section className="trust-bar has-art">
+        <ProgressiveArt variant="nodes" peak={0.4} />
         <div className="container trust-grid">
           <div className="trust-item">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -284,7 +286,7 @@ export default function Home() {
       </section>
 
       <section className="section has-art">
-        <ProgressiveArt image={gallery.about.planning} opacity={0.14} />
+        <ProgressiveArt variant="orbit" peak={0.48} />
         <div className="container">
           <div className="section-head">
             <div>

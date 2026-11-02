@@ -107,7 +107,7 @@ export default function CreativeMarketing() {
       />
 
       <section className="section has-art">
-        <ProgressiveArt image={gallery.creative.workshop} opacity={0.14} />
+        <ProgressiveArt variant="frames" peak={0.5} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -130,7 +130,7 @@ export default function CreativeMarketing() {
       </section>
 
       <section className="section section--soft creative-services has-art">
-        <ProgressiveArt image={gallery.creative.install} opacity={0.17} />
+        <ProgressiveArt variant="arcs" peak={0.52} />
         <div className="container">
           <div className="section-head">
             <div>

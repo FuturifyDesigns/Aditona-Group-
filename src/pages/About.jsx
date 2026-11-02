@@ -4,7 +4,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
-import ProgressiveArt from '../components/ProgressiveArt'
+import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { gallery, heroes } from '../lib/images'
 
@@ -15,19 +15,19 @@ const manifesto = [
     kicker: '01 — Origin',
     title: 'One accountable group.',
     text: 'Aditona Group was built to close the gap between strategy decks and live delivery — one owner for the brief, the look, and the day itself.',
-    art: gallery.about.leadership,
+    art: 'nodes',
   },
   {
     kicker: '02 — Vision',
     title: 'Experiences that feel like one story.',
     text: 'We aim to be the most trusted multidisciplinary partner for brands that need events, creative, and golf to move as a single narrative.',
-    art: gallery.about.briefing,
+    art: 'orbit',
   },
   {
     kicker: '03 — Mission',
     title: 'Ambition, translated into precision.',
     text: 'We turn intent into rehearsed plans and calm execution — across venues, channels, and courses — with shared standards at every stage.',
-    art: gallery.about.planning,
+    art: 'arcs',
   },
 ]
 
@@ -303,7 +303,7 @@ export default function About() {
         <div className="about-manifesto-arts" aria-hidden="true">
           {manifesto.map((panel) => (
             <div className="manifesto-art" key={`art-${panel.kicker}`}>
-              <img src={panel.art} alt="" />
+              <ArtDrawing variant={panel.art} />
             </div>
           ))}
           <div className="about-manifesto-veil" />
@@ -327,7 +327,7 @@ export default function About() {
       </section>
 
       <section className="section about-moments has-art">
-        <ProgressiveArt image={gallery.about.huddle} opacity={0.16} />
+        <ProgressiveArt variant="frames" peak={0.5} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -347,7 +347,7 @@ export default function About() {
       </section>
 
       <section className="section about-divisions has-art">
-        <ProgressiveArt image={gallery.about.venue} opacity={0.14} />
+        <ProgressiveArt variant="blueprint" peak={0.48} />
         <div className="container">
           <div className="about-divisions-head">
             <p className="eyebrow">Divisions</p>
@@ -379,7 +379,7 @@ export default function About() {
       </section>
 
       <section className="section section--soft about-values has-art">
-        <ProgressiveArt image={gallery.about.quality} opacity={0.18} />
+        <ProgressiveArt variant="nodes" peak={0.52} />
         <div className="container">
           <div className="section-head">
             <div>
@@ -401,7 +401,7 @@ export default function About() {
       </section>
 
       <section className="section about-method has-art">
-        <ProgressiveArt image={gallery.about.huddle} opacity={0.12} />
+        <ProgressiveArt variant="rings" peak={0.45} />
         <div className="container">
           <div className="section-head">
             <div>

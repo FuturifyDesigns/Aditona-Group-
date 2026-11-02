@@ -110,7 +110,7 @@ export default function Insights() {
       />
 
       <section className="section insights-feed has-art">
-        <ProgressiveArt image={gallery.insights.debrief} opacity={0.13} />
+        <ProgressiveArt variant="nodes" peak={0.5} />
         <div className="container insights-feed-layout">
           <div className="insights-spine" aria-hidden="true" />
           <div className="insights-rows">

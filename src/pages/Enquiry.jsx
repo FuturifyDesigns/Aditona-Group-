@@ -1,5 +1,6 @@
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
+import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
 import { heroes } from '../lib/images'
 
@@ -18,7 +19,8 @@ export default function Enquiry() {
         }
       />
 
-      <section className="section">
+      <section className="section has-art">
+        <ProgressiveArt variant="arcs" peak={0.48} />
         <div className="container" style={{ maxWidth: 720 }}>
           <EnquiryForm type="enquiry" />
         </div>

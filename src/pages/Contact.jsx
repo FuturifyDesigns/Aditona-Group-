@@ -108,7 +108,7 @@ export default function Contact() {
       />
 
       <section className="section section--tight has-art">
-        <ProgressiveArt image={gallery.about.planning} opacity={0.12} />
+        <ProgressiveArt variant="orbit" peak={0.48} />
         <div className="container contact-channels">
           {channels.map((c) => (
             <a className="contact-channel" key={c.label} href={c.href}>
@@ -121,7 +121,7 @@ export default function Contact() {
       </section>
 
       <section className="section contact-split-section has-art">
-        <ProgressiveArt image={gallery.work.summit} opacity={0.1} />
+        <ProgressiveArt variant="blueprint" peak={0.45} />
         <div className="container contact-split">
           <div className="contact-visual">
             <img src={gallery.about.briefing} alt="" loading="lazy" />

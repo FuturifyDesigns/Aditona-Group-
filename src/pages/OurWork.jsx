@@ -122,7 +122,7 @@ export default function OurWork() {
       />
 
       <section className="section has-art">
-        <ProgressiveArt image={gallery.work.campaign} opacity={0.14} />
+        <ProgressiveArt variant="frames" peak={0.48} />
         <div className="container">
           <div className="chip-row" role="tablist" aria-label="Filter projects">
             {FILTERS.map((chip) => (
