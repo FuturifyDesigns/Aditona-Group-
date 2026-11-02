@@ -54,6 +54,7 @@ const projects = [
 export default function OurWork() {
   const [filter, setFilter] = useState('All')
   const pageRef = useRef(null)
+  const gridRef = useRef(null)
 
   const visible = useMemo(
     () =>
@@ -65,88 +66,215 @@ export default function OurWork() {
     () => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (reduced) {
-        gsap.set('.project-card', { clearProps: 'all', opacity: 1, y: 0 })
+        gsap.set('.work-runway-card, .work-case, .work-chip', {
+          clearProps: 'all',
+          opacity: 1,
+          x: 0,
+          y: 0,
+        })
         return
       }
 
-      gsap.fromTo(
-        '.project-card',
-        {
-          opacity: 0,
-          y: 64,
-          clipPath: 'inset(0 0 100% 0)',
-        },
-        {
-          opacity: 1,
-          y: 0,
-          clipPath: 'inset(0 0 0% 0)',
-          stagger: 0.12,
-          duration: 0.95,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: '.work-grid', start: 'top 85%' },
-        },
-      )
+      gsap.from('.page-work .page-hero-content > *', {
+        opacity: 0,
+        y: 26,
+        stagger: 0.09,
+        duration: 0.75,
+        ease: 'power3.out',
+      })
 
-      gsap.utils.toArray('.project-card img').forEach((img) => {
+      const track = pageRef.current?.querySelector('.work-runway-track')
+      if (track) {
+        gsap.from('.work-runway-card', {
+          opacity: 0,
+          y: 36,
+          scale: 0.94,
+          stagger: 0.08,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: '.work-runway', start: 'top 82%' },
+        })
+
         gsap.fromTo(
-          img,
-          { scale: 1.12 },
+          track,
+          { x: 24 },
           {
-            scale: 1,
+            x: () => Math.min(0, -(track.scrollWidth - window.innerWidth + 64)),
             ease: 'none',
             scrollTrigger: {
-              trigger: img.closest('.project-card'),
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
+              trigger: '.work-runway',
+              start: 'top top',
+              end: () => `+=${Math.max(track.scrollWidth * 0.7, window.innerHeight)}`,
+              pin: true,
+              scrub: 0.7,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
             },
           },
         )
+      }
+
+      gsap.from('.work-chip', {
+        opacity: 0,
+        y: 18,
+        stagger: 0.06,
+        duration: 0.55,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: '.work-filter-bar', start: 'top 90%' },
       })
+
+      const cases = gsap.utils.toArray('.work-case')
+      cases.forEach((card, i) => {
+        const media = card.querySelector('.work-case-media')
+        const img = card.querySelector('img')
+        const copy = card.querySelectorAll('.work-case-copy > *')
+        const line = card.querySelector('.work-case-line')
+        const fromLeft = i % 2 === 0
+
+        gsap.set(line, { scaleX: 0, transformOrigin: fromLeft ? 'left center' : 'right center' })
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 84%',
+            end: 'top 42%',
+            scrub: 0.7,
+          },
+        })
+
+        tl.fromTo(
+          media,
+          {
+            clipPath: fromLeft ? 'inset(0 70% 0 0)' : 'inset(0 0 0 70%)',
+            opacity: 0.4,
+          },
+          { clipPath: 'inset(0 0% 0 0%)', opacity: 1, ease: 'none' },
+          0,
+        )
+          .fromTo(
+            img,
+            { scale: 1.18, xPercent: fromLeft ? -6 : 6 },
+            { scale: 1, xPercent: 0, ease: 'none' },
+            0,
+          )
+          .fromTo(
+            copy,
+            { y: 28, opacity: 0 },
+            { y: 0, opacity: 1, stagger: 0.05, ease: 'none' },
+            0.08,
+          )
+          .to(line, { scaleX: 1, ease: 'none' }, 0.12)
+
+        card.addEventListener('pointerenter', () => {
+          gsap.to(img, { scale: 1.06, duration: 0.55, ease: 'power2.out' })
+          gsap.to(card, { y: -6, duration: 0.35, ease: 'power2.out' })
+        })
+        card.addEventListener('pointerleave', () => {
+          gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' })
+          gsap.to(card, { y: 0, duration: 0.4, ease: 'power2.out' })
+        })
+      })
+
+      requestAnimationFrame(() => ScrollTrigger.refresh())
     },
     { scope: pageRef, dependencies: [filter], revertOnUpdate: true },
   )
+
+  const onFilter = (next) => {
+    if (next === filter) return
+    const grid = gridRef.current
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!grid || reduced) {
+      setFilter(next)
+      return
+    }
+
+    const cards = grid.querySelectorAll('.work-case')
+    gsap.to(cards, {
+      opacity: 0,
+      y: 24,
+      scale: 0.96,
+      stagger: 0.04,
+      duration: 0.28,
+      ease: 'power2.in',
+      onComplete: () => setFilter(next),
+    })
+  }
 
   return (
     <div ref={pageRef} className="page-work">
       <PageHero
         image={heroes.work}
         eyebrow={<p className="eyebrow">Portfolio</p>}
-        title={<SplitHeadline text="Our Work" as="h1" />}
+        title={<SplitHeadline text="Our Work" as="h1" immediate />}
         body={
-          <p>
+          <p className="hero-lead">
             Selected engagements across events, creative, and golf — each delivered
             with one accountable team.
           </p>
         }
       />
 
+      <section className="work-runway" aria-label="Featured work runway">
+        <div className="container work-runway-head">
+          <p className="eyebrow">Featured</p>
+          <h2>A runway of recent delivery</h2>
+        </div>
+        <div className="work-runway-track">
+          {projects.map((project, i) => (
+            <figure className="work-runway-card" key={`runway-${project.title}`}>
+              <img src={project.image} alt="" loading="lazy" />
+              <figcaption>
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                <strong>{project.title}</strong>
+                <em>{project.category}</em>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       <section className="section has-art">
         <ProgressiveArt variant="frames" peak={0.48} />
         <div className="container">
-          <div className="chip-row" role="tablist" aria-label="Filter projects">
-            {FILTERS.map((chip) => (
-              <button
-                key={chip}
-                type="button"
-                className={`chip${filter === chip ? ' active' : ''}`}
-                onClick={() => setFilter(chip)}
-              >
-                {chip}
-              </button>
-            ))}
+          <div className="work-filter-bar">
+            <div>
+              <p className="eyebrow">Archive</p>
+              <h2>Filter the portfolio</h2>
+            </div>
+            <div className="chip-row" role="tablist" aria-label="Filter projects">
+              {FILTERS.map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  className={`chip work-chip${filter === chip ? ' active' : ''}`}
+                  onClick={() => onFilter(chip)}
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid-cards work-grid">
-            {visible.map((project) => (
-              <article className="project-card" key={project.title}>
-                <img src={project.image} alt="" loading="lazy" />
-                <div className="body">
-                  <p className="eyebrow" style={{ marginBottom: '0.35rem' }}>
-                    {project.category}
-                  </p>
+          <p className="work-count" aria-live="polite">
+            Showing {visible.length} {visible.length === 1 ? 'project' : 'projects'}
+          </p>
+
+          <div className="work-cases" ref={gridRef}>
+            {visible.map((project, i) => (
+              <article
+                className={`work-case${i % 2 ? ' is-flip' : ''}`}
+                key={`${filter}-${project.title}`}
+              >
+                <div className="work-case-media">
+                  <img src={project.image} alt="" loading="lazy" />
+                </div>
+                <div className="work-case-copy">
+                  <span className="work-case-index">{String(i + 1).padStart(2, '0')}</span>
+                  <p className="eyebrow">{project.category}</p>
                   <h3>{project.title}</h3>
                   <p>{project.text}</p>
+                  <i className="work-case-line" aria-hidden="true" />
                 </div>
               </article>
             ))}
