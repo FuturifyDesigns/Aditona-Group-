@@ -10,6 +10,7 @@ export default function SplitHeadline({
   as: Tag = 'h2',
   className = '',
   delay = 0,
+  immediate = false,
 }) {
   const ref = useRef(null)
   const words = useMemo(() => text.split(' ').filter(Boolean), [text])
@@ -35,15 +36,19 @@ export default function SplitHeadline({
           stagger: 0.045,
           delay,
           ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
+          ...(immediate
+            ? {}
+            : {
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 85%',
+                  toggleActions: 'play none none none',
+                },
+              }),
         },
       )
     },
-    { scope: ref, dependencies: [text, delay] },
+    { scope: ref, dependencies: [text, delay, immediate] },
   )
 
   return (

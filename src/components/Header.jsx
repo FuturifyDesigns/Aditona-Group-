@@ -17,7 +17,7 @@ export default function Header() {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`
+  const logoSrc = `${import.meta.env.BASE_URL}logo.png`
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
