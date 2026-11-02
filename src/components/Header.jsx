@@ -1,0 +1,88 @@
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { config } from '../lib/config'
+
+const links = [
+  { to: '/about', label: 'About' },
+  { to: '/event-solutions', label: 'Events' },
+  { to: '/creative-marketing', label: 'Creative' },
+  { to: '/golf-solutions', label: 'Golf' },
+  { to: '/our-work', label: 'Work' },
+  { to: '/insights', label: 'Insights' },
+  { to: '/contact', label: 'Contact' },
+]
+
+export default function Header() {
+  const location = useLocation()
+  const [scrolled, setScrolled] = useState(false)
+  const [open, setOpen] = useState(false)
+  const logoSrc = `${import.meta.env.BASE_URL}logo.svg`
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    setOpen(false)
+  }, [location.pathname])
+
+  const closeMenu = () => setOpen(false)
+
+  return (
+    <header className={`site-header${scrolled ? ' is-scrolled' : ''}`}>
+      <div className="header-inner">
+        <Link to="/" className="brand" onClick={closeMenu} aria-label={config.brand}>
+          <img src={logoSrc} alt="" width="36" height="36" />
+          <span>ADITONA</span>
+        </Link>
+
+        <nav className="nav" aria-label="Primary">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => (isActive ? 'active' : undefined)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <Link to="/request-quote" className="btn btn-primary header-cta">
+          Request a Quote
+        </Link>
+
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-expanded={open}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+
+      <nav className={`mobile-nav${open ? ' open' : ''}`} aria-label="Mobile">
+        {links.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) => (isActive ? 'active' : undefined)}
+            onClick={closeMenu}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+        <Link to="/request-quote" className="btn btn-primary" onClick={closeMenu}>
+          Request a Quote
+        </Link>
+      </nav>
+    </header>
+  )
+}
