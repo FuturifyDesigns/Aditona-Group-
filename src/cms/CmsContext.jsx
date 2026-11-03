@@ -19,6 +19,7 @@ import {
   upsertProject,
 } from '../lib/supabase'
 import { isAdminEmail } from '../lib/config'
+import { freezeScrollMotion, softRefreshScroll } from '../lib/scroll'
 import { DEFAULTS } from './defaults'
 
 const CmsContext = createContext(null)
@@ -114,10 +115,28 @@ export function CmsProvider({ children }) {
     navigate(next, { replace: true })
   }, [location.search, location.pathname, location.hash, session, navigate])
 
+  const isAuthedEarly = Boolean(session && isAdminEmail(session?.user?.email))
+
+  // CMS toolbar is fixed — reserve space whenever signed in (not only when editing)
+  useEffect(() => {
+    document.body.classList.toggle('cms-bar-visible', isAuthedEarly)
+    return () => document.body.classList.remove('cms-bar-visible')
+  }, [isAuthedEarly])
+
   useEffect(() => {
     const on =
       Boolean(editMode && session && isAdminEmail(session?.user?.email))
     document.body.classList.toggle('cms-edit-mode', on)
+    if (on) {
+      // Kill pins/scrub so live editing never fights ScrollTrigger
+      freezeScrollMotion()
+    } else if (session && isAdminEmail(session?.user?.email)) {
+      // Leaving edit mode — let pages rebuild motion on next paint
+      softRefreshScroll()
+      // Force remount of route animations via lightweight hash bump on body
+      document.body.dataset.cmsMotion = String(Date.now())
+      window.dispatchEvent(new Event('ag-cms-motion-resume'))
+    }
     return () => document.body.classList.remove('cms-edit-mode')
   }, [editMode, session])
 
@@ -178,7 +197,7 @@ export function CmsProvider({ children }) {
     [projects, editMode],
   )
 
-  const isAuthed = Boolean(session && isAdminEmail(session?.user?.email))
+  const isAuthed = isAuthedEarly
 
   const value = useMemo(
     () => ({

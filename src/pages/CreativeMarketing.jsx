@@ -10,8 +10,9 @@ import EditableText from '../cms/EditableText'
 import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
 import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll } from '../lib/scroll'
+import { hardRefreshScroll, listSignature } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -35,7 +36,8 @@ const FALLBACK_SERVICES = [
 
 export default function CreativeMarketing() {
   const pageRef = useRef(null)
-  const { cardsByCollection, editMode } = useCms()
+  const { cardsByCollection } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   const frames = useMemo(
     () => mergeCards(cardsByCollection('creative_frames'), FALLBACK_FRAMES),
@@ -48,8 +50,7 @@ export default function CreativeMarketing() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.creative-frame, .creative-chip', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
         return
       }
@@ -146,7 +147,10 @@ export default function CreativeMarketing() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [frames, services, editMode] },
+    {
+      scope: pageRef,
+      dependencies: [listSignature(frames), listSignature(services), motionKey],
+    },
   )
 
   return (

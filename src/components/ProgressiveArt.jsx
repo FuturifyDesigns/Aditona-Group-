@@ -2,6 +2,8 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useMotionReady } from '../hooks/useMotionReady'
+import { isCmsEditing, prefersReducedMotion } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -160,6 +162,7 @@ export default function ProgressiveArt({
   dark = false,
 }) {
   const ref = useRef(null)
+  const { motionKey } = useMotionReady()
   const drawing = DRAWINGS[variant] || DRAWINGS.orbit
 
   useGSAP(
@@ -170,8 +173,7 @@ export default function ProgressiveArt({
       const art = el.querySelector('.progressive-art-draw')
       if (!section || !art) return
 
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (isCmsEditing() || prefersReducedMotion()) {
         gsap.set(art, { opacity: peak * 0.55, scale: 1 })
         return
       }
@@ -184,14 +186,14 @@ export default function ProgressiveArt({
             trigger: section,
             start: 'top 95%',
             end: 'bottom 5%',
-            scrub: 0.9,
+            scrub: true,
           },
         })
         .to(art, { opacity: peak, scale: 1.08, duration: 0.36, ease: 'none' })
         .to(art, { opacity: peak, scale: 1.14, duration: 0.28, ease: 'none' })
         .to(art, { opacity: 0, scale: 1.22, duration: 0.36, ease: 'none' })
     },
-    { scope: ref, dependencies: [variant, peak, dark] },
+    { scope: ref, dependencies: [variant, peak, dark, motionKey] },
   )
 
   return (

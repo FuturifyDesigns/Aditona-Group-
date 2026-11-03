@@ -73,7 +73,12 @@ export function CmsAddCard({ collection, defaults = {}, label = '+ Add card', cl
   if (!editMode) return null
   return (
     <>
-      <button type="button" className={`cms-add-tile ${className}`.trim()} onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className={`cms-add-tile ${className}`.trim()}
+        data-cms-add="1"
+        onClick={() => setOpen(true)}
+      >
         {label}
       </button>
       {open && (

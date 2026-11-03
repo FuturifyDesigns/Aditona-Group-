@@ -9,8 +9,9 @@ import SplitHeadline from '../components/SplitHeadline'
 import CardEditor from '../cms/CardEditor'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll } from '../lib/scroll'
+import { hardRefreshScroll, listSignature } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -56,6 +57,7 @@ const FALLBACK_ARTICLES = [
 export default function Insights() {
   const pageRef = useRef(null)
   const { cardsByCollection, editMode } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
   const [editor, setEditor] = useState(null)
   const [adding, setAdding] = useState(false)
 
@@ -83,8 +85,7 @@ export default function Insights() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.insight-row, .insights-spine', { clearProps: 'all', opacity: 1, y: 0, scaleY: 1 })
         return
       }
@@ -115,7 +116,7 @@ export default function Insights() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [articles, editMode] },
+    { scope: pageRef, dependencies: [listSignature(articles), motionKey] },
   )
 
   return (

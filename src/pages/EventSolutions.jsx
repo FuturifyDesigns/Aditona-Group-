@@ -10,8 +10,9 @@ import EditableText from '../cms/EditableText'
 import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
 import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -53,7 +54,8 @@ const FALLBACK_SERVICES = [
 
 export default function EventSolutions() {
   const pageRef = useRef(null)
-  const { cardsByCollection, editMode } = useCms()
+  const { cardsByCollection } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   const moments = useMemo(
     () => mergeCards(cardsByCollection('events_moments'), FALLBACK_MOMENTS),
@@ -66,8 +68,7 @@ export default function EventSolutions() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.events-rail-track, .events-rail-card, .service-panel', {
           clearProps: 'all',
           opacity: 1,
@@ -80,19 +81,27 @@ export default function EventSolutions() {
       const teaserBar = pageRef.current?.querySelector('.pin-teaser-bar > b')
       const teaser = pageRef.current?.querySelector('.events-rail .pin-teaser')
       if (track) {
-        const getScroll = () => -(track.scrollWidth - window.innerWidth + 48)
+        // Measure card distance only — ignore CMS “+ Add” tiles inside the track
+        const travel = () => {
+          const cards = track.querySelectorAll('.events-rail-card')
+          if (!cards.length) return 0
+          const first = cards[0].offsetLeft
+          const last = cards[cards.length - 1]
+          const end = last.offsetLeft + last.offsetWidth
+          return Math.max(0, end - first - window.innerWidth + 96)
+        }
         gsap.fromTo(
           track,
-          { x: 40 },
+          { x: 0 },
           {
-            x: () => getScroll(),
+            x: () => -travel(),
             ease: 'none',
             scrollTrigger: {
               trigger: '.events-rail',
               start: 'top top',
-              end: () => `+=${track.scrollWidth * 0.85}`,
+              end: () => `+=${travel() + window.innerHeight * 0.35}`,
               ...pinOptions({
-                scrub: 0.7,
+                scrub: true,
                 onUpdate: (self) => {
                   if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
                   if (teaser) {
@@ -112,6 +121,7 @@ export default function EventSolutions() {
           stagger: 0.08,
           duration: 0.7,
           ease: 'power3.out',
+          clearProps: 'transform',
           scrollTrigger: { trigger: '.events-rail', start: 'top 80%' },
         })
       }
@@ -128,7 +138,7 @@ export default function EventSolutions() {
             trigger: panel,
             start: 'top 86%',
             end: 'top 45%',
-            scrub: 0.65,
+            scrub: true,
           },
         })
 
@@ -164,7 +174,10 @@ export default function EventSolutions() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [moments, services, editMode] },
+    {
+      scope: pageRef,
+      dependencies: [listSignature(moments), listSignature(services), motionKey],
+    },
   )
 
   return (

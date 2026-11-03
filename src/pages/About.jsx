@@ -10,8 +10,9 @@ import EditableText from '../cms/EditableText'
 import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
 import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -104,6 +105,7 @@ const FALLBACK_STEPS = [
 export default function About() {
   const pageRef = useRef(null)
   const { cardsByCollection } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   const manifesto = useMemo(
     () =>
@@ -140,8 +142,7 @@ export default function About() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set(
           '.about-hero-media, .about-hero-copy > *, .manifesto-panel, .about-moment, .division-slide, .value-row, .method-step, .about-line',
           { clearProps: 'all', opacity: 1, y: 0, x: 0, scale: 1 },
@@ -185,7 +186,7 @@ export default function About() {
             trigger: manifestoSection,
             start: 'top top',
             end: () => `+=${window.innerHeight * panels.length * 0.9}`,
-            ...pinOptions({ scrub: 0.65 }),
+            ...pinOptions({ scrub: true }),
           },
         })
 
@@ -352,7 +353,17 @@ export default function About() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [manifesto, moments, divisions, values, steps] },
+    {
+      scope: pageRef,
+      dependencies: [
+        listSignature(manifesto),
+        listSignature(moments),
+        listSignature(divisions),
+        listSignature(values),
+        listSignature(steps),
+        motionKey,
+      ],
+    },
   )
 
   return (

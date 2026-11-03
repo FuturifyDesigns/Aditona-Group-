@@ -6,6 +6,7 @@ import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
 import EditableText from '../cms/EditableText'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { config, waLink } from '../lib/config'
 import { gallery, heroes } from '../lib/images'
 
@@ -20,11 +21,11 @@ const channels = config.emailChannels.map((c) => ({
 
 export default function Contact() {
   const pageRef = useRef(null)
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.contact-channel, .contact-visual, .contact-form-panel', {
           clearProps: 'all',
           opacity: 1,
@@ -70,7 +71,7 @@ export default function Contact() {
         },
       })
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [motionKey] },
   )
 
   return (

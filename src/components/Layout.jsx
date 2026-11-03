@@ -34,11 +34,16 @@ export default function Layout() {
   useEffect(() => {
     window.scrollTo(0, 0)
     const root = mainRef.current || document
+    // One deferred refresh after route paint — avoid stacked refreshes that make pins jump
     const id = window.setTimeout(() => {
-      hardRefreshScroll(root)
-    }, 40)
+      if (!document.body.classList.contains('cms-edit-mode')) {
+        hardRefreshScroll(root)
+      }
+    }, 120)
 
-    const onLoad = () => softRefreshScroll()
+    const onLoad = () => {
+      if (!document.body.classList.contains('cms-edit-mode')) softRefreshScroll()
+    }
     window.addEventListener('load', onLoad)
 
     return () => {

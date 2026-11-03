@@ -2402,8 +2402,28 @@ ul {
 }
 
 /* ——— Live CMS ——— */
-body.cms-edit-mode {
+/* Reserve space whenever the admin bar is shown (auth), not only while editing —
+   toggling Edit Live must not shift layout or ScrollTrigger will glitch. */
+body.cms-bar-visible {
   padding-top: 44px;
+}
+
+/* Freeze scroll choreography while editing — no leftover transforms fighting the page */
+body.cms-edit-mode .pin-spacer {
+  display: contents !important;
+}
+
+body.cms-edit-mode .events-rail-track,
+body.cms-edit-mode .work-runway-track,
+body.cms-edit-mode .story-panel,
+body.cms-edit-mode .story-art,
+body.cms-edit-mode .manifesto-panel,
+body.cms-edit-mode .manifesto-art,
+body.cms-edit-mode .progressive-art-draw,
+body.cms-edit-mode .reveal {
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .cms-edit-mode [data-cms] {
@@ -2702,6 +2722,13 @@ body.cms-edit-mode {
   width: max-content;
   padding: 0 1.25rem 1rem;
   will-change: transform;
+}
+
+.events-rail-track > .cms-add-tile,
+.work-runway-track > .cms-add-tile {
+  flex: 0 0 auto;
+  min-width: 10rem;
+  align-self: stretch;
 }
 
 .events-rail-card {

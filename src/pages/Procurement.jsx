@@ -10,8 +10,9 @@ import EditableText from '../cms/EditableText'
 import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
 import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll } from '../lib/scroll'
+import { hardRefreshScroll, listSignature } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -77,7 +78,8 @@ const FALLBACK_SERVICES = [
 
 export default function Procurement() {
   const pageRef = useRef(null)
-  const { cardsByCollection, editMode } = useCms()
+  const { cardsByCollection } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   const journey = useMemo(
     () => mergeCards(cardsByCollection('procurement_journey'), FALLBACK_JOURNEY),
@@ -90,8 +92,7 @@ export default function Procurement() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.golf-step, .golf-service-card', { clearProps: 'all', opacity: 1, y: 0 })
         return
       }
@@ -148,7 +149,10 @@ export default function Procurement() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [journey, services, editMode] },
+    {
+      scope: pageRef,
+      dependencies: [listSignature(journey), listSignature(services), motionKey],
+    },
   )
 
   return (

@@ -14,7 +14,8 @@ import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { cards, heroes } from '../lib/images'
-import { hardRefreshScroll, pinOptions } from '../lib/scroll'
+import { useMotionReady } from '../hooks/useMotionReady'
+import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -66,6 +67,7 @@ const storyPanels = [
 export default function Home() {
   const pageRef = useRef(null)
   const { cardsByCollection, get, editMode } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
   const [workEditor, setWorkEditor] = useState(null)
   const [addingDivision, setAddingDivision] = useState(false)
   const [addingWork, setAddingWork] = useState(false)
@@ -105,9 +107,12 @@ export default function Home() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
-        gsap.set('.story-panel, .story-art', { clearProps: 'all', opacity: 1, position: 'relative' })
+      if (!motionEnabled) {
+        gsap.set('.story-panel, .story-art, .division-card, .work-thumb, .trust-item', {
+          clearProps: 'all',
+          opacity: 1,
+          position: 'relative',
+        })
         return
       }
 
@@ -155,7 +160,7 @@ export default function Home() {
             trigger: story,
             start: 'top top',
             end: () => `+=${window.innerHeight * panels.length * 0.85}`,
-            ...pinOptions({ scrub: 0.55 }),
+            ...pinOptions({ scrub: true }),
           },
         })
 
@@ -200,7 +205,10 @@ export default function Home() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [divisions, workThumbs] },
+    {
+      scope: pageRef,
+      dependencies: [listSignature(divisions), listSignature(workThumbs), motionKey],
+    },
   )
 
   const divisionsTitle = get('home.divisions_title')

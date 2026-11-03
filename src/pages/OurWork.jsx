@@ -9,8 +9,9 @@ import SplitHeadline from '../components/SplitHeadline'
 import CardEditor from '../cms/CardEditor'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
+import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -62,6 +63,7 @@ export default function OurWork() {
   const pageRef = useRef(null)
   const gridRef = useRef(null)
   const { projects, editMode } = useCms()
+  const { enabled: motionEnabled, motionKey } = useMotionReady()
 
   const allProjects = useMemo(() => {
     if (projects?.length) {
@@ -93,9 +95,8 @@ export default function OurWork() {
 
   useGSAP(
     () => {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
-        gsap.set('.work-runway-card, .work-case, .work-chip', {
+      if (!motionEnabled) {
+        gsap.set('.work-runway-card, .work-case, .work-chip, .work-runway-track', {
           clearProps: 'all',
           opacity: 1,
           x: 0,
@@ -126,7 +127,13 @@ export default function OurWork() {
           scrollTrigger: { trigger: '.work-runway', start: 'top 82%' },
         })
 
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth)
+        const distance = () => {
+          const cards = track.querySelectorAll('.work-runway-card')
+          if (!cards.length) return Math.max(0, track.scrollWidth - window.innerWidth)
+          const first = cards[0].offsetLeft
+          const last = cards[cards.length - 1]
+          return Math.max(0, last.offsetLeft + last.offsetWidth - first - window.innerWidth + 96)
+        }
         gsap.to(track, {
           x: () => -distance(),
           ease: 'none',
@@ -134,30 +141,25 @@ export default function OurWork() {
             trigger: '.work-runway',
             start: 'top top',
             end: () => `+=${distance() + window.innerHeight * 0.35}`,
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
             onUpdate: (self) => {
               if (teaserBar) teaserBar.style.transform = `scaleX(${self.progress})`
               if (teaser) teaser.classList.toggle('is-done', self.progress > 0.92)
             },
-            ...pinOptions,
+            ...pinOptions({ scrub: true }),
           },
         })
       }
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [allProjects, editMode] },
+    { scope: pageRef, dependencies: [listSignature(allProjects), motionKey] },
   )
 
   useGSAP(
     () => {
       const grid = gridRef.current
       if (!grid) return
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced) {
+      if (!motionEnabled) {
         gsap.set('.work-case', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
         return
       }
@@ -167,9 +169,10 @@ export default function OurWork() {
         stagger: 0.06,
         duration: 0.55,
         ease: 'power3.out',
+        clearProps: 'transform',
       })
     },
-    { scope: gridRef, dependencies: [filter, visible] },
+    { scope: gridRef, dependencies: [filter, listSignature(visible), motionKey] },
   )
 
   const onFilter = (next) => {
