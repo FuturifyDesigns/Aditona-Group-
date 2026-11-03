@@ -32,6 +32,15 @@ export async function submitEnquiry(payload) {
     .single()
 
   if (error) throw error
+
+  // Best-effort email forward — never fail the public form if mail notify errors
+  try {
+    const { notifyFormEmail } = await import('./notifyEmail')
+    await notifyFormEmail(payload)
+  } catch (err) {
+    console.warn('[enquiry] email notify failed', err)
+  }
+
   return data
 }
 
@@ -96,11 +105,19 @@ export async function uploadMedia(file, pathPrefix = 'uploads') {
   return data.publicUrl
 }
 
-export async function listEnquiries() {
-  const { data, error } = await supabase
+export async function listEnquiries({ formTypes } = {}) {
+  let query = supabase
     .from('enquiries')
     .select('*')
     .order('created_at', { ascending: false })
+
+  if (formTypes?.length === 1) {
+    query = query.eq('form_type', formTypes[0])
+  } else if (formTypes?.length > 1) {
+    query = query.in('form_type', formTypes)
+  }
+
+  const { data, error } = await query
   if (error) throw error
   return data || []
 }

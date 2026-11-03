@@ -6,7 +6,12 @@ const tabs = [
   {
     to: '/admin/enquiries',
     label: 'Enquiries',
-    hint: 'Messages from the website',
+    hint: 'Enquiry & contact messages',
+  },
+  {
+    to: '/admin/quotes',
+    label: 'Quotes',
+    hint: 'Quote requests from the site',
   },
 ]
 

@@ -15,6 +15,7 @@ import RequestQuote from './pages/RequestQuote'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/AdminLogin'
 import EnquiriesAdmin from './pages/admin/EnquiriesAdmin'
+import QuotesAdmin from './pages/admin/QuotesAdmin'
 
 export default function App() {
   return (
@@ -37,7 +38,8 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="enquiries" replace />} />
-        <Route path="enquiries" element={<EnquiriesAdmin />} />
+        <Route path="enquiries" element={<EnquiriesAdmin mode="enquiries" />} />
+        <Route path="quotes" element={<QuotesAdmin />} />
         <Route path="copy" element={<Navigate to="/admin/enquiries" replace />} />
         <Route path="cards" element={<Navigate to="/admin/enquiries" replace />} />
         <Route path="projects" element={<Navigate to="/admin/enquiries" replace />} />

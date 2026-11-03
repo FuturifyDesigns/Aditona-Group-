@@ -11,7 +11,15 @@ const emptyDraft = {
   notes: '',
 }
 
-export default function EnquiriesAdmin() {
+/**
+ * Shared inbox UI.
+ * @param {'enquiries' | 'quotes'} mode
+ */
+export default function EnquiriesAdmin({ mode = 'enquiries' }) {
+  const isQuotes = mode === 'quotes'
+  const noun = isQuotes ? 'quote' : 'enquiry'
+  const nounPlural = isQuotes ? 'quotes' : 'enquiries'
+
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -23,13 +31,17 @@ export default function EnquiriesAdmin() {
     setLoading(true)
     setError('')
     try {
-      setRows(await listEnquiries())
+      setRows(
+        await listEnquiries({
+          formTypes: isQuotes ? ['quote'] : ['enquiry', 'contact'],
+        }),
+      )
     } catch (err) {
-      setError(err.message || 'Failed to load enquiries')
+      setError(err.message || `Failed to load ${nounPlural}`)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isQuotes, nounPlural])
 
   useEffect(() => {
     load()
@@ -67,7 +79,7 @@ export default function EnquiriesAdmin() {
     }
   }
 
-  if (loading) return <p className="admin-muted">Loading enquiries…</p>
+  if (loading) return <p className="admin-muted">Loading {nounPlural}…</p>
 
   const newCount = rows.filter((r) => (r.status || 'new') === 'new').length
 
@@ -76,15 +88,16 @@ export default function EnquiriesAdmin() {
       <div className="admin-help">
         <strong>How to use this page</strong>
         <p>
-          Click <em>Open</em> on a row to update status, follow-up date, and notes.
-          Start with anything marked <em>new</em>.
+          {isQuotes
+            ? 'Quote requests from /request-quote appear here. Each submission is also emailed to enquiries@aditona.com.'
+            : 'Enquiries and contact messages appear here. Quote requests are under Quotes. Submissions are also emailed to enquiries@aditona.com.'}
         </p>
       </div>
 
       <div className="admin-stats">
         <div className="admin-stat">
           <span>{rows.length}</span>
-          <p>Total enquiries</p>
+          <p>Total {nounPlural}</p>
         </div>
         <div className="admin-stat">
           <span>{newCount}</span>
@@ -93,7 +106,7 @@ export default function EnquiriesAdmin() {
       </div>
 
       <div className="admin-panel-head">
-        <h2>All messages</h2>
+        <h2>{isQuotes ? 'Quote requests' : 'Enquiries & contact'}</h2>
         <button type="button" className="btn btn-soft" onClick={load}>
           Refresh
         </button>
@@ -121,7 +134,7 @@ export default function EnquiriesAdmin() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={8} className="admin-muted">
-                  No enquiries yet.
+                  No {nounPlural} yet.
                 </td>
               </tr>
             )}
@@ -142,7 +155,7 @@ export default function EnquiriesAdmin() {
                 <td>{row.follow_up_date || '—'}</td>
                 <td>
                   <button type="button" className="btn btn-soft" onClick={() => openEdit(row)}>
-                    Edit
+                    Open
                   </button>
                 </td>
               </tr>
@@ -154,9 +167,10 @@ export default function EnquiriesAdmin() {
       {editing && (
         <div className="cms-popover-backdrop" onClick={() => setEditing(null)}>
           <div className="cms-popover admin-edit-drawer" onClick={(e) => e.stopPropagation()}>
-            <h2>Update enquiry</h2>
+            <h2>Update {noun}</h2>
             <p className="admin-muted">
               {editing.full_name} · {editing.email}
+              {editing.service ? ` · ${editing.service}` : ''}
             </p>
             {editing.message && (
               <blockquote className="admin-quote">{editing.message}</blockquote>
