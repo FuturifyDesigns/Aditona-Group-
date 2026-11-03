@@ -2548,12 +2548,16 @@ body.cms-edit-mode .work-runway-track {
   background: rgba(0, 0, 0, 0.45);
   display: grid;
   place-items: center;
-  padding: 1rem;
+  align-content: center;
+  padding: max(0.75rem, env(safe-area-inset-top)) 1rem
+    max(0.75rem, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cms-popover {
   width: min(100%, 420px);
-  max-height: min(92vh, 720px);
+  max-height: min(92dvh, 760px);
   background: #fff;
   color: var(--ag-black);
   border-radius: 12px;
@@ -2562,6 +2566,7 @@ body.cms-edit-mode .work-runway-track {
   display: grid;
   gap: 0.85rem;
   overflow: hidden;
+  min-height: 0;
 }
 
 .cms-popover--sheet {
@@ -3693,8 +3698,21 @@ body.cms-edit-mode .page-hero--dark .cms-editable {
 
 .admin-edit-drawer {
   width: min(100%, 520px);
-  display: grid;
-  gap: 0.85rem;
+  max-height: min(90dvh, 820px);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-edit-drawer .cms-popover-scroll {
+  padding-bottom: 1rem;
+}
+
+.admin-edit-drawer .admin-quote {
+  max-height: 9rem;
+  overflow-y: auto;
 }
 
 .admin-drawer-head h2 {
