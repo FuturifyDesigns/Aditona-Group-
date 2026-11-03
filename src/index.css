@@ -823,10 +823,9 @@ ul {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
-  background: #0b0b0c;
-  transform: scale(1);
+  transform: scale(1.02);
   transition: transform 0.7s var(--ease);
 }
 
