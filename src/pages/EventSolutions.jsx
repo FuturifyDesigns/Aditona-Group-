@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -115,14 +115,12 @@ export default function EventSolutions() {
             },
           },
         )
-        gsap.from('.events-rail-card', {
-          opacity: 0,
+        softScrollIn('.events-rail-card', {
           y: 40,
           stagger: 0.08,
           duration: 0.7,
-          ease: 'power3.out',
-          clearProps: 'transform',
-          scrollTrigger: { trigger: '.events-rail', start: 'top 80%' },
+          trigger: '.events-rail',
+          start: 'top 80%',
         })
       }
 
@@ -144,7 +142,7 @@ export default function EventSolutions() {
 
         tl.fromTo(
           panel,
-          { opacity: 0.25, y: 48, scale: 0.97 },
+          { opacity: 0.55, y: 48, scale: 0.97 },
           { opacity: 1, y: 0, scale: 1, ease: 'none' },
           0,
         )

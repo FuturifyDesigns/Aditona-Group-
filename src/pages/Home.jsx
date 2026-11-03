@@ -15,7 +15,7 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { cards, heroes } from '../lib/images'
 import { useMotionReady } from '../hooks/useMotionReady'
-import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -116,32 +116,36 @@ export default function Home() {
         return
       }
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.from('.hero-content h1', { opacity: 0, y: 36, duration: 0.85 })
-        .from('.hero-content > p', { opacity: 0, y: 20, duration: 0.55 }, '-=0.45')
-        .from('.hero-content .btn-row', { opacity: 0, y: 16, duration: 0.5 }, '-=0.3')
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+      tl.fromTo('.hero-content h1', { autoAlpha: 0.2, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.8 })
+        .fromTo(
+          '.hero-content > p',
+          { autoAlpha: 0.2, y: 16 },
+          { autoAlpha: 1, y: 0, duration: 0.55 },
+          '-=0.45',
+        )
+        .fromTo(
+          '.hero-content .btn-row',
+          { autoAlpha: 0.2, y: 12 },
+          { autoAlpha: 1, y: 0, duration: 0.5 },
+          '-=0.3',
+        )
 
-      gsap.from('.trust-item', {
-        opacity: 0,
-        y: 18,
-        stagger: 0.1,
-        duration: 0.7,
-        ease: 'power2.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.trust-grid', start: 'top 88%' },
+      softScrollIn('.trust-item', {
+        y: 16,
+        stagger: 0.08,
+        duration: 0.65,
+        trigger: '.trust-grid',
+        start: 'top 90%',
       })
 
-      gsap.from('.division-card', {
-        opacity: 0,
-        y: 56,
-        scale: 0.92,
-        rotateX: 8,
-        transformOrigin: '50% 100%',
-        stagger: 0.14,
-        duration: 0.95,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.division-grid', start: 'top 82%' },
+      softScrollIn('.division-card', {
+        y: 36,
+        scale: 0.98,
+        stagger: 0.1,
+        duration: 0.8,
+        trigger: '.division-grid',
+        start: 'top 84%',
       })
 
       const story = pageRef.current?.querySelector('.story-pin')
@@ -149,11 +153,11 @@ export default function Home() {
       const arts = gsap.utils.toArray('.story-art')
       const bars = gsap.utils.toArray('.story-progress span i')
       if (story && panels.length) {
-        gsap.set(panels, { opacity: 0, y: 28 })
-        gsap.set(panels[0], { opacity: 1, y: 0 })
-        gsap.set(arts, { opacity: 0, scale: 0.92 })
-        if (arts[0]) gsap.set(arts[0], { opacity: 1, scale: 1.08 })
-        gsap.set(bars[0], { width: '100%' })
+        gsap.set(panels, { autoAlpha: 0, y: 16 })
+        gsap.set(panels[0], { autoAlpha: 1, y: 0 })
+        gsap.set(arts, { autoAlpha: 0, scale: 1 })
+        if (arts[0]) gsap.set(arts[0], { autoAlpha: 1, scale: 1.04 })
+        if (bars[0]) gsap.set(bars[0], { width: '100%' })
 
         const storyTl = gsap.timeline({
           scrollTrigger: {
@@ -167,40 +171,38 @@ export default function Home() {
         panels.forEach((panel, i) => {
           if (i === 0) return
           const prev = panels[i - 1]
+          // Overlapped crossfade — no empty black/white gap between panels
           storyTl
-            .to(prev, { opacity: 0, y: -24, duration: 0.45 }, i)
-            .to(arts[i - 1], { opacity: 0, scale: 1.16, duration: 0.45 }, i)
-            .to(bars[i - 1], { width: '100%', duration: 0.2 }, i)
+            .to(prev, { autoAlpha: 0, y: -12, duration: 0.55 }, i)
+            .to(arts[i - 1], { autoAlpha: 0, scale: 1.06, duration: 0.55 }, i)
             .fromTo(
               panel,
-              { opacity: 0, y: 32 },
-              { opacity: 1, y: 0, duration: 0.45 },
-              i + 0.05,
+              { autoAlpha: 0, y: 16 },
+              { autoAlpha: 1, y: 0, duration: 0.55 },
+              i,
             )
             .fromTo(
               arts[i],
-              { opacity: 0, scale: 0.9 },
-              { opacity: 1, scale: 1.1, duration: 0.5 },
-              i + 0.05,
+              { autoAlpha: 0, scale: 0.98 },
+              { autoAlpha: 1, scale: 1.04, duration: 0.55 },
+              i,
             )
             .fromTo(
               bars[i],
               { width: '0%' },
-              { width: '100%', duration: 0.45 },
-              i + 0.05,
+              { width: '100%', duration: 0.55 },
+              i,
             )
         })
       }
 
-      gsap.from('.work-thumb', {
-        opacity: 0,
-        y: 48,
-        scale: 0.94,
-        stagger: 0.12,
-        duration: 0.9,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.work-gallery', start: 'top 82%' },
+      softScrollIn('.work-thumb', {
+        y: 28,
+        scale: 0.98,
+        stagger: 0.08,
+        duration: 0.75,
+        trigger: '.work-gallery',
+        start: 'top 84%',
       })
 
       hardRefreshScroll(pageRef.current)

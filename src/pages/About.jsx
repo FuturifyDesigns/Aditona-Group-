@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -175,10 +175,10 @@ export default function About() {
       const progress = gsap.utils.toArray('.manifesto-progress span i')
 
       if (manifestoSection && panels.length) {
-        gsap.set(panels, { opacity: 0, y: 40 })
-        gsap.set(panels[0], { opacity: 1, y: 0 })
-        gsap.set(arts, { opacity: 0, scale: 1.08 })
-        if (arts[0]) gsap.set(arts[0], { opacity: 1, scale: 1 })
+        gsap.set(panels, { autoAlpha: 0, y: 16 })
+        gsap.set(panels[0], { autoAlpha: 1, y: 0 })
+        gsap.set(arts, { autoAlpha: 0, scale: 1 })
+        if (arts[0]) gsap.set(arts[0], { autoAlpha: 1, scale: 1.04 })
         if (progress[0]) gsap.set(progress[0], { scaleX: 1 })
 
         const mTl = gsap.timeline({
@@ -192,49 +192,47 @@ export default function About() {
 
         panels.forEach((panel, i) => {
           if (i === 0) return
+          const prev = panels[i - 1]
+          // Overlapped crossfade — no empty white gap between panels
           mTl
-            .to(panels[i - 1], { opacity: 0, y: -36, duration: 0.5 }, i)
-            .to(arts[i - 1], { opacity: 0, scale: 1.05, duration: 0.5 }, i)
-            .to(progress[i - 1], { scaleX: 1, duration: 0.2 }, i)
+            .to(prev, { autoAlpha: 0, y: -12, duration: 0.55 }, i)
+            .to(arts[i - 1], { autoAlpha: 0, scale: 1.06, duration: 0.55 }, i)
             .fromTo(
               panel,
-              { opacity: 0, y: 48 },
-              { opacity: 1, y: 0, duration: 0.5 },
-              i + 0.05,
+              { autoAlpha: 0, y: 16 },
+              { autoAlpha: 1, y: 0, duration: 0.55 },
+              i,
             )
             .fromTo(
               arts[i],
-              { opacity: 0, scale: 1.1 },
-              { opacity: 1, scale: 1, duration: 0.55 },
-              i + 0.05,
+              { autoAlpha: 0, scale: 0.98 },
+              { autoAlpha: 1, scale: 1.04, duration: 0.55 },
+              i,
             )
             .fromTo(
               progress[i],
               { scaleX: 0 },
-              { scaleX: 1, duration: 0.5 },
-              i + 0.05,
+              { scaleX: 1, duration: 0.55 },
+              i,
             )
         })
       }
 
-      gsap.from('.about-moment', {
-        opacity: 0,
+      softScrollIn('.about-moment', {
         y: 48,
         scale: 0.94,
         stagger: 0.08,
         duration: 0.75,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.about-moments', start: 'top 82%' },
+        trigger: '.about-moments',
+        start: 'top 82%',
       })
 
-      gsap.from('.about-divisions-head > *', {
-        opacity: 0,
+      softScrollIn('.about-divisions-head > *', {
         y: 32,
         stagger: 0.1,
         duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.about-divisions', start: 'top 78%' },
+        trigger: '.about-divisions',
+        start: 'top 78%',
       })
 
       gsap.utils.toArray('.division-slide').forEach((slide, i) => {
@@ -277,14 +275,12 @@ export default function About() {
         }
       })
 
-      gsap.from('.value-row', {
-        opacity: 0,
+      softScrollIn('.value-row', {
         y: 48,
         stagger: 0.12,
         duration: 0.85,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.about-values', start: 'top 78%' },
+        trigger: '.about-values',
+        start: 'top 78%',
       })
 
       gsap.from('.about-line', {
@@ -295,15 +291,13 @@ export default function About() {
         scrollTrigger: { trigger: '.about-values', start: 'top 70%' },
       })
 
-      gsap.from('.method-step', {
-        opacity: 0,
+      softScrollIn('.method-step', {
         y: 36,
         scale: 0.96,
         stagger: 0.14,
         duration: 0.75,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.about-method', start: 'top 78%' },
+        trigger: '.about-method',
+        start: 'top 78%',
       })
 
       gsap.from('.method-track', {

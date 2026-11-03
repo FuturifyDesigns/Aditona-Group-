@@ -11,7 +11,7 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -117,14 +117,13 @@ export default function OurWork() {
       const teaserBar = pageRef.current?.querySelector('.work-runway .pin-teaser-bar > b')
       const teaser = pageRef.current?.querySelector('.work-runway .pin-teaser')
       if (track) {
-        gsap.from('.work-runway-card', {
-          opacity: 0,
+        softScrollIn('.work-runway-card', {
           y: 36,
           scale: 0.94,
           stagger: 0.08,
           duration: 0.7,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: '.work-runway', start: 'top 82%' },
+          trigger: '.work-runway',
+          start: 'top 82%',
         })
 
         const distance = () => {
@@ -163,13 +162,10 @@ export default function OurWork() {
         gsap.set('.work-case', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
         return
       }
-      gsap.from('.work-case', {
-        opacity: 0,
+      softScrollIn('.work-case', {
         y: 28,
         stagger: 0.06,
         duration: 0.55,
-        ease: 'power3.out',
-        clearProps: 'transform',
       })
     },
     { scope: gridRef, dependencies: [filter, listSignature(visible), motionKey] },

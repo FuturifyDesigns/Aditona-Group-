@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -55,12 +55,10 @@ export default function CreativeMarketing() {
         return
       }
 
-      gsap.from('.page-creative .page-hero-content > *', {
-        opacity: 0,
+      softScrollIn('.page-creative .page-hero-content > *', {
         y: 28,
         stagger: 0.1,
         duration: 0.8,
-        ease: 'power3.out',
       })
 
       gsap.utils.toArray('.creative-frame').forEach((frame, i) => {
@@ -70,7 +68,7 @@ export default function CreativeMarketing() {
 
         gsap.fromTo(
           frame,
-          { opacity: 0, y: 70, rotateX: 8 },
+          { opacity: 0.2, y: 70, rotateX: 8 },
           {
             opacity: 1,
             y: 0,
@@ -111,17 +109,13 @@ export default function CreativeMarketing() {
         })
       })
 
-      gsap.from('.creative-chip', {
-        opacity: 0,
+      softScrollIn('.creative-chip', {
         y: 36,
         scale: 0.92,
-        rotateY: -10,
-        transformOrigin: 'left center',
         stagger: 0.1,
         duration: 0.8,
-        ease: 'power3.out',
-        clearProps: 'transform',
-        scrollTrigger: { trigger: '.creative-services', start: 'top 82%' },
+        trigger: '.creative-services',
+        start: 'top 82%',
       })
 
       gsap.utils.toArray('.creative-chip').forEach((chip) => {

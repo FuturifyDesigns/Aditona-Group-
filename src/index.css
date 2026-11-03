@@ -12,7 +12,7 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --container: 1180px;
   color: var(--ag-black);
-  background: var(--ag-white);
+  background: var(--ag-bg);
   font-family: 'Inter Variable', Inter, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -32,7 +32,8 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--ag-white);
+  /* Soft page ground — pure white behind fading cards reads as harsh flashes */
+  background: var(--ag-bg);
   color: var(--ag-black);
   -webkit-tap-highlight-color: transparent;
   overflow-x: clip;
@@ -102,7 +103,7 @@ ul {
 }
 
 .section--soft {
-  background: var(--ag-bg);
+  background: #ececec;
 }
 
 .has-art {
@@ -1584,6 +1585,12 @@ ul {
 
 .reveal {
   will-change: transform, opacity;
+}
+
+/* Keep light sections from punching through as pure white during pin/scrub */
+.section:not(.section--dark),
+.page > section:not(.section--dark):not(.hero):not(.page-hero):not(.story-pin):not(.about-hero):not(.events-rail):not(.work-runway) {
+  background-color: var(--ag-bg);
 }
 
 .values-grid {

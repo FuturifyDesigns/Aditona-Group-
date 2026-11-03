@@ -6,6 +6,7 @@ gsap.registerPlugin(useGSAP)
 
 export default function HeroSlideshow({ slides = [], children }) {
   const rootRef = useRef(null)
+  const indexRef = useRef(0)
   const [index, setIndex] = useState(0)
   const reduced =
     typeof window !== 'undefined' &&
@@ -14,39 +15,51 @@ export default function HeroSlideshow({ slides = [], children }) {
   useGSAP(
     () => {
       if (!rootRef.current || !slides.length) return
-      const nodes = rootRef.current.querySelectorAll('.hero-slide')
+      const nodes = Array.from(rootRef.current.querySelectorAll('.hero-slide'))
       if (!nodes.length) return
 
-      if (reduced) {
-        gsap.set(nodes, { opacity: 0, scale: 1 })
-        gsap.set(nodes[0], { opacity: 1, scale: 1 })
-        return
-      }
-
-      nodes.forEach((node, i) => {
-        gsap.set(node, {
-          opacity: i === index ? 1 : 0,
-          scale: i === index ? 1.08 : 1.06,
-        })
-      })
-
-      const active = nodes[index]
-      if (!active) return
-
-      gsap.fromTo(
-        active,
-        { opacity: 0, scale: 1.06 },
-        { opacity: 1, scale: 1.12, duration: 5, ease: 'none' },
-      )
+      gsap.set(nodes, { opacity: 0, scale: 1.04 })
+      gsap.set(nodes[0], { opacity: 1, scale: 1.06 })
+      indexRef.current = 0
     },
-    { scope: rootRef, dependencies: [index, slides.length, reduced], revertOnUpdate: true },
+    { scope: rootRef, dependencies: [slides.length] },
   )
 
   useEffect(() => {
     if (reduced || slides.length < 2) return undefined
+
     const id = window.setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length)
-    }, 5000)
+      const root = rootRef.current
+      if (!root) return
+      const nodes = root.querySelectorAll('.hero-slide')
+      if (nodes.length < 2) return
+
+      const prev = indexRef.current
+      const next = (prev + 1) % nodes.length
+      indexRef.current = next
+      setIndex(next)
+
+      // Crossfade on black hero — never drop all slides to 0 (that flashes)
+      gsap.to(nodes[prev], {
+        opacity: 0,
+        scale: 1.1,
+        duration: 1.1,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+      })
+      gsap.fromTo(
+        nodes[next],
+        { opacity: 0, scale: 1.04 },
+        {
+          opacity: 1,
+          scale: 1.06,
+          duration: 1.1,
+          ease: 'power2.inOut',
+          overwrite: 'auto',
+        },
+      )
+    }, 5500)
+
     return () => window.clearInterval(id)
   }, [slides.length, reduced])
 

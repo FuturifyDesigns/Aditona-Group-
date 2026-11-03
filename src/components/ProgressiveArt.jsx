@@ -178,7 +178,7 @@ export default function ProgressiveArt({
         return
       }
 
-      gsap.set(art, { opacity: 0, scale: 0.82, transformOrigin: '50% 45%' })
+      gsap.set(art, { opacity: 0.05, scale: 0.82, transformOrigin: '50% 45%' })
 
       gsap
         .timeline({
@@ -191,7 +191,7 @@ export default function ProgressiveArt({
         })
         .to(art, { opacity: peak, scale: 1.08, duration: 0.36, ease: 'none' })
         .to(art, { opacity: peak, scale: 1.14, duration: 0.28, ease: 'none' })
-        .to(art, { opacity: 0, scale: 1.22, duration: 0.36, ease: 'none' })
+        .to(art, { opacity: Math.max(0.08, peak * 0.12), scale: 1.22, duration: 0.36, ease: 'none' })
     },
     { scope: ref, dependencies: [variant, peak, dark, motionKey] },
   )

@@ -11,7 +11,7 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -102,15 +102,13 @@ export default function Insights() {
         },
       })
 
-      gsap.utils.toArray('.insight-row').forEach((row, i) => {
-        const fromX = i % 2 === 0 ? -48 : 48
-        gsap.from(row, {
-          opacity: 0,
-          x: fromX,
+      gsap.utils.toArray('.insight-row').forEach((row) => {
+        softScrollIn(row, {
           y: 24,
+          stagger: 0,
           duration: 0.85,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: row, start: 'top 85%' },
+          trigger: row,
+          start: 'top 85%',
         })
       })
 

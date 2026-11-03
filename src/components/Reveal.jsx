@@ -10,11 +10,11 @@ export default function Reveal({
   children,
   className = '',
   style,
-  y = 40,
+  y = 22,
   x = 0,
-  scale = 0.96,
+  scale = 1,
   delay = 0,
-  duration = 0.9,
+  duration = 0.75,
   as: Tag = 'div',
 }) {
   const ref = useRef(null)
@@ -25,26 +25,28 @@ export default function Reveal({
       if (!el) return
 
       if (document.body.classList.contains('cms-edit-mode') || prefersReducedMotion()) {
-        gsap.set(el, { clearProps: 'all', opacity: 1, x: 0, y: 0, scale: 1 })
+        gsap.set(el, { clearProps: 'transform,opacity,filter', autoAlpha: 1, x: 0, y: 0, scale: 1 })
         return
       }
 
+      // Soft enter — never hard opacity 0 + blur (that reads as a white flash on light bg)
       gsap.fromTo(
         el,
-        { opacity: 0, y, x, scale, filter: 'blur(6px)' },
+        { autoAlpha: 0.15, y, x, scale },
         {
-          opacity: 1,
+          autoAlpha: 1,
           y: 0,
           x: 0,
           scale: 1,
-          filter: 'blur(0px)',
           duration,
           delay,
-          ease: 'power3.out',
+          ease: 'power2.out',
+          overwrite: 'auto',
           scrollTrigger: {
             trigger: el,
-            start: 'top 90%',
+            start: 'top 92%',
             toggleActions: 'play none none none',
+            once: true,
           },
         },
       )

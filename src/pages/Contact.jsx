@@ -9,6 +9,7 @@ import EditableText from '../cms/EditableText'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { config, waLink } from '../lib/config'
 import { gallery, heroes } from '../lib/images'
+import { softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -35,29 +36,28 @@ export default function Contact() {
         return
       }
 
-      gsap.from('.contact-channel', {
-        opacity: 0,
+      softScrollIn('.contact-channel', {
         y: 28,
         stagger: 0.1,
         duration: 0.7,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.contact-channels', start: 'top 85%' },
+        trigger: '.contact-channels',
+        start: 'top 85%',
       })
 
-      gsap.from('.contact-visual', {
-        opacity: 0,
-        clipPath: 'inset(8% 8% 8% 8% round 18px)',
+      softScrollIn('.contact-visual', {
+        y: 28,
         duration: 1.05,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.contact-split', start: 'top 80%' },
+        stagger: 0,
+        trigger: '.contact-split',
+        start: 'top 80%',
       })
 
-      gsap.from('.contact-form-panel', {
-        opacity: 0,
-        x: 36,
+      softScrollIn('.contact-form-panel', {
+        y: 28,
         duration: 0.85,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.contact-split', start: 'top 78%' },
+        stagger: 0,
+        trigger: '.contact-split',
+        start: 'top 78%',
       })
 
       gsap.to('.contact-visual img', {

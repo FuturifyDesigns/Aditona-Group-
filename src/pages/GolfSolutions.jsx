@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -67,17 +67,16 @@ export default function GolfSolutions() {
           },
         })
         tl.fromTo(media, { yPercent: 14, scale: 1.12 }, { yPercent: 0, scale: 1, ease: 'none' }, 0)
-          .fromTo(copy, { y: 36, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.06, ease: 'none' }, 0.05)
+          .fromTo(copy, { y: 36, opacity: 0.25 }, { y: 0, opacity: 1, stagger: 0.06, ease: 'none' }, 0.05)
       })
 
-      gsap.from('.golf-service-card', {
-        opacity: 0,
+      softScrollIn('.golf-service-card', {
         y: 50,
         scale: 0.94,
         stagger: { each: 0.1, from: 'center' },
         duration: 0.85,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.golf-services', start: 'top 82%' },
+        trigger: '.golf-services',
+        start: 'top 82%',
       })
 
       gsap.utils.toArray('.golf-service-card').forEach((card) => {

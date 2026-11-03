@@ -134,3 +134,41 @@ export function listSignature(items) {
   if (!items?.length) return '0'
   return `${items.length}:${items.map((i) => i.card?.id || i.id || i.title || i.src || '').join('|')}`
 }
+
+/**
+ * Soft scroll-in — avoids harsh white flashes from opacity:0 + blur on light sections.
+ */
+export function softScrollIn(targets, vars = {}) {
+  const {
+    y = 28,
+    scale = 1,
+    stagger = 0.08,
+    duration = 0.75,
+    trigger,
+    start = 'top 88%',
+    ...rest
+  } = vars
+
+  return gsap.fromTo(
+    targets,
+    { autoAlpha: 0.2, y, scale },
+    {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      duration,
+      stagger,
+      ease: 'power2.out',
+      overwrite: 'auto',
+      scrollTrigger: trigger
+        ? {
+            trigger,
+            start,
+            toggleActions: 'play none none none',
+            once: true,
+          }
+        : undefined,
+      ...rest,
+    },
+  )
+}
