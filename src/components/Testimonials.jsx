@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import EditableText from '../cms/EditableText'
 import Reveal from './Reveal'
 import {
@@ -61,8 +61,10 @@ const emptyForm = {
 }
 
 export default function Testimonials() {
+  const panelId = useId()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [formOpen, setFormOpen] = useState(false)
   const [values, setValues] = useState(emptyForm)
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState({ type: '', text: '' })
@@ -94,6 +96,7 @@ export default function Testimonials() {
 
     if (values.website_url) {
       setStatus({ type: 'ok', text: 'Thank you — your review has been posted.' })
+      setFormOpen(false)
       return
     }
 
@@ -134,6 +137,7 @@ export default function Testimonials() {
       setValues(emptyForm)
       setErrors({})
       setStatus({ type: 'ok', text: 'Thank you — your review is now on the site.' })
+      setFormOpen(false)
       await load()
     } catch {
       setStatus({
@@ -148,7 +152,7 @@ export default function Testimonials() {
   return (
     <section className="section testimonials-section has-art" id="testimonials">
       <div className="container">
-        <div className="section-head">
+        <div className="section-head testimonials-head">
           <div>
             <Reveal>
               <EditableText contentKey="home.testimonials_eyebrow" as="p" className="eyebrow">
@@ -173,125 +177,163 @@ export default function Testimonials() {
           </div>
         </div>
 
-        <div className="testimonials-layout">
-          <div className="testimonials-list" aria-live="polite">
-            {loading && <p className="admin-muted">Loading reviews…</p>}
-            {!loading && items.length === 0 && (
-              <p className="testimonials-empty">
-                Be the first to leave a review for Aditona Group.
+        <div className="testimonials-list" aria-live="polite">
+          {loading && <p className="admin-muted">Loading reviews…</p>}
+          {!loading && items.length === 0 && (
+            <p className="testimonials-empty">
+              Be the first to leave a review for Aditona Group.
+            </p>
+          )}
+          {!loading &&
+            items.map((item, i) => (
+              <Reveal key={item.id} delay={Math.min(i * 0.04, 0.2)}>
+                <article className="testimonial-item">
+                  <Stars value={item.rating} />
+                  <p className="testimonial-copy">{item.message}</p>
+                  <footer className="testimonial-byline">
+                    <strong>{item.full_name}</strong>
+                    {item.company ? <span>{item.company}</span> : null}
+                  </footer>
+                </article>
+              </Reveal>
+            ))}
+        </div>
+
+        <Reveal delay={0.1}>
+          <div className={`testimonial-compose${formOpen ? ' is-open' : ''}`}>
+            <button
+              type="button"
+              className="testimonial-compose-toggle"
+              aria-expanded={formOpen}
+              aria-controls={panelId}
+              onClick={() => setFormOpen((open) => !open)}
+            >
+              <span className="testimonial-compose-copy">
+                <strong>{formOpen ? 'Hide review form' : 'Write a review'}</strong>
+                <span>
+                  {formOpen
+                    ? 'Collapse this panel when you are done'
+                    : 'Open the form to rate and share your experience'}
+                </span>
+              </span>
+              <span className="testimonial-compose-chevron" aria-hidden="true" />
+            </button>
+
+            {status.text && !formOpen ? (
+              <p className={`form-msg ${status.type} testimonial-compose-status`} role="status">
+                {status.text}
               </p>
-            )}
-            {!loading &&
-              items.map((item, i) => (
-                <Reveal key={item.id} delay={Math.min(i * 0.04, 0.2)}>
-                  <article className="testimonial-item">
-                    <Stars value={item.rating} />
-                    <p className="testimonial-copy">{item.message}</p>
-                    <footer className="testimonial-byline">
-                      <strong>{item.full_name}</strong>
-                      {item.company ? <span>{item.company}</span> : null}
-                    </footer>
-                  </article>
-                </Reveal>
-              ))}
-          </div>
+            ) : null}
 
-          <Reveal delay={0.1}>
-            <form className="testimonial-form" onSubmit={onSubmit} noValidate>
-              <h3>Share your review</h3>
-              <p className="testimonial-form-hint">
-                Your name and review appear on this page. Email stays private for our records.
-              </p>
+            <div
+              id={panelId}
+              className="testimonial-compose-panel"
+              hidden={!formOpen}
+            >
+              <form className="testimonial-form" onSubmit={onSubmit} noValidate>
+                <p className="testimonial-form-hint">
+                  Your name and review appear on this page. Email stays private for our records.
+                </p>
 
-              <div className="field">
-                <label htmlFor="t_rating">Rating *</label>
-                <Stars
-                  value={values.rating}
-                  interactive
-                  onChange={(n) => setValues((v) => ({ ...v, rating: n }))}
-                />
-                {errors.rating && <div className="error">{errors.rating}</div>}
-              </div>
-
-              <div className="form-grid two">
                 <div className="field">
-                  <label htmlFor="t_full_name">Name *</label>
+                  <label htmlFor="t_rating">Rating *</label>
+                  <Stars
+                    value={values.rating}
+                    interactive
+                    onChange={(n) => setValues((v) => ({ ...v, rating: n }))}
+                  />
+                  {errors.rating && <div className="error">{errors.rating}</div>}
+                </div>
+
+                <div className="form-grid two">
+                  <div className="field">
+                    <label htmlFor="t_full_name">Name *</label>
+                    <input
+                      id="t_full_name"
+                      name="full_name"
+                      value={values.full_name}
+                      onChange={onChange}
+                      autoComplete="name"
+                      maxLength={120}
+                      required
+                    />
+                    {errors.full_name && <div className="error">{errors.full_name}</div>}
+                  </div>
+                  <div className="field">
+                    <label htmlFor="t_company">Company</label>
+                    <input
+                      id="t_company"
+                      name="company"
+                      value={values.company}
+                      onChange={onChange}
+                      autoComplete="organization"
+                      maxLength={160}
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label htmlFor="t_email">Email (private)</label>
                   <input
-                    id="t_full_name"
-                    name="full_name"
-                    value={values.full_name}
+                    id="t_email"
+                    name="email"
+                    type="email"
+                    value={values.email}
                     onChange={onChange}
-                    autoComplete="name"
-                    maxLength={120}
+                    autoComplete="email"
+                    maxLength={254}
+                  />
+                  {errors.email && <div className="error">{errors.email}</div>}
+                </div>
+
+                <div className="field">
+                  <label htmlFor="t_message">Your review *</label>
+                  <textarea
+                    id="t_message"
+                    name="message"
+                    rows={4}
+                    value={values.message}
+                    onChange={onChange}
+                    maxLength={1200}
                     required
                   />
-                  {errors.full_name && <div className="error">{errors.full_name}</div>}
+                  {errors.message && <div className="error">{errors.message}</div>}
                 </div>
-                <div className="field">
-                  <label htmlFor="t_company">Company</label>
+
+                <div className="hp" aria-hidden="true">
+                  <label htmlFor="t_website_url">Website</label>
                   <input
-                    id="t_company"
-                    name="company"
-                    value={values.company}
+                    id="t_website_url"
+                    name="website_url"
+                    value={values.website_url}
                     onChange={onChange}
-                    autoComplete="organization"
-                    maxLength={160}
+                    tabIndex={-1}
+                    autoComplete="off"
                   />
                 </div>
-              </div>
 
-              <div className="field">
-                <label htmlFor="t_email">Email (private)</label>
-                <input
-                  id="t_email"
-                  name="email"
-                  type="email"
-                  value={values.email}
-                  onChange={onChange}
-                  autoComplete="email"
-                  maxLength={254}
-                />
-                {errors.email && <div className="error">{errors.email}</div>}
-              </div>
+                {status.text ? (
+                  <p className={`form-msg ${status.type}`} role="status">
+                    {status.text}
+                  </p>
+                ) : null}
 
-              <div className="field">
-                <label htmlFor="t_message">Your review *</label>
-                <textarea
-                  id="t_message"
-                  name="message"
-                  rows={4}
-                  value={values.message}
-                  onChange={onChange}
-                  maxLength={1200}
-                  required
-                />
-                {errors.message && <div className="error">{errors.message}</div>}
-              </div>
-
-              <div className="hp" aria-hidden="true">
-                <label htmlFor="t_website_url">Website</label>
-                <input
-                  id="t_website_url"
-                  name="website_url"
-                  value={values.website_url}
-                  onChange={onChange}
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
-              </div>
-
-              {status.text ? (
-                <p className={`form-msg ${status.type}`} role="status">
-                  {status.text}
-                </p>
-              ) : null}
-
-              <button type="submit" className="btn btn-primary" disabled={submitting}>
-                {submitting ? 'Posting…' : 'Post review'}
-              </button>
-            </form>
-          </Reveal>
-        </div>
+                <div className="testimonial-form-actions">
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Posting…' : 'Post review'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-soft"
+                    onClick={() => setFormOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   )
