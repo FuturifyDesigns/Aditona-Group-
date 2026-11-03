@@ -28,7 +28,9 @@ export async function submitEnquiry(payload) {
   let data = null
   let dbError = null
   try {
-    const res = await supabase.from('enquiries').insert([row]).select('id').single()
+    // Do not .select() after insert — anon has INSERT but no SELECT under RLS,
+    // and Prefer: return=representation would otherwise 401.
+    const res = await supabase.from('enquiries').insert([row])
     data = res.data
     dbError = res.error
   } catch (err) {

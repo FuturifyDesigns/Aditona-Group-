@@ -1,8 +1,8 @@
 import { config } from './config'
 
 /**
- * Forward a website form submission to the inbox.
- * Uses FormSubmit (no SMTP needed with Cloudflare receive-only routing).
+ * Forward a website form submission to the inbox via FormSubmit.
+ * Uses application/x-www-form-urlencoded (simple request) to avoid CORS preflight.
  * First-time: FormSubmit emails enquiries@ for a one-click confirm, then delivers.
  */
 export async function notifyFormEmail(payload) {
@@ -14,31 +14,29 @@ export async function notifyFormEmail(payload) {
         ? 'Contact message'
         : 'Enquiry'
 
-  const body = {
-    _subject: `[Aditona] ${kind} — ${payload.full_name || 'Website'}`,
-    _template: 'table',
-    _captcha: 'false',
-    _replyto: payload.email || undefined,
-    Form: kind,
-    Name: payload.full_name || '',
-    Company: payload.company || '—',
-    Email: payload.email || '',
-    Phone: payload.phone || '—',
-    Division: payload.division || '—',
-    Service: payload.service || '—',
-    'Project date': payload.project_date || '—',
-    Budget: payload.budget || '—',
-    Message: payload.message || '',
-    Page: payload.page_source || '—',
-  }
+  const params = new URLSearchParams()
+  params.set('_subject', `[Aditona] ${kind} — ${payload.full_name || 'Website'}`)
+  params.set('_template', 'table')
+  params.set('_captcha', 'false')
+  if (payload.email) params.set('_replyto', payload.email)
+  params.set('Form', kind)
+  params.set('Name', payload.full_name || '')
+  params.set('Company', payload.company || '—')
+  params.set('Email', payload.email || '')
+  params.set('Phone', payload.phone || '—')
+  params.set('Division', payload.division || '—')
+  params.set('Service', payload.service || '—')
+  params.set('Project date', payload.project_date || '—')
+  params.set('Budget', payload.budget || '—')
+  params.set('Message', payload.message || '')
+  params.set('Page', payload.page_source || '—')
 
   const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: JSON.stringify(body),
+    body: params.toString(),
   })
 
   if (!res.ok) {
