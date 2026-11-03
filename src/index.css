@@ -823,8 +823,10 @@ ul {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transform: scale(1.02);
+  object-fit: contain;
+  object-position: center;
+  background: #0b0b0c;
+  transform: scale(1);
   transition: transform 0.7s var(--ease);
 }
 
@@ -2450,6 +2452,7 @@ body.cms-edit-mode {
 
 .cms-popover {
   width: min(100%, 420px);
+  max-height: min(92vh, 720px);
   background: #fff;
   color: var(--ag-black);
   border-radius: 12px;
@@ -2457,6 +2460,63 @@ body.cms-edit-mode {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
   display: grid;
   gap: 0.85rem;
+  overflow: hidden;
+}
+
+.cms-popover--sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.cms-popover-scroll {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+.cms-popover-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem 1.15rem;
+  border-top: 1px solid rgba(26, 26, 27, 0.1);
+  background: #fff;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+}
+
+.cms-btn-danger {
+  margin-right: auto;
+  color: #8b1a1a !important;
+  border-color: rgba(139, 26, 26, 0.25) !important;
+}
+
+.cms-popover-actions--start {
+  justify-content: flex-start;
+}
+
+.cms-editor-preview-frame {
+  width: 100%;
+  min-height: 160px;
+  max-height: 240px;
+  border-radius: 10px;
+  background: #0b0b0c;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.cms-editor-preview-frame.is-empty {
+  color: #9a9a9a;
+  font-size: 0.85rem;
+  background: #e8e8e8;
 }
 
 .cms-popover-key {
@@ -3121,23 +3181,16 @@ body.cms-edit-mode {
 }
 
 .cms-popover--wide {
-  width: min(28rem, calc(100vw - 2rem));
+  width: min(32rem, calc(100vw - 2rem));
 }
 
 .cms-editor-preview {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.65rem;
-  background: #e8e8e8;
-}
-
-.cms-editor-preview.is-empty {
-  display: grid;
-  place-items: center;
-  color: #6d6c6c;
-  font-size: 0.85rem;
+  height: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 
 .cms-add-tile {

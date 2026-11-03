@@ -45,6 +45,30 @@ export default function EditableButton({
     onClick?.(e)
   }
 
+  const dirty =
+    draftLabel !== (typeof label === 'string' ? label : '') ||
+    (hrefKey ? draftHref !== (resolvedHref || '') : false)
+
+  const undo = () => {
+    setDraftLabel(typeof label === 'string' ? label : '')
+    setDraftHref(resolvedHref || '')
+  }
+
+  const resetDefault = async () => {
+    const fallbackLabel = typeof children === 'string' ? children : ''
+    if (!window.confirm('Reset this button to the site default?')) return
+    setSaving(true)
+    try {
+      await setContent(contentKey, fallbackLabel)
+      if (hrefKey) await setContent(hrefKey, to || href || '')
+      setOpen(false)
+    } catch (err) {
+      alert(err.message || 'Failed to reset')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const save = async () => {
     setSaving(true)
     try {
@@ -110,39 +134,62 @@ export default function EditableButton({
             }}
           >
             <div
-              className="cms-popover"
+              className="cms-popover cms-popover--sheet"
               role="dialog"
               aria-label={`Edit ${contentKey}`}
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="cms-popover-key">{contentKey}</p>
-              <label className="cms-field">
-                <span>Label</span>
-                <input
-                  type="text"
-                  value={draftLabel}
-                  onChange={(e) => setDraftLabel(e.target.value)}
-                  autoFocus
-                />
-              </label>
-              {hrefKey && (
+              <div className="cms-popover-scroll">
+                <p className="cms-popover-key">{contentKey}</p>
                 <label className="cms-field">
-                  <span>Href ({hrefKey})</span>
+                  <span>Label</span>
                   <input
                     type="text"
-                    value={draftHref}
-                    onChange={(e) => setDraftHref(e.target.value)}
+                    value={draftLabel}
+                    onChange={(e) => setDraftLabel(e.target.value)}
+                    autoFocus
                   />
                 </label>
-              )}
-              <div className="cms-popover-actions">
-                <button type="button" className="btn btn-soft" onClick={() => setOpen(false)}>
+                {hrefKey && (
+                  <label className="cms-field">
+                    <span>Href ({hrefKey})</span>
+                    <input
+                      type="text"
+                      value={draftHref}
+                      onChange={(e) => setDraftHref(e.target.value)}
+                    />
+                  </label>
+                )}
+              </div>
+              <div className="cms-popover-footer">
+                <button
+                  type="button"
+                  className="btn btn-soft cms-btn-danger"
+                  onClick={resetDefault}
+                  disabled={saving}
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-soft"
+                  onClick={undo}
+                  disabled={saving || !dirty}
+                >
+                  Undo
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-soft"
+                  onClick={() => setOpen(false)}
+                  disabled={saving}
+                >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="btn btn-primary"
-                  disabled={saving}
+                  disabled={saving || !dirty}
                   onClick={save}
                 >
                   {saving ? 'Saving…' : 'Save'}

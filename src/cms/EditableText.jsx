@@ -17,9 +17,13 @@ export default function EditableText({
   const [draft, setDraft] = useState(value)
   const [saving, setSaving] = useState(false)
   const anchorRef = useRef(null)
+  const initialRef = useRef(value)
 
   useEffect(() => {
-    if (open) setDraft(value)
+    if (open) {
+      setDraft(value)
+      initialRef.current = value
+    }
   }, [open, value])
 
   const openEditor = (e) => {
@@ -27,6 +31,24 @@ export default function EditableText({
     e.preventDefault()
     e.stopPropagation()
     setOpen(true)
+  }
+
+  const dirty = draft !== initialRef.current
+
+  const undo = () => setDraft(initialRef.current)
+
+  const resetDefault = async () => {
+    const fallback = typeof children === 'string' ? children : ''
+    if (!window.confirm('Reset this text to the site default?')) return
+    setSaving(true)
+    try {
+      await setContent(contentKey, fallback)
+      setOpen(false)
+    } catch (err) {
+      alert(err.message || 'Failed to reset')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const save = async () => {
@@ -71,35 +93,58 @@ export default function EditableText({
             }}
           >
             <div
-              className="cms-popover"
+              className="cms-popover cms-popover--sheet"
               role="dialog"
               aria-label={`Edit ${contentKey}`}
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="cms-popover-key">{contentKey}</p>
-              {multiline ? (
-                <textarea
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  rows={5}
-                  autoFocus
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  autoFocus
-                />
-              )}
-              <div className="cms-popover-actions">
-                <button type="button" className="btn btn-soft" onClick={() => setOpen(false)}>
+              <div className="cms-popover-scroll">
+                <p className="cms-popover-key">{contentKey}</p>
+                {multiline ? (
+                  <textarea
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    rows={5}
+                    autoFocus
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    autoFocus
+                  />
+                )}
+              </div>
+              <div className="cms-popover-footer">
+                <button
+                  type="button"
+                  className="btn btn-soft cms-btn-danger"
+                  onClick={resetDefault}
+                  disabled={saving}
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-soft"
+                  onClick={undo}
+                  disabled={saving || !dirty}
+                >
+                  Undo
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-soft"
+                  onClick={() => setOpen(false)}
+                  disabled={saving}
+                >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="btn btn-primary"
-                  disabled={saving}
+                  disabled={saving || !dirty}
                   onClick={save}
                 >
                   {saving ? 'Saving…' : 'Save'}

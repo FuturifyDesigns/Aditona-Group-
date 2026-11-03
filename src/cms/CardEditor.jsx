@@ -1,11 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { uploadMedia } from '../lib/supabase'
 import { useCms } from './CmsContext'
 
+function buildInitial(kind, record, defaults) {
+  const base = { ...defaults, ...(record || {}) }
+  if (kind === 'project') {
+    return {
+      ...base,
+      title: base.title || '',
+      summary: base.summary || base.body || '',
+      image_url: base.image_url || '',
+      division: base.division || base.tag || '',
+      sort_order: Number(base.sort_order) || 0,
+      published: base.published !== false,
+    }
+  }
+  return {
+    ...base,
+    collection: base.collection || defaults.collection || 'home_divisions',
+    title: base.title || '',
+    body: base.body || '',
+    image_url: base.image_url || '',
+    link_url: base.link_url || '',
+    link_label: base.link_label || '',
+    sort_order: Number(base.sort_order) || 0,
+    published: base.published !== false,
+  }
+}
+
 /**
- * Live-edit popover for cms_cards rows or projects rows.
- * kind: 'card' | 'project'
+ * Live-edit dialog for cms_cards or projects — Save / Undo / Delete always visible.
  */
 export default function CardEditor({
   kind = 'card',
@@ -15,13 +40,20 @@ export default function CardEditor({
 }) {
   const { saveCard, removeCard, saveProject, removeProject } = useCms()
   const fileRef = useRef(null)
-  const [draft, setDraft] = useState(() => ({ ...defaults, ...record }))
+  const initial = useMemo(
+    () => buildInitial(kind, record, defaults),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [kind, record?.id],
+  )
+  const [draft, setDraft] = useState(initial)
   const [saving, setSaving] = useState(false)
   const [busyImage, setBusyImage] = useState(false)
 
   useEffect(() => {
-    setDraft({ ...defaults, ...record })
-  }, [record, defaults])
+    setDraft(buildInitial(kind, record, defaults))
+  }, [kind, record, defaults])
+
+  const dirty = JSON.stringify(draft) !== JSON.stringify(initial)
 
   const onChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -30,6 +62,8 @@ export default function CardEditor({
       [name]: type === 'checkbox' ? checked : value,
     }))
   }
+
+  const undo = () => setDraft(initial)
 
   const onImage = async (e) => {
     const file = e.target.files?.[0]
@@ -53,9 +87,9 @@ export default function CardEditor({
         const payload = {
           id: record?.id,
           title: draft.title?.trim() || 'Untitled',
-          summary: draft.summary?.trim() || draft.body?.trim() || '',
+          summary: draft.summary?.trim() || '',
           image_url: draft.image_url || '',
-          division: draft.division?.trim() || draft.tag?.trim() || '',
+          division: draft.division?.trim() || '',
           sort_order: Number(draft.sort_order) || 0,
           published: draft.published !== false,
         }
@@ -103,11 +137,6 @@ export default function CardEditor({
   }
 
   const image = draft.image_url || ''
-  const bodyKey = kind === 'project' ? 'summary' : 'body'
-  const bodyValue = kind === 'project' ? draft.summary ?? draft.body ?? '' : draft.body ?? ''
-  const tagKey = kind === 'project' ? 'division' : 'link_label'
-  const tagLabel = kind === 'project' ? 'Division / category' : 'Link label'
-  const tagValue = kind === 'project' ? draft.division ?? '' : draft.link_label ?? ''
 
   return createPortal(
     <div
@@ -118,71 +147,95 @@ export default function CardEditor({
       }}
     >
       <div
-        className="cms-popover cms-popover--wide"
+        className="cms-popover cms-popover--wide cms-popover--sheet"
         role="dialog"
         aria-label="Edit content"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="cms-popover-key">
-          {kind === 'project' ? 'Project' : `Card · ${draft.collection || 'content'}`}
-          {record?.id ? '' : ' · new'}
-        </p>
+        <div className="cms-popover-scroll">
+          <p className="cms-popover-key">
+            {kind === 'project' ? 'Project' : `Card · ${draft.collection || 'content'}`}
+            {record?.id ? '' : ' · new'}
+          </p>
 
-        {image ? (
-          <img src={image} alt="" className="cms-editor-preview" />
-        ) : (
-          <div className="cms-editor-preview is-empty">No image</div>
-        )}
+          {image ? (
+            <div className="cms-editor-preview-frame">
+              <img src={image} alt="" className="cms-editor-preview" />
+            </div>
+          ) : (
+            <div className="cms-editor-preview-frame is-empty">No image</div>
+          )}
 
-        <div className="cms-popover-actions" style={{ marginBottom: '0.75rem' }}>
+          <div className="cms-popover-actions cms-popover-actions--start">
+            <button
+              type="button"
+              className="btn btn-soft"
+              disabled={busyImage}
+              onClick={() => fileRef.current?.click()}
+            >
+              {busyImage ? 'Uploading…' : 'Replace image'}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" hidden onChange={onImage} />
+          </div>
+
+          <label className="cms-field">
+            <span>Title</span>
+            <input name="title" value={draft.title || ''} onChange={onChange} autoFocus />
+          </label>
+
+          <label className="cms-field">
+            <span>{kind === 'project' ? 'Summary' : 'Body'}</span>
+            <textarea
+              name={kind === 'project' ? 'summary' : 'body'}
+              value={kind === 'project' ? draft.summary || '' : draft.body || ''}
+              onChange={onChange}
+              rows={4}
+            />
+          </label>
+
+          <label className="cms-field">
+            <span>{kind === 'project' ? 'Division / category' : 'Link label'}</span>
+            <input
+              name={kind === 'project' ? 'division' : 'link_label'}
+              value={kind === 'project' ? draft.division || '' : draft.link_label || ''}
+              onChange={onChange}
+            />
+          </label>
+
+          {kind === 'card' && (
+            <label className="cms-field">
+              <span>Link URL</span>
+              <input name="link_url" value={draft.link_url || ''} onChange={onChange} />
+            </label>
+          )}
+        </div>
+
+        <div className="cms-popover-footer">
+          <button
+            type="button"
+            className="btn btn-soft cms-btn-danger"
+            onClick={remove}
+            disabled={saving}
+          >
+            {record?.id ? 'Delete' : 'Discard'}
+          </button>
           <button
             type="button"
             className="btn btn-soft"
-            disabled={busyImage}
-            onClick={() => fileRef.current?.click()}
+            onClick={undo}
+            disabled={saving || !dirty}
           >
-            {busyImage ? 'Uploading…' : 'Replace image'}
+            Undo
           </button>
-          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onImage} />
-        </div>
-
-        <label className="cms-field">
-          <span>Title</span>
-          <input name="title" value={draft.title || ''} onChange={onChange} autoFocus />
-        </label>
-
-        <label className="cms-field">
-          <span>{kind === 'project' ? 'Summary' : 'Body'}</span>
-          <textarea
-            name={bodyKey}
-            value={bodyValue}
-            onChange={onChange}
-            rows={4}
-          />
-        </label>
-
-        <label className="cms-field">
-          <span>{tagLabel}</span>
-          <input name={tagKey} value={tagValue} onChange={onChange} />
-        </label>
-
-        {kind === 'card' && (
-          <label className="cms-field">
-            <span>Link URL</span>
-            <input name="link_url" value={draft.link_url || ''} onChange={onChange} />
-          </label>
-        )}
-
-        <div className="cms-popover-actions">
-          {record?.id && (
-            <button type="button" className="btn btn-soft" onClick={remove} disabled={saving}>
-              Delete
-            </button>
-          )}
-          <button type="button" className="btn btn-soft" onClick={onClose}>
+          <button type="button" className="btn btn-soft" onClick={onClose} disabled={saving}>
             Cancel
           </button>
-          <button type="button" className="btn btn-primary" onClick={save} disabled={saving}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={save}
+            disabled={saving || !dirty}
+          >
             {saving ? 'Saving…' : 'Save'}
           </button>
         </div>
