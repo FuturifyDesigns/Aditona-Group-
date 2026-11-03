@@ -3721,6 +3721,16 @@ body.cms-edit-mode .page-hero--dark .cms-editable {
   letter-spacing: -0.02em;
 }
 
+.admin-reply-cta {
+  margin-top: 0.85rem;
+  width: fit-content;
+  text-decoration: none;
+}
+
+a.admin-btn {
+  text-decoration: none;
+}
+
 .admin-drawer-kicker {
   margin: 0;
   font-size: 0.72rem;

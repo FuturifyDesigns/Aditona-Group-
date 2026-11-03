@@ -56,7 +56,8 @@ function buildBody(payload) {
     clean(payload.message, 5000) || '—',
     '',
     '—',
-    'Also saved in Admin → Enquiries / Quotes on aditona.com',
+    'Reply to this email to respond directly to the client.',
+    'Also saved in Admin → Enquiries / Quotes (use Reply there too).',
   ].join('\n')
 }
 

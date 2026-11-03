@@ -49,6 +49,38 @@ function formatFollowUp(value) {
   })
 }
 
+/** Opens the admin's mail app addressed to the form submitter. */
+function buildReplyMailto(row, noun) {
+  const to = String(row?.email || '').trim()
+  if (!to) return null
+
+  const name = String(row.full_name || 'there').trim()
+  const formType = String(row.form_type || noun || 'enquiry').trim()
+  const subject = `Re: Your Aditona ${formType} request`
+  const quote = String(row.message || '')
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => `> ${line}`)
+    .join('\n')
+
+  const body = [
+    `Hi ${name},`,
+    '',
+    'Thank you for getting in touch with Aditona Group.',
+    '',
+    '',
+    '',
+    'Kind regards,',
+    'Aditona Group',
+    '',
+    '----------',
+    `Original ${formType}:`,
+    quote || '(no message)',
+  ].join('\n')
+
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+}
+
 /**
  * Shared inbox UI.
  * @param {'enquiries' | 'quotes'} mode
@@ -159,8 +191,8 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
         <strong>How to use this page</strong>
         <p>
           {isQuotes
-            ? 'Quote requests from the website. Open a row to update status, notes, or delete.'
-            : 'Enquiry and contact messages. Quotes live under Quotes. Open a row to update or delete.'}
+            ? 'Quote requests from the website. Use Reply to email the client at the address they submitted, or Open to update status and notes.'
+            : 'Enquiry and contact messages. Quotes live under Quotes. Reply emails the submitter; Open updates status or deletes.'}
         </p>
       </div>
 
@@ -238,9 +270,26 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                   </td>
                   <td className="admin-cell-follow">{formatFollowUp(row.follow_up_date)}</td>
                   <td className="admin-row-actions">
+                    {row.email ? (
+                      <a
+                        className="admin-btn admin-btn-solid"
+                        href={buildReplyMailto(row, noun)}
+                        onClick={async () => {
+                          if ((row.status || 'new') !== 'new') return
+                          try {
+                            await updateEnquiry(row.id, { status: 'contacted' })
+                            await load()
+                          } catch {
+                            /* reply still works even if status update fails */
+                          }
+                        }}
+                      >
+                        Reply
+                      </a>
+                    ) : null}
                     <button
                       type="button"
-                      className="admin-btn admin-btn-solid"
+                      className="admin-btn admin-btn-ghost"
                       onClick={() => openEdit(row)}
                     >
                       Open
@@ -279,6 +328,25 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                   {editing.service ? ` · ${editing.service}` : ''}
                   {editing.division ? ` · ${editing.division}` : ''}
                 </p>
+                {editing.email ? (
+                  <a
+                    className="admin-btn admin-btn-solid admin-reply-cta"
+                    href={buildReplyMailto(editing, noun)}
+                    onClick={async () => {
+                      if ((editing.status || 'new') !== 'new') return
+                      try {
+                        await updateEnquiry(editing.id, { status: 'contacted' })
+                        setDraft((d) => ({ ...d, status: 'contacted' }))
+                        setEditing((e) => (e ? { ...e, status: 'contacted' } : e))
+                        await load()
+                      } catch {
+                        /* ignore */
+                      }
+                    }}
+                  >
+                    Reply by email
+                  </a>
+                ) : null}
               </div>
               {editing.message && (
                 <blockquote className="admin-quote">{editing.message}</blockquote>
