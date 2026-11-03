@@ -5,7 +5,7 @@ export const DEFAULTS = {
   'nav.cta': 'Request a Quote',
   'hero.headline': config.headline,
   'hero.body':
-    'Aditona Group unites Event Solutions, Creative & Marketing, and Golf Solutions — one accountable partner from brief to delivery.',
+    'Aditona Group unites Event Solutions, Creative & Marketing, Golf Solutions, and Sourcing & Procurement — one accountable partner from brief to delivery.',
   'hero.cta_quote': 'Request a Quote',
   'hero.cta_enquiry': 'Make an Enquiry',
   'hero.tagline': config.tagline,
