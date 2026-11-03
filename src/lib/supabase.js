@@ -132,6 +132,52 @@ export async function deleteEnquiry(id) {
   if (error) throw error
 }
 
+export async function listPublicTestimonials() {
+  const { data, error } = await supabase
+    .from('testimonials')
+    .select('id, created_at, full_name, company, rating, message')
+    .eq('is_hidden', false)
+    .order('created_at', { ascending: false })
+    .limit(24)
+  if (error) throw error
+  return data || []
+}
+
+export async function listAllTestimonials() {
+  const { data, error } = await supabase
+    .from('testimonials')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function submitTestimonial(payload) {
+  const row = {
+    full_name: payload.full_name,
+    company: payload.company || null,
+    email: payload.email || null,
+    rating: payload.rating,
+    message: payload.message,
+    is_hidden: false,
+    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+  }
+  // No .select() — keep insert fast and RLS-safe for anon
+  const { error } = await supabase.from('testimonials').insert([row])
+  if (error) throw error
+  return { ok: true }
+}
+
+export async function updateTestimonial(id, patch) {
+  const { error } = await supabase.from('testimonials').update(patch).eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteTestimonial(id) {
+  const { error } = await supabase.from('testimonials').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function listProjects() {
   const { data, error } = await supabase
     .from('projects')

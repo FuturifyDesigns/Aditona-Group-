@@ -13,6 +13,11 @@ const tabs = [
     label: 'Quotes',
     hint: 'Quote requests from the site',
   },
+  {
+    to: '/admin/testimonials',
+    label: 'Testimonials',
+    hint: 'Client reviews on the homepage',
+  },
 ]
 
 export default function AdminLayout() {

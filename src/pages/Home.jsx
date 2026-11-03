@@ -6,6 +6,7 @@ import CountUp from '../components/CountUp'
 import CTABand from '../components/CTABand'
 import DivisionCard from '../components/DivisionCard'
 import HeroSlideshow from '../components/HeroSlideshow'
+import Testimonials from '../components/Testimonials'
 import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
@@ -467,6 +468,8 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      <Testimonials />
 
       <CTABand />
 

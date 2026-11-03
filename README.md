@@ -40,7 +40,7 @@ Admin email: **admin@aditona.com** only (other accounts are signed out automatic
 Change the password in the Supabase Auth dashboard if needed. Do not commit passwords.
 
 1. Sign in at `/admin` (or `/admin/login`) with `admin@aditona.com`.
-2. Use the admin tabs: **Enquiries** | **Copy** | **Cards** | **Projects**.
+2. Use the admin tabs: **Enquiries** | **Quotes** | **Testimonials**.
 3. On the public site, the fixed bar appears when you are authenticated. Toggle **Edit Live: ON**.
 4. Clickable fields and buttons show a pencil badge.
 5. Images can be replaced via file picker (uploads to the public `media` storage bucket).
@@ -53,6 +53,14 @@ Public forms save into Supabase `enquiries`, then a Cloudflare Worker emails `ad
 - **Admin → Quotes** — quote requests only (update / delete)  
 
 If insert or delete is blocked by RLS, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor.
+
+## Testimonials
+
+Homepage section where clients post reviews. Admin can **Hide** (remove from site) or **Delete**.
+
+1. Run `supabase/testimonials.sql` once in the Supabase SQL Editor.
+2. Reviews appear on `/` under **What clients say**.
+3. Manage them at **Admin → Testimonials**.
 
 ## Security notes
 

@@ -26,6 +26,10 @@ export const DEFAULTS = {
   'home.work_body':
     'A snapshot of recent productions, campaigns, and golf hospitality engagements across the group.',
   'home.work_cta': 'View all work',
+  'home.testimonials_eyebrow': 'Testimonials',
+  'home.testimonials_title': 'What clients say',
+  'home.testimonials_body':
+    'Real feedback from people we have worked with — share your experience below.',
   'cta.title': 'Have a project in mind?',
   'cta.body':
     'Tell us what you need — we will route it to the right division and respond with a clear next step.',

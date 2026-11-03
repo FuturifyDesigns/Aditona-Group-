@@ -31,6 +31,9 @@ export default function EditModeBar() {
       <Link to="/admin/quotes" className="cms-bar-link">
         Quotes
       </Link>
+      <Link to="/admin/testimonials" className="cms-bar-link">
+        Testimonials
+      </Link>
       <button type="button" className="cms-bar-link" onClick={logout}>
         Log out
       </button>
