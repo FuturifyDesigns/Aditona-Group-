@@ -1,27 +1,30 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
+import { useCms } from '../cms/CmsContext'
+import { mergeCards } from '../cms/mergeCards'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const moments = [
-  { image: gallery.events.showCaller, label: 'Show calling' },
-  { image: gallery.events.registration, label: 'Registration' },
-  { image: gallery.events.livestream, label: 'Livestream' },
-  { image: gallery.events.lighting, label: 'Stage build' },
-  { image: gallery.events.gala, label: 'Gala prep' },
-  { image: gallery.events.outdoor, label: 'Outdoor activation' },
+const FALLBACK_MOMENTS = [
+  { image: gallery.events.showCaller, title: 'Show calling', text: '', label: 'Show calling' },
+  { image: gallery.events.registration, title: 'Registration', text: '', label: 'Registration' },
+  { image: gallery.events.livestream, title: 'Livestream', text: '', label: 'Livestream' },
+  { image: gallery.events.lighting, title: 'Stage build', text: '', label: 'Stage build' },
+  { image: gallery.events.gala, title: 'Gala prep', text: '', label: 'Gala prep' },
+  { image: gallery.events.outdoor, title: 'Outdoor activation', text: '', label: 'Outdoor activation' },
 ]
 
-const services = [
+const FALLBACK_SERVICES = [
   {
     title: 'Conferences & summits',
     text: 'Programme design, speaker management, registration flows, and stage production that keep days on time.',
@@ -50,6 +53,16 @@ const services = [
 
 export default function EventSolutions() {
   const pageRef = useRef(null)
+  const { cardsByCollection, editMode } = useCms()
+
+  const moments = useMemo(
+    () => mergeCards(cardsByCollection('events_moments'), FALLBACK_MOMENTS),
+    [cardsByCollection],
+  )
+  const services = useMemo(
+    () => mergeCards(cardsByCollection('events_services'), FALLBACK_SERVICES),
+    [cardsByCollection],
+  )
 
   useGSAP(
     () => {
@@ -151,36 +164,49 @@ export default function EventSolutions() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [moments, services, editMode] },
   )
 
   return (
     <div ref={pageRef} className="page-events">
       <PageHero
         image={heroes.events}
-        eyebrow={<p className="eyebrow">Division</p>}
-        title={<SplitHeadline text="Event Solutions" as="h1" />}
+        eyebrow={<EditableText contentKey="events.eyebrow" as="p" className="eyebrow" />}
+        title={<EditableText contentKey="events.hero_title" as="h1" />}
         body={
-          <p className="hero-lead">
-            From intimate briefings to multi-day conferences — we plan, produce, and
-            deliver events with precision and presence.
-          </p>
+          <EditableText contentKey="events.hero_body" as="p" className="hero-lead" multiline />
         }
       />
 
       <section className="events-rail has-art" aria-label="Production moments">
         <ProgressiveArt variant="grid" peak={0.45} dark />
         <div className="events-rail-head container">
-          <p className="eyebrow">On the floor</p>
-          <h2>Production in motion</h2>
+          <EditableText contentKey="events.rail_eyebrow" as="p" className="eyebrow" />
+          <EditableText contentKey="events.rail_title" as="h2" />
         </div>
         <div className="events-rail-track">
           {moments.map((m) => (
-            <figure className="events-rail-card" key={m.label}>
+            <CmsClickEdit
+              as="figure"
+              className="events-rail-card"
+              collection="events_moments"
+              item={m}
+              key={m.card?.id || m.title}
+            >
               <img src={m.image} alt="" loading="lazy" />
-              <figcaption>{m.label}</figcaption>
-            </figure>
+              <figcaption>{m.label || m.title}</figcaption>
+            </CmsClickEdit>
           ))}
+          <CmsAddCard
+            collection="events_moments"
+            defaults={{
+              sort_order: moments.length,
+              image_url: FALLBACK_MOMENTS[0].image,
+              title: 'New moment',
+              body: '',
+            }}
+            label="+ Add moment"
+          />
         </div>
         <aside className="pin-teaser" aria-hidden="true">
           <p className="eyebrow">Up next</p>
@@ -197,21 +223,32 @@ export default function EventSolutions() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Services</p>
-              <h2>What we deliver</h2>
+              <EditableText contentKey="events.services_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="events.services_title" as="h2" />
             </div>
           </div>
           <div className="service-panels">
             {services.map((s, i) => (
-              <article className="service-panel" key={s.title}>
+              <CmsClickEdit
+                as="article"
+                className="service-panel"
+                collection="events_services"
+                item={s}
+                key={s.card?.id || s.title}
+              >
                 <span className="service-panel-num">0{i + 1}</span>
                 <div className="service-panel-body">
                   <h3>{s.title}</h3>
                   <p>{s.text}</p>
                   <i className="service-panel-line" aria-hidden="true" />
                 </div>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="events_services"
+              defaults={{ sort_order: services.length, title: 'New service', body: '' }}
+              label="+ Add service"
+            />
           </div>
         </div>
       </section>
@@ -219,22 +256,25 @@ export default function EventSolutions() {
       <section className="section section--soft has-art">
         <ProgressiveArt variant="arcs" peak={0.5} />
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <p className="eyebrow">Engage</p>
-          <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
-            How to work with us
-          </h2>
-          <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
-            Share your date, audience size, venue preferences, and success measures.
-            We respond with a scoped proposal covering creative direction, production,
-            and on-site staffing.
-          </p>
+          <EditableText contentKey="events.engage_eyebrow" as="p" className="eyebrow" />
+          <EditableText
+            contentKey="events.engage_title"
+            as="h2"
+            style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}
+          />
+          <EditableText
+            contentKey="events.engage_body"
+            as="p"
+            multiline
+            style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}
+          />
           <div className="btn-row">
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton to="/request-quote" contentKey="cta.quote" className="btn btn-primary">
               Request a Quote
-            </Link>
-            <Link to="/enquiry" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton to="/enquiry" contentKey="cta.enquiry" className="btn btn-soft">
               Make an Enquiry
-            </Link>
+            </EditableButton>
           </div>
         </div>
       </section>

@@ -1,7 +1,7 @@
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableText from '../cms/EditableText'
 import { heroes } from '../lib/images'
 
 export default function RequestQuote() {
@@ -9,13 +9,21 @@ export default function RequestQuote() {
     <>
       <PageHero
         image={heroes.contact}
-        eyebrow={<p className="eyebrow">Quote</p>}
-        title={<SplitHeadline text="Request a Quote" as="h1" />}
+        eyebrow={
+          <EditableText contentKey="quote.eyebrow" as="p" className="eyebrow">
+            Quote
+          </EditableText>
+        }
+        title={
+          <EditableText contentKey="quote.hero_title" as="h1">
+            Request a Quote
+          </EditableText>
+        }
         body={
-          <p className="hero-lead">
+          <EditableText contentKey="quote.hero_body" as="p" className="hero-lead" multiline>
             Share as much as you can about scope, timing, and budget. We will return a
             clear proposal from the right division.
-          </p>
+          </EditableText>
         }
       />
 

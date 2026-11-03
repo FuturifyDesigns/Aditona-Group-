@@ -1,18 +1,21 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
+import { useCms } from '../cms/CmsContext'
+import { mergeCards } from '../cms/mergeCards'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const frames = [
+const FALLBACK_FRAMES = [
   { image: gallery.creative.workshop, title: 'Brand workshop', text: 'Aligning language, tone, and visual direction.' },
   { image: gallery.creative.proof, title: 'Proof review', text: 'Material systems checked before they go live.' },
   { image: gallery.creative.shoot, title: 'Content shoot', text: 'Photography and film built around the brief.' },
@@ -21,7 +24,7 @@ const frames = [
   { image: gallery.creative.install, title: 'Installation', text: 'Brand systems that hold up in the room.' },
 ]
 
-const services = [
+const FALLBACK_SERVICES = [
   { title: 'Brand identity', text: 'Naming support, visual systems, and guidelines that keep every touchpoint coherent.' },
   { title: 'Campaign strategy', text: 'Insight-led platforms and channel plans built for measurable brand movement.' },
   { title: 'Content & social', text: 'Editorial calendars, production, and community rhythms that stay on-brand.' },
@@ -32,6 +35,16 @@ const services = [
 
 export default function CreativeMarketing() {
   const pageRef = useRef(null)
+  const { cardsByCollection, editMode } = useCms()
+
+  const frames = useMemo(
+    () => mergeCards(cardsByCollection('creative_frames'), FALLBACK_FRAMES),
+    [cardsByCollection],
+  )
+  const services = useMemo(
+    () => mergeCards(cardsByCollection('creative_services'), FALLBACK_SERVICES),
+    [cardsByCollection],
+  )
 
   useGSAP(
     () => {
@@ -133,20 +146,17 @@ export default function CreativeMarketing() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [frames, services, editMode] },
   )
 
   return (
     <div ref={pageRef} className="page-creative">
       <PageHero
         image={heroes.creative}
-        eyebrow={<p className="eyebrow">Division</p>}
-        title={<SplitHeadline text="Creative & Marketing" as="h1" />}
+        eyebrow={<EditableText contentKey="creative.eyebrow" as="p" className="eyebrow" />}
+        title={<EditableText contentKey="creative.hero_title" as="h1" />}
         body={
-          <p className="hero-lead">
-            Brand systems, campaigns, and content that feel considered — sharp across
-            every channel, never loud for the sake of it.
-          </p>
+          <EditableText contentKey="creative.hero_body" as="p" className="hero-lead" multiline />
         }
       />
 
@@ -155,20 +165,36 @@ export default function CreativeMarketing() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Studio</p>
-              <h2>Craft you can see</h2>
+              <EditableText contentKey="creative.studio_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="creative.studio_title" as="h2" />
             </div>
           </div>
           <div className="creative-mosaic">
             {frames.map((f) => (
-              <article className="creative-frame" key={f.title}>
+              <CmsClickEdit
+                as="article"
+                className="creative-frame"
+                collection="creative_frames"
+                item={f}
+                key={f.card?.id || f.title}
+              >
                 <div className="creative-frame-media">
                   <img src={f.image} alt="" loading="lazy" />
                 </div>
                 <h3>{f.title}</h3>
                 <p>{f.text}</p>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="creative_frames"
+              defaults={{
+                sort_order: frames.length,
+                image_url: FALLBACK_FRAMES[0].image,
+                title: 'New frame',
+                body: '',
+              }}
+              label="+ Add frame"
+            />
           </div>
         </div>
       </section>
@@ -178,18 +204,29 @@ export default function CreativeMarketing() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Services</p>
-              <h2>Creative capabilities</h2>
+              <EditableText contentKey="creative.services_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="creative.services_title" as="h2" />
             </div>
           </div>
           <div className="creative-chips">
             {services.map((s, i) => (
-              <article className="creative-chip" key={s.title}>
+              <CmsClickEdit
+                as="article"
+                className="creative-chip"
+                collection="creative_services"
+                item={s}
+                key={s.card?.id || s.title}
+              >
                 <span>0{i + 1}</span>
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="creative_services"
+              defaults={{ sort_order: services.length, title: 'New service', body: '' }}
+              label="+ Add service"
+            />
           </div>
         </div>
       </section>
@@ -197,21 +234,25 @@ export default function CreativeMarketing() {
       <section className="section has-art">
         <ProgressiveArt variant="orbit" peak={0.4} />
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <p className="eyebrow">Engage</p>
-          <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
-            How to engage
-          </h2>
-          <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
-            Send your brand context, audience, and the outcome you need. We return a
-            creative scope covering strategy, assets, and production timelines.
-          </p>
+          <EditableText contentKey="creative.engage_eyebrow" as="p" className="eyebrow" />
+          <EditableText
+            contentKey="creative.engage_title"
+            as="h2"
+            style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}
+          />
+          <EditableText
+            contentKey="creative.engage_body"
+            as="p"
+            multiline
+            style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}
+          />
           <div className="btn-row">
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton to="/request-quote" contentKey="cta.quote" className="btn btn-primary">
               Request a Quote
-            </Link>
-            <Link to="/enquiry" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton to="/enquiry" contentKey="cta.enquiry" className="btn btn-soft">
               Make an Enquiry
-            </Link>
+            </EditableButton>
           </div>
         </div>
       </section>

@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
 import { config } from '../lib/config'
 
 const links = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/about', label: 'About' },
-  { to: '/event-solutions', label: 'Events' },
-  { to: '/creative-marketing', label: 'Creative' },
-  { to: '/golf-solutions', label: 'Golf' },
-  { to: '/procurement', label: 'Procurement' },
-  { to: '/our-work', label: 'Work' },
-  { to: '/insights', label: 'Insights' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/', label: 'Home', end: true, key: 'nav.home' },
+  { to: '/about', label: 'About', key: 'nav.about' },
+  { to: '/event-solutions', label: 'Events', key: 'nav.events' },
+  { to: '/creative-marketing', label: 'Creative', key: 'nav.creative' },
+  { to: '/golf-solutions', label: 'Golf', key: 'nav.golf' },
+  { to: '/procurement', label: 'Procurement', key: 'nav.procurement' },
+  { to: '/our-work', label: 'Work', key: 'nav.work' },
+  { to: '/insights', label: 'Insights', key: 'nav.insights' },
+  { to: '/contact', label: 'Contact', key: 'nav.contact' },
 ]
 
 export default function Header() {
@@ -49,7 +50,9 @@ export default function Header() {
               end={link.end}
               className={({ isActive }) => (isActive ? 'active' : undefined)}
             >
-              {link.label}
+              <EditableText contentKey={link.key} as="span">
+                {link.label}
+              </EditableText>
             </NavLink>
           ))}
         </nav>
@@ -86,7 +89,9 @@ export default function Header() {
             className={({ isActive }) => (isActive ? 'active' : undefined)}
             onClick={closeMenu}
           >
-            {link.label}
+            <EditableText contentKey={link.key} as="span">
+              {link.label}
+            </EditableText>
           </NavLink>
         ))}
         <EditableButton

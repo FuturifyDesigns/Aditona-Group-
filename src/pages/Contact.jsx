@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableText from '../cms/EditableText'
 import { config, waLink } from '../lib/config'
 import { gallery, heroes } from '../lib/images'
 
@@ -77,13 +77,21 @@ export default function Contact() {
     <div ref={pageRef} className="page-contact">
       <PageHero
         image={heroes.contact}
-        eyebrow={<p className="eyebrow">Contact</p>}
-        title={<SplitHeadline text="Let’s talk." as="h1" />}
+        eyebrow={
+          <EditableText contentKey="contact.eyebrow" as="p" className="eyebrow">
+            Contact
+          </EditableText>
+        }
+        title={
+          <EditableText contentKey="contact.hero_title" as="h1">
+            Let’s talk.
+          </EditableText>
+        }
         body={
-          <p className="hero-lead">
+          <EditableText contentKey="contact.hero_body" as="p" className="hero-lead" multiline>
             Reach the right inbox — or send a message and we will route it to the
             right division.
-          </p>
+          </EditableText>
         }
       />
 
@@ -106,24 +114,34 @@ export default function Contact() {
           <div className="contact-visual">
             <img src={gallery.about.briefing} alt="" loading="lazy" />
             <div className="contact-visual-card">
-              <p className="eyebrow">Prefer WhatsApp?</p>
-              <p>Message the team during business hours for a faster first reply.</p>
+              <EditableText contentKey="contact.wa_eyebrow" as="p" className="eyebrow">
+                Prefer WhatsApp?
+              </EditableText>
+              <EditableText contentKey="contact.wa_body" as="p" multiline>
+                Message the team during business hours for a faster first reply.
+              </EditableText>
               <a
                 className="btn btn-primary"
                 href={waLink('Hello Aditona Group — I would like to get in touch.')}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open WhatsApp
+                <EditableText contentKey="contact.wa_cta" as="span">
+                  Open WhatsApp
+                </EditableText>
               </a>
             </div>
           </div>
           <div className="contact-form-panel">
-            <p className="eyebrow">Send a message</p>
-            <h2>Tell us what you need</h2>
-            <p className="contact-form-lead">
+            <EditableText contentKey="contact.form_eyebrow" as="p" className="eyebrow">
+              Send a message
+            </EditableText>
+            <EditableText contentKey="contact.form_title" as="h2">
+              Tell us what you need
+            </EditableText>
+            <EditableText contentKey="contact.form_lead" as="p" className="contact-form-lead" multiline>
               Share a short brief and we will route it to Events, Creative, or Golf.
-            </p>
+            </EditableText>
             <EnquiryForm type="contact" />
           </div>
         </div>

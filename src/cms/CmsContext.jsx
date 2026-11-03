@@ -30,7 +30,24 @@ export function CmsProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [authLoading, setAuthLoading] = useState(true)
   const [session, setSession] = useState(null)
-  const [editMode, setEditMode] = useState(false)
+  const [editMode, setEditModeState] = useState(() => {
+    try {
+      return sessionStorage.getItem('ag_cms_edit') === '1'
+    } catch {
+      return false
+    }
+  })
+  const setEditMode = useCallback((value) => {
+    setEditModeState((prev) => {
+      const next = typeof value === 'function' ? value(prev) : value
+      try {
+        sessionStorage.setItem('ag_cms_edit', next ? '1' : '0')
+      } catch {
+        /* ignore */
+      }
+      return Boolean(next)
+    })
+  }, [])
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -193,6 +210,7 @@ export function CmsProvider({ children }) {
       session,
       isAuthed,
       editMode,
+      setEditMode,
       setContent,
       get,
       refresh,

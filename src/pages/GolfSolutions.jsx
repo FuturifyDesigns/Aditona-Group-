@@ -1,18 +1,21 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
+import { useCms } from '../cms/CmsContext'
+import { mergeCards } from '../cms/mergeCards'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const journey = [
+const FALLBACK_JOURNEY = [
   { image: gallery.golf.checkin, title: 'Guest check-in', text: 'Calm arrival, clear kits, no queues.' },
   { image: gallery.golf.foursome, title: 'On the fairway', text: 'Formats that keep groups moving together.' },
   { image: gallery.golf.tee, title: 'Tee activations', text: 'Brand moments placed with restraint.' },
@@ -21,7 +24,7 @@ const journey = [
   { image: gallery.golf.prize, title: 'Prize-giving', text: 'Closing energy without losing pace.' },
 ]
 
-const services = [
+const FALLBACK_SERVICES = [
   { title: 'Corporate golf days', text: 'Full-day formats with registration, shotgun starts, scoring, and prize-giving choreography.' },
   { title: 'Hospitality packages', text: 'Clubhouse hosting, F&B coordination, and guest flows that feel effortless.' },
   { title: 'Course activations', text: 'Hole sponsorships, brand moments, and photo opportunities placed with restraint.' },
@@ -32,6 +35,16 @@ const services = [
 
 export default function GolfSolutions() {
   const pageRef = useRef(null)
+  const { cardsByCollection, editMode } = useCms()
+
+  const journey = useMemo(
+    () => mergeCards(cardsByCollection('golf_journey'), FALLBACK_JOURNEY),
+    [cardsByCollection],
+  )
+  const services = useMemo(
+    () => mergeCards(cardsByCollection('golf_services'), FALLBACK_SERVICES),
+    [cardsByCollection],
+  )
 
   useGSAP(
     () => {
@@ -92,20 +105,17 @@ export default function GolfSolutions() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [journey, services, editMode] },
   )
 
   return (
     <div ref={pageRef} className="page-golf">
       <PageHero
         image={heroes.golf}
-        eyebrow={<p className="eyebrow">Division</p>}
-        title={<SplitHeadline text="Golf Solutions" as="h1" />}
+        eyebrow={<EditableText contentKey="golf.eyebrow" as="p" className="eyebrow" />}
+        title={<EditableText contentKey="golf.hero_title" as="h1" />}
         body={
-          <p className="hero-lead">
-            Corporate golf days and hospitality planned with the same precision we
-            bring to stages and campaigns — calm, polished, memorable.
-          </p>
+          <EditableText contentKey="golf.hero_body" as="p" className="hero-lead" multiline />
         }
       />
 
@@ -114,13 +124,19 @@ export default function GolfSolutions() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Guest journey</p>
-              <h2>From first tee to final toast</h2>
+              <EditableText contentKey="golf.journey_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="golf.journey_title" as="h2" />
             </div>
           </div>
           <div className="golf-steps">
             {journey.map((step, i) => (
-              <article className={`golf-step${i % 2 ? ' is-flip' : ''}`} key={step.title}>
+              <CmsClickEdit
+                as="article"
+                className={`golf-step${i % 2 ? ' is-flip' : ''}`}
+                collection="golf_journey"
+                item={step}
+                key={step.card?.id || step.title}
+              >
                 <div className="golf-step-media">
                   <img src={step.image} alt="" loading="lazy" />
                 </div>
@@ -129,8 +145,18 @@ export default function GolfSolutions() {
                   <h3>{step.title}</h3>
                   <p>{step.text}</p>
                 </div>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="golf_journey"
+              defaults={{
+                sort_order: journey.length,
+                image_url: FALLBACK_JOURNEY[0].image,
+                title: 'New step',
+                body: '',
+              }}
+              label="+ Add step"
+            />
           </div>
         </div>
       </section>
@@ -140,20 +166,31 @@ export default function GolfSolutions() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Services</p>
-              <h2>On and around the course</h2>
+              <EditableText contentKey="golf.services_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="golf.services_title" as="h2" />
             </div>
           </div>
           <div className="golf-service-grid">
             {services.map((s, i) => (
-              <article className="golf-service-card" key={s.title}>
+              <CmsClickEdit
+                as="article"
+                className="golf-service-card"
+                collection="golf_services"
+                item={s}
+                key={s.card?.id || s.title}
+              >
                 <span className="golf-service-mark" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="golf_services"
+              defaults={{ sort_order: services.length, title: 'New service', body: '' }}
+              label="+ Add service"
+            />
           </div>
         </div>
       </section>
@@ -161,21 +198,25 @@ export default function GolfSolutions() {
       <section className="section has-art">
         <ProgressiveArt variant="fairway" peak={0.4} />
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <p className="eyebrow">Engage</p>
-          <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
-            How to engage
-          </h2>
-          <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
-            Tell us preferred courses, player count, date window, and hospitality
-            level. We return a format proposal with logistics and brand moments.
-          </p>
+          <EditableText contentKey="golf.engage_eyebrow" as="p" className="eyebrow" />
+          <EditableText
+            contentKey="golf.engage_title"
+            as="h2"
+            style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}
+          />
+          <EditableText
+            contentKey="golf.engage_body"
+            as="p"
+            multiline
+            style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}
+          />
           <div className="btn-row">
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton to="/request-quote" contentKey="cta.quote" className="btn btn-primary">
               Request a Quote
-            </Link>
-            <Link to="/enquiry" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton to="/enquiry" contentKey="cta.enquiry" className="btn btn-soft">
               Make an Enquiry
-            </Link>
+            </EditableButton>
           </div>
         </div>
       </section>

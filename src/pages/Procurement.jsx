@@ -1,18 +1,21 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
+import { useCms } from '../cms/CmsContext'
+import { mergeCards } from '../cms/mergeCards'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const journey = [
+const FALLBACK_JOURNEY = [
   {
     image: gallery.procurement.brief,
     title: 'Brief & requirements',
@@ -45,7 +48,7 @@ const journey = [
   },
 ]
 
-const services = [
+const FALLBACK_SERVICES = [
   {
     title: 'Product & service sourcing',
     text: 'Identify and source the products and services required for events, creative, golf, and wider projects.',
@@ -74,6 +77,16 @@ const services = [
 
 export default function Procurement() {
   const pageRef = useRef(null)
+  const { cardsByCollection, editMode } = useCms()
+
+  const journey = useMemo(
+    () => mergeCards(cardsByCollection('procurement_journey'), FALLBACK_JOURNEY),
+    [cardsByCollection],
+  )
+  const services = useMemo(
+    () => mergeCards(cardsByCollection('procurement_services'), FALLBACK_SERVICES),
+    [cardsByCollection],
+  )
 
   useGSAP(
     () => {
@@ -135,20 +148,17 @@ export default function Procurement() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [journey, services, editMode] },
   )
 
   return (
     <div ref={pageRef} className="page-procurement">
       <PageHero
         image={heroes.procurement}
-        eyebrow={<p className="eyebrow">Group capability</p>}
-        title={<SplitHeadline text="Sourcing & Procurement" as="h1" immediate />}
+        eyebrow={<EditableText contentKey="procurement.eyebrow" as="p" className="eyebrow" />}
+        title={<EditableText contentKey="procurement.hero_title" as="h1" />}
         body={
-          <p className="hero-lead">
-            Product and service sourcing, supplier coordination, and budget-aligned
-            procurement that supports delivery across every Aditona brief.
-          </p>
+          <EditableText contentKey="procurement.hero_body" as="p" className="hero-lead" multiline />
         }
       />
 
@@ -157,13 +167,19 @@ export default function Procurement() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">How we source</p>
-              <h2>From requirement to delivery</h2>
+              <EditableText contentKey="procurement.journey_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="procurement.journey_title" as="h2" />
             </div>
           </div>
           <div className="golf-steps">
             {journey.map((step, i) => (
-              <article className={`golf-step${i % 2 ? ' is-flip' : ''}`} key={step.title}>
+              <CmsClickEdit
+                as="article"
+                className={`golf-step${i % 2 ? ' is-flip' : ''}`}
+                collection="procurement_journey"
+                item={step}
+                key={step.card?.id || step.title}
+              >
                 <div className="golf-step-media">
                   <img src={step.image} alt="" loading="lazy" />
                 </div>
@@ -172,8 +188,18 @@ export default function Procurement() {
                   <h3>{step.title}</h3>
                   <p>{step.text}</p>
                 </div>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="procurement_journey"
+              defaults={{
+                sort_order: journey.length,
+                image_url: FALLBACK_JOURNEY[0].image,
+                title: 'New step',
+                body: '',
+              }}
+              label="+ Add step"
+            />
           </div>
         </div>
       </section>
@@ -183,20 +209,31 @@ export default function Procurement() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Services</p>
-              <h2>Procurement across the group</h2>
+              <EditableText contentKey="procurement.services_eyebrow" as="p" className="eyebrow" />
+              <EditableText contentKey="procurement.services_title" as="h2" />
             </div>
           </div>
           <div className="golf-service-grid">
             {services.map((s, i) => (
-              <article className="golf-service-card" key={s.title}>
+              <CmsClickEdit
+                as="article"
+                className="golf-service-card"
+                collection="procurement_services"
+                item={s}
+                key={s.card?.id || s.title}
+              >
                 <span className="golf-service-mark" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="procurement_services"
+              defaults={{ sort_order: services.length, title: 'New service', body: '' }}
+              label="+ Add service"
+            />
           </div>
         </div>
       </section>
@@ -204,21 +241,25 @@ export default function Procurement() {
       <section className="section has-art">
         <ProgressiveArt variant="rings" peak={0.4} />
         <div className="container" style={{ maxWidth: '40rem' }}>
-          <p className="eyebrow">Engage</p>
-          <h2 style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}>
-            How to engage
-          </h2>
-          <p style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}>
-            Share what you need sourced, timing, and budget envelope. We return a
-            clear procurement plan with supplier options and next steps.
-          </p>
+          <EditableText contentKey="procurement.engage_eyebrow" as="p" className="eyebrow" />
+          <EditableText
+            contentKey="procurement.engage_title"
+            as="h2"
+            style={{ fontSize: '1.6rem', letterSpacing: '-0.03em', marginBottom: '0.6rem' }}
+          />
+          <EditableText
+            contentKey="procurement.engage_body"
+            as="p"
+            multiline
+            style={{ color: 'var(--ag-mid)', lineHeight: 1.6, marginBottom: '1.1rem' }}
+          />
           <div className="btn-row">
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton to="/request-quote" contentKey="cta.quote" className="btn btn-primary">
               Request a Quote
-            </Link>
-            <Link to="/enquiry" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton to="/enquiry" contentKey="cta.enquiry" className="btn btn-soft">
               Make an Enquiry
-            </Link>
+            </EditableButton>
           </div>
         </div>
       </section>

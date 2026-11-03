@@ -79,15 +79,17 @@ export default function Footer() {
       </div>
 
       <div className="container footer-bottom">
-        <span>
-          © {year} {config.brand}. All rights reserved.
-        </span>
+        <EditableText contentKey="footer.copyright" as="span">
+          {`© ${year} ${config.brand}. All rights reserved.`}
+        </EditableText>
         <a
           href="https://futurifydesigns.com"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Built by Futurify Designs
+          <EditableText contentKey="footer.built_by" as="span">
+            Built by Futurify Designs
+          </EditableText>
         </a>
       </div>
     </footer>

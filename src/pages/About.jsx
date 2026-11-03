@@ -1,70 +1,73 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import CTABand from '../components/CTABand'
 import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableButton from '../cms/EditableButton'
+import EditableText from '../cms/EditableText'
+import CmsClickEdit, { CmsAddCard } from '../cms/CmsClickEdit'
+import { useCms } from '../cms/CmsContext'
+import { mergeCards } from '../cms/mergeCards'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const manifesto = [
+const FALLBACK_MANIFESTO = [
   {
-    kicker: '01 — Origin',
     title: 'One accountable group.',
     text: 'Aditona Group was built to close the gap between strategy decks and live delivery — one owner for the brief, the look, and the day itself.',
+    label: '01 — Origin',
+    to: 'nodes',
     art: 'nodes',
   },
   {
-    kicker: '02 — Vision',
     title: 'Experiences that feel like one story.',
     text: 'We aim to be the most trusted multidisciplinary partner for brands that need events, creative, and golf to move as a single narrative.',
+    label: '02 — Vision',
+    to: 'orbit',
     art: 'orbit',
   },
   {
-    kicker: '03 — Mission',
     title: 'Ambition, translated into precision.',
     text: 'We turn intent into rehearsed plans and calm execution — across venues, channels, and courses — with shared standards at every stage.',
+    label: '03 — Mission',
+    to: 'arcs',
     art: 'arcs',
   },
 ]
 
-const moments = [
-  { image: gallery.about.leadership, label: 'Leadership review' },
-  { image: gallery.about.briefing, label: 'Client briefing' },
-  { image: gallery.about.venue, label: 'Venue recce' },
-  { image: gallery.about.quality, label: 'Quality control' },
-  { image: gallery.about.huddle, label: 'Team huddle' },
-  { image: gallery.about.planning, label: 'Integrated planning' },
+const FALLBACK_MOMENTS = [
+  { title: 'Leadership review', image: gallery.about.leadership },
+  { title: 'Client briefing', image: gallery.about.briefing },
+  { title: 'Venue recce', image: gallery.about.venue },
+  { title: 'Quality control', image: gallery.about.quality },
+  { title: 'Team huddle', image: gallery.about.huddle },
+  { title: 'Integrated planning', image: gallery.about.planning },
 ]
 
-const divisions = [
+const FALLBACK_DIVISIONS = [
   {
-    index: '01',
     title: 'Event Solutions',
     text: 'Planning, production, and on-site ownership for conferences, launches, and brand experiences.',
     to: '/event-solutions',
     image: gallery.about.venue,
   },
   {
-    index: '02',
     title: 'Creative & Marketing',
     text: 'Brand systems, campaigns, photography, and digital storytelling that stay sharp everywhere.',
     to: '/creative-marketing',
     image: gallery.about.planning,
   },
   {
-    index: '03',
     title: 'Golf Solutions',
     text: 'Corporate golf days, hospitality, and course activations planned with polish and pace.',
     to: '/golf-solutions',
     image: gallery.about.quality,
   },
   {
-    index: '04',
     title: 'Sourcing & Procurement',
     text: 'Supplier sourcing, quotations, purchasing coordination, and budget-aligned procurement across projects.',
     to: '/procurement',
@@ -72,7 +75,7 @@ const divisions = [
   },
 ]
 
-const values = [
+const FALLBACK_VALUES = [
   {
     title: 'Vision',
     text: 'We clarify the outcome before we invent the method — so every decision points the same way.',
@@ -91,7 +94,7 @@ const values = [
   },
 ]
 
-const steps = [
+const FALLBACK_STEPS = [
   { title: 'Brief', text: 'Align on goals, audience, constraints, and success measures.' },
   { title: 'Design', text: 'Shape the experience, creative system, or golf programme.' },
   { title: 'Rehearse', text: 'Pressure-test timelines, vendors, and contingencies.' },
@@ -100,6 +103,40 @@ const steps = [
 
 export default function About() {
   const pageRef = useRef(null)
+  const { cardsByCollection } = useCms()
+
+  const manifesto = useMemo(
+    () =>
+      mergeCards(cardsByCollection('about_manifesto'), FALLBACK_MANIFESTO).map((item, i) => {
+        const fb = FALLBACK_MANIFESTO[i] || FALLBACK_MANIFESTO[0] || {}
+        return {
+          ...item,
+          kicker: item.label || fb.label,
+          art: item.to || fb.art || 'nodes',
+        }
+      }),
+    [cardsByCollection],
+  )
+
+  const moments = useMemo(
+    () => mergeCards(cardsByCollection('about_moments'), FALLBACK_MOMENTS),
+    [cardsByCollection],
+  )
+
+  const divisions = useMemo(
+    () => mergeCards(cardsByCollection('about_divisions'), FALLBACK_DIVISIONS),
+    [cardsByCollection],
+  )
+
+  const values = useMemo(
+    () => mergeCards(cardsByCollection('about_values'), FALLBACK_VALUES),
+    [cardsByCollection],
+  )
+
+  const steps = useMemo(
+    () => mergeCards(cardsByCollection('about_method'), FALLBACK_STEPS),
+    [cardsByCollection],
+  )
 
   useGSAP(
     () => {
@@ -116,6 +153,7 @@ export default function About() {
       heroTl
         .from('.about-hero-media', { scale: 1.18, opacity: 0.5, duration: 1.4 }, 0)
         .from('.about-hero-copy .eyebrow', { y: 24, opacity: 0, duration: 0.6 }, 0.25)
+        .from('.about-hero-copy .about-hero-title', { y: 36, opacity: 0, duration: 0.75 }, 0.35)
         .from('.about-hero-copy .about-hero-body', { y: 28, opacity: 0, duration: 0.7 }, 0.55)
         .from('.about-hero-copy .about-scroll-cue', { y: 12, opacity: 0, duration: 0.5 }, 0.9)
 
@@ -130,12 +168,12 @@ export default function About() {
         },
       })
 
-      const manifesto = pageRef.current?.querySelector('.about-manifesto')
+      const manifestoSection = pageRef.current?.querySelector('.about-manifesto')
       const panels = gsap.utils.toArray('.manifesto-panel')
       const arts = gsap.utils.toArray('.manifesto-art')
       const progress = gsap.utils.toArray('.manifesto-progress span i')
 
-      if (manifesto && panels.length) {
+      if (manifestoSection && panels.length) {
         gsap.set(panels, { opacity: 0, y: 40 })
         gsap.set(panels[0], { opacity: 1, y: 0 })
         gsap.set(arts, { opacity: 0, scale: 1.08 })
@@ -144,7 +182,7 @@ export default function About() {
 
         const mTl = gsap.timeline({
           scrollTrigger: {
-            trigger: manifesto,
+            trigger: manifestoSection,
             start: 'top top',
             end: () => `+=${window.innerHeight * panels.length * 0.9}`,
             ...pinOptions({ scrub: 0.65 }),
@@ -314,7 +352,7 @@ export default function About() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef },
+    { scope: pageRef, dependencies: [manifesto, moments, divisions, values, steps] },
   )
 
   return (
@@ -325,20 +363,21 @@ export default function About() {
         </div>
         <div className="about-hero-scrim" aria-hidden="true" />
         <div className="container about-hero-copy">
-          <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.65)' }}>
+          <EditableText
+            contentKey="about.eyebrow"
+            as="p"
+            className="eyebrow"
+            style={{ color: 'rgba(255,255,255,0.65)' }}
+          >
             About Aditona Group
-          </p>
-          <SplitHeadline
-            text="Built as one group. Delivered as specialists."
-            as="h1"
-            className="about-hero-title"
-            immediate
-            delay={0.2}
-          />
-          <p className="about-hero-body">
+          </EditableText>
+          <EditableText contentKey="about.hero_title" as="h1" className="about-hero-title">
+            Built as one group. Delivered as specialists.
+          </EditableText>
+          <EditableText contentKey="about.hero_body" as="p" className="about-hero-body" multiline>
             A multidisciplinary partner for brands that need events, creative, and golf
             experiences to feel intentional — and land without friction.
-          </p>
+          </EditableText>
           <div className="about-scroll-cue" aria-hidden="true">
             <span>Scroll</span>
             <i />
@@ -348,24 +387,35 @@ export default function About() {
 
       <section className="about-manifesto" aria-label="Our story">
         <div className="about-manifesto-arts" aria-hidden="true">
-          {manifesto.map((panel) => (
-            <div className="manifesto-art" key={`art-${panel.kicker}`}>
+          {manifesto.map((panel, i) => (
+            <div className="manifesto-art" key={`art-${panel.kicker || panel.title || i}`}>
               <ArtDrawing variant={panel.art} />
             </div>
           ))}
           <div className="about-manifesto-veil" />
         </div>
         <div className="about-manifesto-inner">
-          {manifesto.map((panel) => (
-            <article className="manifesto-panel" key={panel.kicker}>
+          {manifesto.map((panel, i) => (
+            <CmsClickEdit
+              key={panel.card?.id || panel.kicker || panel.title || i}
+              collection="about_manifesto"
+              item={panel}
+              as="article"
+              className="manifesto-panel"
+            >
               <p className="eyebrow">{panel.kicker}</p>
               <h2>{panel.title}</h2>
               <p>{panel.text}</p>
-            </article>
+            </CmsClickEdit>
           ))}
+          <CmsAddCard
+            collection="about_manifesto"
+            label="+ Add manifesto"
+            defaults={{ link_label: '0X — New', link_url: 'nodes', sort_order: manifesto.length }}
+          />
           <div className="manifesto-progress" aria-hidden="true">
-            {manifesto.map((panel) => (
-              <span key={panel.kicker}>
+            {manifesto.map((panel, i) => (
+              <span key={panel.kicker || panel.title || i}>
                 <i />
               </span>
             ))}
@@ -378,19 +428,34 @@ export default function About() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">How we work</p>
-              <h2>Moments from the room</h2>
+              <EditableText contentKey="about.moments_eyebrow" as="p" className="eyebrow">
+                How we work
+              </EditableText>
+              <EditableText contentKey="about.moments_title" as="h2">
+                Moments from the room
+              </EditableText>
             </div>
           </div>
           <div className="about-moments-grid">
-            {moments.map((m) => (
-              <figure className="about-moment" key={m.label}>
+            {moments.map((m, i) => (
+              <CmsClickEdit
+                key={m.card?.id || m.title || i}
+                collection="about_moments"
+                item={m}
+                as="figure"
+                className="about-moment"
+              >
                 <div className="about-moment-media">
                   <img src={m.image} alt="" loading="lazy" />
                 </div>
-                <figcaption>{m.label}</figcaption>
-              </figure>
+                <figcaption>{m.title}</figcaption>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="about_moments"
+              label="+ Add moment"
+              defaults={{ sort_order: moments.length }}
+            />
           </div>
         </div>
       </section>
@@ -399,30 +464,45 @@ export default function About() {
         <ProgressiveArt variant="blueprint" peak={0.48} />
         <div className="container">
           <div className="about-divisions-head">
-            <p className="eyebrow">Divisions</p>
-            <h2>Specialist branches. Shared procurement. One standard of delivery.</h2>
-            <p>
-              Each division runs with depth — supported by group-wide sourcing &amp;
+            <EditableText contentKey="about.divisions_eyebrow" as="p" className="eyebrow">
+              Divisions
+            </EditableText>
+            <EditableText contentKey="about.divisions_title" as="h2">
+              Specialist branches. Shared procurement. One standard of delivery.
+            </EditableText>
+            <EditableText contentKey="about.divisions_body" as="p" multiline>
+              Each division runs with depth — supported by group-wide sourcing &
               procurement, planning, and on-the-day accountability.
-            </p>
+            </EditableText>
           </div>
 
           <div className="division-slides">
-            {divisions.map((d) => (
-              <article className="division-slide" key={d.title}>
+            {divisions.map((d, i) => (
+              <CmsClickEdit
+                key={d.card?.id || d.title || i}
+                collection="about_divisions"
+                item={d}
+                as="article"
+                className="division-slide"
+              >
                 <div className="division-slide-media">
                   <img src={d.image} alt="" loading="lazy" />
                 </div>
                 <div className="division-slide-copy">
-                  <span className="division-index">{d.index}</span>
+                  <span className="division-index">0{i + 1}</span>
                   <h3>{d.title}</h3>
                   <p>{d.text}</p>
-                  <Link to={d.to} className="section-link">
+                  <Link to={d.to || '/'} className="section-link">
                     Explore →
                   </Link>
                 </div>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="about_divisions"
+              label="+ Add division"
+              defaults={{ link_url: '/', sort_order: divisions.length }}
+            />
           </div>
         </div>
       </section>
@@ -432,14 +512,24 @@ export default function About() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Values</p>
-              <h2>What we protect on every brief</h2>
+              <EditableText contentKey="about.values_eyebrow" as="p" className="eyebrow">
+                Values
+              </EditableText>
+              <EditableText contentKey="about.values_title" as="h2">
+                What we protect on every brief
+              </EditableText>
             </div>
           </div>
           <div className="about-line" aria-hidden="true" />
           <div className="value-rows">
             {values.map((v, i) => (
-              <article className="value-row" key={v.title}>
+              <CmsClickEdit
+                key={v.card?.id || v.title || i}
+                collection="about_values"
+                item={v}
+                as="article"
+                className="value-row"
+              >
                 <i className="value-accent" aria-hidden="true" />
                 <span className="value-num">0{i + 1}</span>
                 <div className="value-row-main">
@@ -449,8 +539,13 @@ export default function About() {
                 <span className="value-arrow" aria-hidden="true">
                   →
                 </span>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="about_values"
+              label="+ Add value"
+              defaults={{ sort_order: values.length }}
+            />
           </div>
         </div>
       </section>
@@ -460,27 +555,42 @@ export default function About() {
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Method</p>
-              <h2>Brief. Design. Rehearse. Deliver.</h2>
+              <EditableText contentKey="about.method_eyebrow" as="p" className="eyebrow">
+                Method
+              </EditableText>
+              <EditableText contentKey="about.method_title" as="h2">
+                Brief. Design. Rehearse. Deliver.
+              </EditableText>
             </div>
           </div>
           <div className="method-track" aria-hidden="true" />
           <div className="method-grid">
             {steps.map((step, i) => (
-              <article className="method-step" key={step.title}>
+              <CmsClickEdit
+                key={step.card?.id || step.title || i}
+                collection="about_method"
+                item={step}
+                as="article"
+                className="method-step"
+              >
                 <span className="method-step-mark">0{i + 1}</span>
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
-              </article>
+              </CmsClickEdit>
             ))}
+            <CmsAddCard
+              collection="about_method"
+              label="+ Add step"
+              defaults={{ sort_order: steps.length }}
+            />
           </div>
           <div className="btn-row" style={{ marginTop: '2rem' }}>
-            <Link to="/request-quote" className="btn btn-primary">
+            <EditableButton to="/request-quote" contentKey="about.cta_quote" className="btn btn-primary">
               Request a Quote
-            </Link>
-            <Link to="/contact" className="btn btn-soft">
+            </EditableButton>
+            <EditableButton to="/contact" contentKey="about.cta_contact" className="btn btn-soft">
               Contact us
-            </Link>
+            </EditableButton>
           </div>
         </div>
       </section>

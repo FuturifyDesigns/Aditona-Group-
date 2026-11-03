@@ -1,7 +1,7 @@
 import EnquiryForm from '../components/EnquiryForm'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
-import SplitHeadline from '../components/SplitHeadline'
+import EditableText from '../cms/EditableText'
 import { heroes } from '../lib/images'
 
 export default function Enquiry() {
@@ -9,13 +9,21 @@ export default function Enquiry() {
     <>
       <PageHero
         image={heroes.contact}
-        eyebrow={<p className="eyebrow">Enquiry</p>}
-        title={<SplitHeadline text="Make an Enquiry" as="h1" />}
+        eyebrow={
+          <EditableText contentKey="enquiry.eyebrow" as="p" className="eyebrow">
+            Enquiry
+          </EditableText>
+        }
+        title={
+          <EditableText contentKey="enquiry.hero_title" as="h1">
+            Make an Enquiry
+          </EditableText>
+        }
         body={
-          <p className="hero-lead">
+          <EditableText contentKey="enquiry.hero_body" as="p" className="hero-lead" multiline>
             Not ready for a full brief? Send a short enquiry and we will follow up with
             next steps.
-          </p>
+          </EditableText>
         }
       />
 
