@@ -13,7 +13,7 @@
   --container: 1180px;
   color: var(--ag-black);
   background: var(--ag-white);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: 'Inter Variable', Inter, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

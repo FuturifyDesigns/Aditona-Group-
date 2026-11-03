@@ -1,9 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { submitEnquiry } from '../lib/supabase'
+import {
+  checkClientRateLimit,
+  cleanMultiline,
+  cleanText,
+  isValidEmail,
+} from '../lib/sanitize'
 
-const RATE_KEY = 'aditona_enquiry_last'
-const RATE_MS = 30_000
+const RATE_KEY = 'aditona_enquiry_hits'
+const RATE_WINDOW_MS = 60_000
+const RATE_MAX = 2
 
 const DIVISIONS = [
   'Event Solutions',
@@ -39,9 +46,7 @@ function validate(type, values) {
   const errors = {}
   if (!values.full_name.trim()) errors.full_name = 'Name is required.'
   if (!values.email.trim()) errors.email = 'Email is required.'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
-    errors.email = 'Enter a valid email.'
-  }
+  else if (!isValidEmail(values.email)) errors.email = 'Enter a valid email.'
   if (!values.message.trim() || values.message.trim().length < 10) {
     errors.message = 'Please share a little more detail (10+ characters).'
   }
@@ -72,6 +77,7 @@ export default function EnquiryForm({ type = 'enquiry' }) {
     e.preventDefault()
     setStatus({ type: '', text: '' })
 
+    // Honeypot — bots that fill hidden fields are silently accepted.
     if (values.website_url) {
       setStatus({ type: 'ok', text: 'Thank you. We have received your message.' })
       return
@@ -81,11 +87,11 @@ export default function EnquiryForm({ type = 'enquiry' }) {
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) return
 
-    const last = Number(localStorage.getItem(RATE_KEY) || 0)
-    if (Date.now() - last < RATE_MS) {
+    const rate = checkClientRateLimit(RATE_KEY, RATE_WINDOW_MS, RATE_MAX)
+    if (!rate.ok) {
       setStatus({
         type: 'err',
-        text: 'Please wait about 30 seconds before sending another message.',
+        text: 'Please wait about a minute before sending another message.',
       })
       return
     }
@@ -94,18 +100,17 @@ export default function EnquiryForm({ type = 'enquiry' }) {
     try {
       await submitEnquiry({
         form_type: type,
-        full_name: values.full_name.trim(),
-        company: values.company?.trim() || null,
-        email: values.email.trim(),
-        phone: values.phone?.trim() || null,
-        division: values.division || null,
-        service: values.service?.trim() || null,
-        message: values.message.trim(),
+        full_name: cleanText(values.full_name, 120),
+        company: cleanText(values.company || '', 160) || null,
+        email: cleanText(values.email, 254),
+        phone: cleanText(values.phone || '', 40) || null,
+        division: values.division ? cleanText(values.division, 80) : null,
+        service: values.service ? cleanText(values.service, 160) : null,
+        message: cleanMultiline(values.message, 5000),
         project_date: values.project_date || null,
-        budget: values.budget || null,
-        page_source: location.pathname,
+        budget: values.budget ? cleanText(values.budget, 40) : null,
+        page_source: cleanText(location.pathname, 200),
       })
-      localStorage.setItem(RATE_KEY, String(Date.now()))
       setValues(initial)
       setErrors({})
       setStatus({
@@ -144,6 +149,8 @@ export default function EnquiryForm({ type = 'enquiry' }) {
               value={values.full_name}
               onChange={onChange}
               autoComplete="name"
+              maxLength={120}
+              required
             />
             {errors.full_name && <div className="error">{errors.full_name}</div>}
           </div>
@@ -156,6 +163,7 @@ export default function EnquiryForm({ type = 'enquiry' }) {
               value={values.company}
               onChange={onChange}
               autoComplete="organization"
+              maxLength={160}
             />
           </div>
 
@@ -168,6 +176,8 @@ export default function EnquiryForm({ type = 'enquiry' }) {
               value={values.email}
               onChange={onChange}
               autoComplete="email"
+              maxLength={254}
+              required
             />
             {errors.email && <div className="error">{errors.email}</div>}
           </div>
@@ -181,6 +191,7 @@ export default function EnquiryForm({ type = 'enquiry' }) {
               value={values.phone}
               onChange={onChange}
               autoComplete="tel"
+              maxLength={40}
             />
           </div>
 
@@ -212,6 +223,7 @@ export default function EnquiryForm({ type = 'enquiry' }) {
                   value={values.service}
                   onChange={onChange}
                   placeholder="e.g. Conference production"
+                  maxLength={160}
                 />
                 {errors.service && <div className="error">{errors.service}</div>}
               </div>
@@ -254,6 +266,8 @@ export default function EnquiryForm({ type = 'enquiry' }) {
             value={values.message}
             onChange={onChange}
             placeholder="Tell us about your goals, timeline, and any must-haves."
+            maxLength={5000}
+            required
           />
           {errors.message && <div className="error">{errors.message}</div>}
         </div>

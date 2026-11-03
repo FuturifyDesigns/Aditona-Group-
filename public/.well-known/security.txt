@@ -1,0 +1,6 @@
+Contact: mailto:admin@aditona.com
+Contact: mailto:enquiries@aditona.com
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://aditona.com/.well-known/security.txt
+Policy: https://aditona.com/contact
