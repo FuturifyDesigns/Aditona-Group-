@@ -18,7 +18,6 @@ export function setupScrollDefaults() {
     autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load',
   })
 
-  // Match scroll position more tightly — high scrub numbers feel laggy / “glitchy”.
   ScrollTrigger.defaults({
     anticipatePin: 1,
   })
@@ -39,7 +38,6 @@ export function isCmsEditing() {
   return document.body.classList.contains('cms-edit-mode')
 }
 
-/** True when scroll choreography should be skipped (edit live or reduced motion). */
 export function shouldSkipScrollMotion() {
   return prefersReducedMotion() || isCmsEditing()
 }
@@ -47,20 +45,11 @@ export function shouldSkipScrollMotion() {
 export function softRefreshScroll() {
   clearTimeout(softTimer)
   softTimer = setTimeout(() => {
-    ScrollTrigger.refresh()
+    if (!isCmsEditing()) ScrollTrigger.refresh()
   }, 120)
 }
 
-/**
- * Kill every ScrollTrigger and clear common transform leftovers so the page
- * can be edited / scrolled normally without pin spacers fighting the layout.
- */
-export function freezeScrollMotion() {
-  clearTimeout(softTimer)
-  clearTimeout(hardTimer)
-  refreshGen += 1
-  ScrollTrigger.getAll().forEach((st) => st.kill())
-  // Clear leftover pin spacers GSAP may leave mid-kill
+function unwrapPinSpacers() {
   document.querySelectorAll('.pin-spacer').forEach((el) => {
     const child = el.firstElementChild
     if (child && el.parentNode) {
@@ -68,16 +57,75 @@ export function freezeScrollMotion() {
     }
     el.remove()
   })
-  gsap.set(
-    '.story-panel, .story-art, .manifesto-panel, .manifesto-art, .events-rail-track, .work-runway-track, .progressive-art-draw, .reveal, .division-card, .work-thumb, .service-panel, .golf-step, .golf-service-card, .creative-frame, .creative-chip, .about-moment, .division-slide, .value-row, .method-step, .insight-row, .work-case, .work-runway-card, .events-rail-card',
-    { clearProps: 'transform,opacity,filter,x,y,scale,rotate,rotateX' },
-  )
+}
+
+/** Restore stacked pin sections so only the first panel is visible (normal mode). */
+export function resetPinnedSections() {
+  gsap.set('.events-rail-track, .work-runway-track', { clearProps: 'transform', x: 0, y: 0 })
+
+  document.querySelectorAll('.story-panel').forEach((el, i) => {
+    gsap.set(el, {
+      clearProps: 'transform,filter',
+      autoAlpha: i === 0 ? 1 : 0,
+      y: 0,
+      x: 0,
+    })
+  })
+  document.querySelectorAll('.story-art').forEach((el, i) => {
+    gsap.set(el, {
+      clearProps: 'transform,filter',
+      autoAlpha: i === 0 ? 1 : 0,
+      scale: i === 0 ? 1.04 : 1,
+    })
+  })
+
+  document.querySelectorAll('.manifesto-panel').forEach((el, i) => {
+    gsap.set(el, {
+      clearProps: 'transform,filter',
+      autoAlpha: i === 0 ? 1 : 0,
+      y: 0,
+    })
+  })
+  document.querySelectorAll('.manifesto-art').forEach((el, i) => {
+    gsap.set(el, {
+      clearProps: 'transform,filter',
+      autoAlpha: i === 0 ? 1 : 0,
+      scale: 1,
+    })
+  })
 }
 
 /**
- * Wait for images/fonts, then refresh ScrollTrigger once (debounced).
- * Avoids the old triple-refresh that made pins jump while scrolling.
+ * Kill ScrollTriggers for live edit — do NOT force every panel to opacity:1
+ * (that stacks story/manifesto text on top of itself).
  */
+export function freezeScrollMotion() {
+  clearTimeout(softTimer)
+  clearTimeout(hardTimer)
+  refreshGen += 1
+  ScrollTrigger.getAll().forEach((st) => st.kill())
+  unwrapPinSpacers()
+
+  gsap.set('.events-rail-track, .work-runway-track', { clearProps: 'transform', x: 0, y: 0 })
+  gsap.set(
+    '.progressive-art-draw, .reveal, .division-card, .work-thumb, .service-panel, .golf-step, .golf-service-card, .creative-frame, .creative-chip, .about-moment, .division-slide, .value-row, .method-step, .insight-row, .work-case, .work-runway-card, .events-rail-card, .trust-item, .contact-channel, .contact-visual, .contact-form-panel',
+    { clearProps: 'transform,filter,x,y,scale,rotate,rotateX', autoAlpha: 1 },
+  )
+
+  // Leave story/manifesto opacity alone — CSS in cms-edit-mode unstacks them for editing
+  gsap.set('.story-panel, .story-art, .manifesto-panel, .manifesto-art', {
+    clearProps: 'transform,filter,x,y,scale',
+  })
+}
+
+/** Call when leaving edit mode before pages rebuild motion. */
+export function resumeScrollMotion() {
+  unwrapPinSpacers()
+  resetPinnedSections()
+  softRefreshScroll()
+  window.dispatchEvent(new Event('ag-cms-motion-resume'))
+}
+
 export function hardRefreshScroll(root = document) {
   clearTimeout(hardTimer)
   const gen = ++refreshGen
@@ -114,7 +162,6 @@ export function isMobileViewport() {
   return window.matchMedia('(max-width: 767px)').matches
 }
 
-/** Stable pin options — low scrub lag, no preventOverlaps (that caused jumps). */
 export function pinOptions(extra = {}) {
   const mobile = isMobileViewport()
   const { scrub: scrubOverride, ...rest } = extra
@@ -129,15 +176,19 @@ export function pinOptions(extra = {}) {
   }
 }
 
-/** Stable signature for CMS lists so useGSAP does not re-init on every render. */
 export function listSignature(items) {
   if (!items?.length) return '0'
   return `${items.length}:${items.map((i) => i.card?.id || i.id || i.title || i.src || '').join('|')}`
 }
 
 /**
- * Soft scroll-in — avoids harsh white flashes from opacity:0 + blur on light sections.
+ * useGSAP deps: while editing, ignore list signatures so add/delete cards
+ * does not tear down / rebuild scroll mid-edit (that was breaking GSAP).
  */
+export function motionDeps(motionEnabled, motionKey, ...signatures) {
+  return motionEnabled ? [motionKey, ...signatures] : [motionKey, 'editing']
+}
+
 export function softScrollIn(targets, vars = {}) {
   const {
     y = 28,

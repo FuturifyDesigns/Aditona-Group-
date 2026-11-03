@@ -15,7 +15,13 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { cards, heroes } from '../lib/images'
 import { useMotionReady } from '../hooks/useMotionReady'
-import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
+import {
+  hardRefreshScroll,
+  listSignature,
+  motionDeps,
+  pinOptions,
+  softScrollIn,
+} from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -108,11 +114,13 @@ export default function Home() {
   useGSAP(
     () => {
       if (!motionEnabled) {
-        gsap.set('.story-panel, .story-art, .division-card, .work-thumb, .trust-item', {
-          clearProps: 'all',
-          opacity: 1,
-          position: 'relative',
+        // Do NOT force every story-panel to opacity 1 — they share one grid cell.
+        // Edit-mode CSS unstacks them; reduced-motion keeps .is-first visible.
+        gsap.set('.division-card, .work-thumb, .trust-item', {
+          clearProps: 'transform,filter',
+          autoAlpha: 1,
         })
+        gsap.set('.events-rail-track, .work-runway-track', { clearProps: 'transform', x: 0 })
         return
       }
 
@@ -209,7 +217,12 @@ export default function Home() {
     },
     {
       scope: pageRef,
-      dependencies: [listSignature(divisions), listSignature(workThumbs), motionKey],
+      dependencies: motionDeps(
+        motionEnabled,
+        motionKey,
+        listSignature(divisions),
+        listSignature(workThumbs),
+      ),
     },
   )
 

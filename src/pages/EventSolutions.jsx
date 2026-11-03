@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, motionDeps, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -174,7 +174,12 @@ export default function EventSolutions() {
     },
     {
       scope: pageRef,
-      dependencies: [listSignature(moments), listSignature(services), motionKey],
+      dependencies: motionDeps(
+        motionEnabled,
+        motionKey,
+        listSignature(moments),
+        listSignature(services),
+      ),
     },
   )
 

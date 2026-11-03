@@ -11,7 +11,7 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, softScrollIn } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, motionDeps, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -114,7 +114,10 @@ export default function Insights() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [listSignature(articles), motionKey] },
+    {
+      scope: pageRef,
+      dependencies: motionDeps(motionEnabled, motionKey, listSignature(articles)),
+    },
   )
 
   return (

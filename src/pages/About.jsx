@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, motionDeps, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -143,9 +143,11 @@ export default function About() {
   useGSAP(
     () => {
       if (!motionEnabled) {
+        // Do NOT force manifesto-panel/art to opacity 1 — they share one grid cell.
+        // Edit-mode CSS unstacks them; reduced-motion keeps .is-first visible.
         gsap.set(
-          '.about-hero-media, .about-hero-copy > *, .manifesto-panel, .about-moment, .division-slide, .value-row, .method-step, .about-line',
-          { clearProps: 'all', opacity: 1, y: 0, x: 0, scale: 1 },
+          '.about-hero-media, .about-hero-copy > *, .about-moment, .division-slide, .value-row, .method-step, .about-line',
+          { clearProps: 'transform,filter', autoAlpha: 1 },
         )
         return
       }
@@ -349,14 +351,15 @@ export default function About() {
     },
     {
       scope: pageRef,
-      dependencies: [
+      dependencies: motionDeps(
+        motionEnabled,
+        motionKey,
         listSignature(manifesto),
         listSignature(moments),
         listSignature(divisions),
         listSignature(values),
         listSignature(steps),
-        motionKey,
-      ],
+      ),
     },
   )
 

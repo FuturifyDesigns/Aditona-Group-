@@ -11,7 +11,7 @@ import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, pinOptions, softScrollIn } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, motionDeps, pinOptions, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -151,7 +151,10 @@ export default function OurWork() {
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [listSignature(allProjects), motionKey] },
+    {
+      scope: pageRef,
+      dependencies: motionDeps(motionEnabled, motionKey, listSignature(allProjects)),
+    },
   )
 
   useGSAP(
@@ -168,7 +171,10 @@ export default function OurWork() {
         duration: 0.55,
       })
     },
-    { scope: gridRef, dependencies: [filter, listSignature(visible), motionKey] },
+    {
+      scope: gridRef,
+      dependencies: motionDeps(motionEnabled, motionKey, filter, listSignature(visible)),
+    },
   )
 
   const onFilter = (next) => {

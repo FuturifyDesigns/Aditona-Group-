@@ -9,7 +9,7 @@ import EditableText from '../cms/EditableText'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { config, waLink } from '../lib/config'
 import { gallery, heroes } from '../lib/images'
-import { softScrollIn } from '../lib/scroll'
+import { motionDeps, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -71,7 +71,7 @@ export default function Contact() {
         },
       })
     },
-    { scope: pageRef, dependencies: [motionKey] },
+    { scope: pageRef, dependencies: motionDeps(motionEnabled, motionKey) },
   )
 
   return (

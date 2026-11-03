@@ -12,7 +12,7 @@ import { useCms } from '../cms/CmsContext'
 import { mergeCards } from '../cms/mergeCards'
 import { useMotionReady } from '../hooks/useMotionReady'
 import { gallery, heroes } from '../lib/images'
-import { hardRefreshScroll, listSignature, softScrollIn } from '../lib/scroll'
+import { hardRefreshScroll, listSignature, motionDeps, softScrollIn } from '../lib/scroll'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -143,7 +143,12 @@ export default function CreativeMarketing() {
     },
     {
       scope: pageRef,
-      dependencies: [listSignature(frames), listSignature(services), motionKey],
+      dependencies: motionDeps(
+        motionEnabled,
+        motionKey,
+        listSignature(frames),
+        listSignature(services),
+      ),
     },
   )
 

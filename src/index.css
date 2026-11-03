@@ -2421,15 +2421,74 @@ body.cms-edit-mode .pin-spacer {
 
 body.cms-edit-mode .events-rail-track,
 body.cms-edit-mode .work-runway-track,
-body.cms-edit-mode .story-panel,
-body.cms-edit-mode .story-art,
-body.cms-edit-mode .manifesto-panel,
-body.cms-edit-mode .manifesto-art,
 body.cms-edit-mode .progressive-art-draw,
 body.cms-edit-mode .reveal {
   transform: none !important;
   opacity: 1 !important;
   filter: none !important;
+}
+
+/*
+ * Pin sections stack every panel in one grid cell for scrubbing.
+ * In edit mode, unstack them so add/delete cards never leaves overlapping text.
+ */
+body.cms-edit-mode .story-pin-inner,
+body.cms-edit-mode .about-manifesto-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2.5rem !important;
+  min-height: auto !important;
+  place-items: stretch !important;
+  padding-top: 3.5rem !important;
+  padding-bottom: 3.5rem !important;
+}
+
+body.cms-edit-mode .story-panel,
+body.cms-edit-mode .manifesto-panel {
+  grid-area: auto !important;
+  position: relative !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  filter: none !important;
+}
+
+body.cms-edit-mode .story-art,
+body.cms-edit-mode .manifesto-art {
+  opacity: 0 !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+body.cms-edit-mode .story-art:first-child,
+body.cms-edit-mode .manifesto-art:first-child {
+  opacity: 0.28 !important;
+}
+
+body.cms-edit-mode .story-progress,
+body.cms-edit-mode .manifesto-progress,
+body.cms-edit-mode .pin-teaser {
+  display: none !important;
+}
+
+body.cms-edit-mode .events-rail,
+body.cms-edit-mode .work-runway {
+  min-height: auto !important;
+  height: auto !important;
+}
+
+body.cms-edit-mode .events-rail-track,
+body.cms-edit-mode .work-runway-track {
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
+}
+
+.division-grid .cms-add-tile {
+  min-height: 280px;
+  width: 100%;
+  align-self: stretch;
 }
 
 .cms-edit-mode [data-cms] {

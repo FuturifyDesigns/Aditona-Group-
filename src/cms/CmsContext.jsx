@@ -19,7 +19,7 @@ import {
   upsertProject,
 } from '../lib/supabase'
 import { isAdminEmail } from '../lib/config'
-import { freezeScrollMotion, softRefreshScroll } from '../lib/scroll'
+import { freezeScrollMotion, resumeScrollMotion } from '../lib/scroll'
 import { DEFAULTS } from './defaults'
 
 const CmsContext = createContext(null)
@@ -131,11 +131,9 @@ export function CmsProvider({ children }) {
       // Kill pins/scrub so live editing never fights ScrollTrigger
       freezeScrollMotion()
     } else if (session && isAdminEmail(session?.user?.email)) {
-      // Leaving edit mode — let pages rebuild motion on next paint
-      softRefreshScroll()
-      // Force remount of route animations via lightweight hash bump on body
+      // Leaving edit mode — reset stacked panels, then rebuild motion
       document.body.dataset.cmsMotion = String(Date.now())
-      window.dispatchEvent(new Event('ag-cms-motion-resume'))
+      resumeScrollMotion()
     }
     return () => document.body.classList.remove('cms-edit-mode')
   }, [editMode, session])
@@ -149,6 +147,8 @@ export function CmsProvider({ children }) {
     async (payload) => {
       const saved = await upsertCard(payload)
       await refresh()
+      // Keep scroll killed while editing after DOM card lists change
+      if (document.body.classList.contains('cms-edit-mode')) freezeScrollMotion()
       return saved
     },
     [refresh],
@@ -158,6 +158,7 @@ export function CmsProvider({ children }) {
     async (id) => {
       await deleteCard(id)
       await refresh()
+      if (document.body.classList.contains('cms-edit-mode')) freezeScrollMotion()
     },
     [refresh],
   )
@@ -166,6 +167,7 @@ export function CmsProvider({ children }) {
     async (payload) => {
       const saved = await upsertProject(payload)
       await refresh()
+      if (document.body.classList.contains('cms-edit-mode')) freezeScrollMotion()
       return saved
     },
     [refresh],
@@ -175,6 +177,7 @@ export function CmsProvider({ children }) {
     async (id) => {
       await deleteProject(id)
       await refresh()
+      if (document.body.classList.contains('cms-edit-mode')) freezeScrollMotion()
     },
     [refresh],
   )
