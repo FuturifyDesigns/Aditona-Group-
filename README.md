@@ -36,10 +36,10 @@ Edit `src/lib/config.js`:
 
 ## Admin & live CMS
 
-Admin email: **admin@aditona.com**  
+Admin email: **admin@aditona.com** only (other accounts are signed out automatically).  
 Change the password in the Supabase Auth dashboard if needed. Do not commit passwords.
 
-1. Sign in at `/admin` (or `/admin/login`).
+1. Sign in at `/admin` (or `/admin/login`) with `admin@aditona.com`.
 2. Use the admin tabs: **Enquiries** | **Copy** | **Cards** | **Projects**.
 3. On the public site, the fixed bar appears when you are authenticated. Toggle **Edit Live: ON**.
 4. Clickable fields and buttons show a pencil badge.

@@ -14,6 +14,8 @@ export const config = {
     accounts: 'accounts@aditona.com',
     operations: 'operations@aditona.com',
   },
+  /** Only this address may sign in to /admin and use live CMS editing. */
+  adminEmail: 'admin@aditona.com',
   emailChannels: [
     {
       key: 'info',
@@ -68,4 +70,9 @@ export function absoluteUrl(path = '/') {
   const base = config.siteUrl.replace(/\/$/, '')
   if (!path || path === '/') return `${base}/`
   return `${base}${path.startsWith('/') ? path : `/${path}`}`
+}
+
+export function isAdminEmail(email) {
+  if (!email || typeof email !== 'string') return false
+  return email.trim().toLowerCase() === config.adminEmail.toLowerCase()
 }

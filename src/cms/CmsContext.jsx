@@ -12,6 +12,7 @@ import {
   supabase,
   upsertContent,
 } from '../lib/supabase'
+import { isAdminEmail } from '../lib/config'
 import { DEFAULTS } from './defaults'
 
 const CmsContext = createContext(null)
@@ -43,15 +44,27 @@ export function CmsProvider({ children }) {
 
   useEffect(() => {
     let mounted = true
-    supabase.auth.getSession().then(({ data }) => {
+
+    const applySession = async (next) => {
       if (!mounted) return
-      setSession(data.session ?? null)
-      setAuthLoading(false)
-    })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      const email = next?.user?.email
+      if (next && !isAdminEmail(email)) {
+        await supabase.auth.signOut()
+        setSession(null)
+        setEditMode(false)
+        setAuthLoading(false)
+        return
+      }
       setSession(next)
       setAuthLoading(false)
       if (!next) setEditMode(false)
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      applySession(data.session ?? null)
+    })
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      applySession(next)
     })
     return () => {
       mounted = false
@@ -90,8 +103,8 @@ export function CmsProvider({ children }) {
       loading: loading || authLoading,
       session,
       user: session?.user ?? null,
-      isAuthenticated: Boolean(session),
-      editMode: Boolean(editMode && session),
+      isAuthenticated: Boolean(session && isAdminEmail(session?.user?.email)),
+      editMode: Boolean(editMode && session && isAdminEmail(session?.user?.email)),
       setEditMode,
       setContent,
       get,

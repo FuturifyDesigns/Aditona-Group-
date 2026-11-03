@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { config, isAdminEmail } from '../../lib/config'
 import { supabase } from '../../lib/supabase'
 import { useCms } from '../../cms/CmsContext'
 
 export default function AdminLogin() {
   const { isAuthenticated } = useCms()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('admin@aditona.com')
+  const [email, setEmail] = useState(config.adminEmail)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -20,8 +21,12 @@ export default function AdminLogin() {
     setError('')
     setBusy(true)
     try {
+      const trimmed = email.trim()
+      if (!isAdminEmail(trimmed)) {
+        throw new Error(`Only ${config.adminEmail} can access admin.`)
+      }
       const { error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: trimmed,
         password,
       })
       if (authError) throw authError
