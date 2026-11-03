@@ -3,12 +3,50 @@ import { deleteEnquiry, listEnquiries, updateEnquiry } from '../../lib/supabase'
 
 const STATUSES = ['new', 'contacted', 'quoted', 'follow_up', 'won', 'lost', 'closed']
 
+const STATUS_LABELS = {
+  new: 'New',
+  contacted: 'Contacted',
+  quoted: 'Quoted',
+  follow_up: 'Follow-up',
+  won: 'Won',
+  lost: 'Lost',
+  closed: 'Closed',
+}
+
 const emptyDraft = {
   status: 'new',
   follow_up_date: '',
   quotation_sent: false,
   converted: false,
   notes: '',
+}
+
+function formatWhen(value) {
+  if (!value) return { date: '—', time: '' }
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return { date: '—', time: '' }
+  return {
+    date: d.toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    time: d.toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  }
+}
+
+function formatFollowUp(value) {
+  if (!value) return '—'
+  const d = new Date(`${String(value).slice(0, 10)}T12:00:00`)
+  if (Number.isNaN(d.getTime())) return String(value).slice(0, 10)
+  return d.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 /**
@@ -80,7 +118,20 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
     }
   }
 
-  const remove = async () => {
+  const removeRow = async (row) => {
+    const label = row.full_name || row.email || noun
+    if (!window.confirm(`Delete this ${noun} from ${label}? This cannot be undone.`)) return
+    setError('')
+    try {
+      await deleteEnquiry(row.id)
+      if (editing?.id === row.id) setEditing(null)
+      await load()
+    } catch (err) {
+      setError(err.message || 'Delete failed')
+    }
+  }
+
+  const removeEditing = async () => {
     if (!editing) return
     const label = editing.full_name || editing.email || noun
     if (!window.confirm(`Delete this ${noun} from ${label}? This cannot be undone.`)) return
@@ -100,6 +151,7 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
   if (loading) return <p className="admin-muted">Loading {nounPlural}…</p>
 
   const newCount = rows.filter((r) => (r.status || 'new') === 'new').length
+  const colCount = isQuotes ? 6 : 7
 
   return (
     <div className="admin-panel">
@@ -107,8 +159,8 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
         <strong>How to use this page</strong>
         <p>
           {isQuotes
-            ? 'Quote requests from /request-quote appear here. New submissions are emailed to enquiries@aditona.com and listed below — open to update status or delete.'
-            : 'Enquiries and contact messages appear here. Quote requests are under Quotes. Open a row to update status or delete it.'}
+            ? 'Quote requests from the website. Open a row to update status, notes, or delete.'
+            : 'Enquiry and contact messages. Quotes live under Quotes. Open a row to update or delete.'}
         </p>
       </div>
 
@@ -125,7 +177,7 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
 
       <div className="admin-panel-head">
         <h2>{isQuotes ? 'Quote requests' : 'Enquiries & contact'}</h2>
-        <button type="button" className="btn btn-soft" onClick={load}>
+        <button type="button" className="admin-btn admin-btn-ghost" onClick={load}>
           Refresh
         </button>
       </div>
@@ -135,73 +187,75 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
         </p>
       )}
       <div className="admin-table-wrap">
-        <table className="admin-table">
+        <table className="admin-table admin-table--inbox">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Name</th>
-              <th>Email</th>
+              <th>Received</th>
+              {!isQuotes && <th>Type</th>}
+              <th>Client</th>
               <th>Division</th>
               <th>Status</th>
               <th>Follow-up</th>
-              <th />
+              <th className="admin-th-actions">Actions</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className="admin-muted">
+                <td colSpan={colCount} className="admin-muted">
                   No {nounPlural} yet.
                 </td>
               </tr>
             )}
-            {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.created_at ? new Date(row.created_at).toLocaleString() : '—'}</td>
-                <td>{row.form_type || '—'}</td>
-                <td>{row.full_name}</td>
-                <td>
-                  <a href={`mailto:${row.email}`}>{row.email}</a>
-                </td>
-                <td>{row.division || '—'}</td>
-                <td>
-                  <span className={`admin-status status-${row.status || 'new'}`}>
-                    {row.status || 'new'}
-                  </span>
-                </td>
-                <td>{row.follow_up_date || '—'}</td>
-                <td className="admin-row-actions">
-                  <button type="button" className="btn btn-soft" onClick={() => openEdit(row)}>
-                    Open
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-soft cms-btn-danger"
-                    onClick={async () => {
-                      const label = row.full_name || row.email || noun
-                      if (
-                        !window.confirm(
-                          `Delete this ${noun} from ${label}? This cannot be undone.`,
-                        )
-                      ) {
-                        return
-                      }
-                      setError('')
-                      try {
-                        await deleteEnquiry(row.id)
-                        if (editing?.id === row.id) setEditing(null)
-                        await load()
-                      } catch (err) {
-                        setError(err.message || 'Delete failed')
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {rows.map((row) => {
+              const when = formatWhen(row.created_at)
+              const status = row.status || 'new'
+              return (
+                <tr key={row.id}>
+                  <td className="admin-cell-when">
+                    <span className="admin-when-date">{when.date}</span>
+                    {when.time ? <span className="admin-when-time">{when.time}</span> : null}
+                  </td>
+                  {!isQuotes && (
+                    <td>
+                      <span className="admin-type-pill">{row.form_type || '—'}</span>
+                    </td>
+                  )}
+                  <td className="admin-cell-client">
+                    <strong>{row.full_name || '—'}</strong>
+                    {row.email ? (
+                      <a className="admin-email-link" href={`mailto:${row.email}`}>
+                        {row.email}
+                      </a>
+                    ) : null}
+                    {row.service ? <span className="admin-meta-line">{row.service}</span> : null}
+                  </td>
+                  <td>{row.division || '—'}</td>
+                  <td>
+                    <span className={`admin-status status-${status}`}>
+                      {STATUS_LABELS[status] || status}
+                    </span>
+                  </td>
+                  <td className="admin-cell-follow">{formatFollowUp(row.follow_up_date)}</td>
+                  <td className="admin-row-actions">
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-solid"
+                      onClick={() => openEdit(row)}
+                    >
+                      Open
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-danger"
+                      onClick={() => removeRow(row)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
@@ -209,53 +263,64 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
       {editing && (
         <div className="cms-popover-backdrop" onClick={() => setEditing(null)}>
           <div className="cms-popover admin-edit-drawer" onClick={(e) => e.stopPropagation()}>
-            <h2>Update {noun}</h2>
-            <p className="admin-muted">
-              {editing.full_name} · {editing.email}
-              {editing.service ? ` · ${editing.service}` : ''}
-            </p>
+            <div className="admin-drawer-head">
+              <div>
+                <p className="admin-drawer-kicker">Update {noun}</p>
+                <h2>{editing.full_name || 'Untitled'}</h2>
+                <p className="admin-muted admin-drawer-meta">
+                  {editing.email}
+                  {editing.phone ? ` · ${editing.phone}` : ''}
+                  {editing.service ? ` · ${editing.service}` : ''}
+                  {editing.division ? ` · ${editing.division}` : ''}
+                </p>
+              </div>
+            </div>
             {editing.message && (
               <blockquote className="admin-quote">{editing.message}</blockquote>
             )}
-            <label className="cms-field">
-              <span>Status</span>
-              <select
-                value={draft.status}
-                onChange={(e) => setDraft((d) => ({ ...d, status: e.target.value }))}
-              >
-                {STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="cms-field">
-              <span>Follow-up date</span>
-              <input
-                type="date"
-                value={draft.follow_up_date}
-                onChange={(e) => setDraft((d) => ({ ...d, follow_up_date: e.target.value }))}
-              />
-            </label>
-            <label className="cms-check">
-              <input
-                type="checkbox"
-                checked={draft.quotation_sent}
-                onChange={(e) =>
-                  setDraft((d) => ({ ...d, quotation_sent: e.target.checked }))
-                }
-              />
-              Quotation sent
-            </label>
-            <label className="cms-check">
-              <input
-                type="checkbox"
-                checked={draft.converted}
-                onChange={(e) => setDraft((d) => ({ ...d, converted: e.target.checked }))}
-              />
-              Converted
-            </label>
+            <div className="admin-drawer-grid">
+              <label className="cms-field">
+                <span>Status</span>
+                <select
+                  value={draft.status}
+                  onChange={(e) => setDraft((d) => ({ ...d, status: e.target.value }))}
+                >
+                  {STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {STATUS_LABELS[s] || s}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="cms-field">
+                <span>Follow-up date</span>
+                <input
+                  type="date"
+                  value={draft.follow_up_date}
+                  onChange={(e) => setDraft((d) => ({ ...d, follow_up_date: e.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="admin-drawer-checks">
+              <label className="cms-check">
+                <input
+                  type="checkbox"
+                  checked={draft.quotation_sent}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, quotation_sent: e.target.checked }))
+                  }
+                />
+                Quotation sent
+              </label>
+              <label className="cms-check">
+                <input
+                  type="checkbox"
+                  checked={draft.converted}
+                  onChange={(e) => setDraft((d) => ({ ...d, converted: e.target.checked }))}
+                />
+                Converted
+              </label>
+            </div>
             <label className="cms-field">
               <span>Notes</span>
               <textarea
@@ -264,19 +329,28 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                 onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))}
               />
             </label>
-            <div className="cms-popover-actions">
+            <div className="cms-popover-actions admin-drawer-actions">
               <button
                 type="button"
-                className="btn btn-soft cms-btn-danger"
+                className="admin-btn admin-btn-danger"
                 disabled={deleting || saving}
-                onClick={remove}
+                onClick={removeEditing}
               >
                 {deleting ? 'Deleting…' : 'Delete'}
               </button>
-              <button type="button" className="btn btn-soft" onClick={() => setEditing(null)}>
+              <button
+                type="button"
+                className="admin-btn admin-btn-ghost"
+                onClick={() => setEditing(null)}
+              >
                 Cancel
               </button>
-              <button type="button" className="btn btn-primary" disabled={saving || deleting} onClick={save}>
+              <button
+                type="button"
+                className="admin-btn admin-btn-solid"
+                disabled={saving || deleting}
+                onClick={save}
+              >
                 {saving ? 'Saving…' : 'Save'}
               </button>
             </div>
