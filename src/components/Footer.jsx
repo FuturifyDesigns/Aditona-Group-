@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import EditableText from '../cms/EditableText'
 import { config } from '../lib/config'
 
 export default function Footer() {
@@ -8,17 +9,27 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="container footer-grid">
         <div>
-          <h4>{config.brand}</h4>
-          <p>
+          <EditableText contentKey="footer.brand" as="h4">
+            {config.brand}
+          </EditableText>
+          <EditableText contentKey="footer.blurb" as="p" multiline>
             A multi-disciplinary solutions company delivering events, creative &amp;
             marketing, golf experiences, and sourcing &amp; procurement with vision,
             precision, and execution.
-          </p>
-          <p style={{ marginTop: '0.75rem' }}>{config.tagline}</p>
+          </EditableText>
+          <EditableText
+            contentKey="footer.tagline"
+            as="p"
+            style={{ marginTop: '0.75rem' }}
+          >
+            {config.tagline}
+          </EditableText>
         </div>
 
         <div>
-          <h4>Divisions</h4>
+          <EditableText contentKey="footer.divisions_heading" as="h4">
+            Divisions
+          </EditableText>
           <p>
             <Link to="/event-solutions">Event Solutions</Link>
           </p>
@@ -34,7 +45,9 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4>Company</h4>
+          <EditableText contentKey="footer.company_heading" as="h4">
+            Company
+          </EditableText>
           <p>
             <Link to="/about">About</Link>
           </p>
@@ -50,7 +63,9 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4>Contact</h4>
+          <EditableText contentKey="footer.contact_heading" as="h4">
+            Contact
+          </EditableText>
           {config.emailChannels.map((channel) => (
             <p key={channel.email} className="footer-email">
               <a href={`mailto:${channel.email}`}>{channel.email}</a>

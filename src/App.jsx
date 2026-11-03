@@ -14,10 +14,7 @@ import Procurement from './pages/Procurement'
 import RequestQuote from './pages/RequestQuote'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/AdminLogin'
-import CardsAdmin from './pages/admin/CardsAdmin'
-import CopyAdmin from './pages/admin/CopyAdmin'
 import EnquiriesAdmin from './pages/admin/EnquiriesAdmin'
-import ProjectsAdmin from './pages/admin/ProjectsAdmin'
 
 export default function App() {
   return (
@@ -41,9 +38,9 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="enquiries" replace />} />
         <Route path="enquiries" element={<EnquiriesAdmin />} />
-        <Route path="copy" element={<CopyAdmin />} />
-        <Route path="cards" element={<CardsAdmin />} />
-        <Route path="projects" element={<ProjectsAdmin />} />
+        <Route path="copy" element={<Navigate to="/admin/enquiries" replace />} />
+        <Route path="cards" element={<Navigate to="/admin/enquiries" replace />} />
+        <Route path="projects" element={<Navigate to="/admin/enquiries" replace />} />
       </Route>
     </Routes>
   )

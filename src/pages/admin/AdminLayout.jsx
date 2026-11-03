@@ -8,25 +8,10 @@ const tabs = [
     label: 'Enquiries',
     hint: 'Messages from the website',
   },
-  {
-    to: '/admin/copy',
-    label: 'Website text',
-    hint: 'Headlines and button labels',
-  },
-  {
-    to: '/admin/cards',
-    label: 'Cards & images',
-    hint: 'Home and portfolio cards',
-  },
-  {
-    to: '/admin/projects',
-    label: 'Projects',
-    hint: 'Work page entries',
-  },
 ]
 
 export default function AdminLayout() {
-  const { isAuthenticated, loading } = useCms()
+  const { isAuthenticated, loading, setEditMode } = useCms()
   const location = useLocation()
 
   if (loading) {
@@ -54,7 +39,7 @@ export default function AdminLayout() {
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <strong>Aditona Admin</strong>
-          <span>Simple tools for the live site</span>
+          <span>Enquiries + live site editing</span>
         </div>
         <nav className="admin-nav" aria-label="Admin">
           {tabs.map((tab) => (
@@ -71,9 +56,17 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="admin-sidebar-foot">
-          <NavLink to="/" className="admin-site-link">
-            ← View live website
+          <NavLink
+            to="/?edit=1"
+            className="admin-live-edit-btn"
+            onClick={() => setEditMode(true)}
+          >
+            Edit live site
           </NavLink>
+          <p className="admin-live-edit-hint">
+            Turn on live edit to change text, cards, images, footer, and projects on
+            the website itself.
+          </p>
           <button type="button" className="btn btn-soft admin-logout" onClick={logout}>
             Log out
           </button>
@@ -87,6 +80,13 @@ export default function AdminLayout() {
             <h1>{active?.label || 'Dashboard'}</h1>
             <p className="admin-muted">{active?.hint}</p>
           </div>
+          <NavLink
+            to="/?edit=1"
+            className="btn btn-primary admin-top-live"
+            onClick={() => setEditMode(true)}
+          >
+            Edit live site
+          </NavLink>
         </header>
         <main className="admin-main">
           <Outlet />

@@ -16,6 +16,7 @@ export default function EditModeBar() {
     <div className="cms-bar" role="region" aria-label="CMS toolbar">
       <span className="cms-bar-label">
         Signed in as {user?.email || 'admin'}
+        {editMode ? ' — click any ✎ item to edit' : ''}
       </span>
       <button
         type="button"
@@ -24,8 +25,8 @@ export default function EditModeBar() {
       >
         {editMode ? 'Edit Live: ON' : 'Edit Live: OFF'}
       </button>
-      <Link to="/admin" className="cms-bar-link">
-        Admin
+      <Link to="/admin/enquiries" className="cms-bar-link">
+        Enquiries
       </Link>
       <button type="button" className="cms-bar-link" onClick={logout}>
         Log out

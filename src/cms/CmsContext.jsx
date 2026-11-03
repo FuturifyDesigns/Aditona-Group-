@@ -6,11 +6,17 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
+  deleteCard,
+  deleteProject,
   getContentMap,
   listCards,
+  listProjects,
   supabase,
+  upsertCard,
   upsertContent,
+  upsertProject,
 } from '../lib/supabase'
 import { isAdminEmail } from '../lib/config'
 import { DEFAULTS } from './defaults'
@@ -20,16 +26,24 @@ const CmsContext = createContext(null)
 export function CmsProvider({ children }) {
   const [content, setContentState] = useState({ ...DEFAULTS })
   const [cards, setCards] = useState([])
+  const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [authLoading, setAuthLoading] = useState(true)
   const [session, setSession] = useState(null)
   const [editMode, setEditMode] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const refresh = useCallback(async () => {
     try {
-      const [map, cardRows] = await Promise.all([getContentMap(), listCards()])
+      const [map, cardRows, projectRows] = await Promise.all([
+        getContentMap(),
+        listCards(),
+        listProjects().catch(() => []),
+      ])
       setContentState({ ...DEFAULTS, ...map })
       setCards(cardRows)
+      setProjects(projectRows || [])
     } catch (err) {
       console.warn('[cms] refresh failed', err)
       setContentState((prev) => ({ ...DEFAULTS, ...prev }))
@@ -72,8 +86,21 @@ export function CmsProvider({ children }) {
     }
   }, [])
 
+  // Deep-link: /?edit=1 turns live edit on for signed-in admin
   useEffect(() => {
-    document.body.classList.toggle('cms-edit-mode', Boolean(editMode && session))
+    const params = new URLSearchParams(location.search)
+    if (params.get('edit') !== '1') return
+    if (!(session && isAdminEmail(session?.user?.email))) return
+    setEditMode(true)
+    params.delete('edit')
+    const next = `${location.pathname}${params.toString() ? `?${params}` : ''}${location.hash || ''}`
+    navigate(next, { replace: true })
+  }, [location.search, location.pathname, location.hash, session, navigate])
+
+  useEffect(() => {
+    const on =
+      Boolean(editMode && session && isAdminEmail(session?.user?.email))
+    document.body.classList.toggle('cms-edit-mode', on)
     return () => document.body.classList.remove('cms-edit-mode')
   }, [editMode, session])
 
@@ -81,6 +108,40 @@ export function CmsProvider({ children }) {
     setContentState((prev) => ({ ...prev, [key]: value }))
     await upsertContent(key, value)
   }, [])
+
+  const saveCard = useCallback(
+    async (payload) => {
+      const saved = await upsertCard(payload)
+      await refresh()
+      return saved
+    },
+    [refresh],
+  )
+
+  const removeCard = useCallback(
+    async (id) => {
+      await deleteCard(id)
+      await refresh()
+    },
+    [refresh],
+  )
+
+  const saveProject = useCallback(
+    async (payload) => {
+      const saved = await upsertProject(payload)
+      await refresh()
+      return saved
+    },
+    [refresh],
+  )
+
+  const removeProject = useCallback(
+    async (id) => {
+      await deleteProject(id)
+      await refresh()
+    },
+    [refresh],
+  )
 
   const get = useCallback(
     (key) => content[key] ?? DEFAULTS[key] ?? '',
@@ -95,32 +156,50 @@ export function CmsProvider({ children }) {
     [cards, editMode],
   )
 
+  const publishedProjects = useMemo(
+    () => projects.filter((p) => p.published !== false || editMode),
+    [projects, editMode],
+  )
+
+  const isAuthed = Boolean(session && isAdminEmail(session?.user?.email))
+
   const value = useMemo(
     () => ({
       content,
       cards,
+      projects: publishedProjects,
       cardsByCollection,
       loading: loading || authLoading,
       session,
       user: session?.user ?? null,
-      isAuthenticated: Boolean(session && isAdminEmail(session?.user?.email)),
-      editMode: Boolean(editMode && session && isAdminEmail(session?.user?.email)),
+      isAuthenticated: isAuthed,
+      editMode: Boolean(editMode && isAuthed),
       setEditMode,
       setContent,
       get,
       refresh,
+      saveCard,
+      removeCard,
+      saveProject,
+      removeProject,
     }),
     [
       content,
       cards,
+      publishedProjects,
       cardsByCollection,
       loading,
       authLoading,
       session,
+      isAuthed,
       editMode,
       setContent,
       get,
       refresh,
+      saveCard,
+      removeCard,
+      saveProject,
+      removeProject,
     ],
   )
 

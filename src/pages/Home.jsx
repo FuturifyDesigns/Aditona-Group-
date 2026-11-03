@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,6 +9,7 @@ import HeroSlideshow from '../components/HeroSlideshow'
 import ProgressiveArt, { ArtDrawing } from '../components/ProgressiveArt'
 import Reveal from '../components/Reveal'
 import SplitHeadline from '../components/SplitHeadline'
+import CardEditor from '../cms/CardEditor'
 import EditableButton from '../cms/EditableButton'
 import EditableText from '../cms/EditableText'
 import { useCms } from '../cms/CmsContext'
@@ -57,48 +58,49 @@ const FALLBACK_WORK = [
 ]
 
 const storyPanels = [
-  {
-    title: 'One group.',
-    text: 'A single accountable partner — not a patchwork of vendors.',
-    art: 'nodes',
-  },
-  {
-    title: 'Specialist depth.',
-    text: 'Events, creative & marketing, golf, and group-wide sourcing & procurement.',
-    art: 'orbit',
-  },
-  {
-    title: 'Multiple solutions.',
-    text: 'Vision. Precision. Execution. Across every brief we take on.',
-    art: 'arcs',
-  },
+  { titleKey: 'story.1.title', bodyKey: 'story.1.body', art: 'nodes' },
+  { titleKey: 'story.2.title', bodyKey: 'story.2.body', art: 'orbit' },
+  { titleKey: 'story.3.title', bodyKey: 'story.3.body', art: 'arcs' },
 ]
 
 export default function Home() {
   const pageRef = useRef(null)
-  const { cardsByCollection, get } = useCms()
+  const { cardsByCollection, get, editMode } = useCms()
+  const [workEditor, setWorkEditor] = useState(null)
+  const [addingDivision, setAddingDivision] = useState(false)
+  const [addingWork, setAddingWork] = useState(false)
 
   const divisions = useMemo(() => {
     const fromCms = cardsByCollection('home_divisions')
     if (fromCms.length) {
-      return fromCms.map((c) => ({
+      return fromCms.map((c, i) => ({
+        card: c,
         to: c.link_url || '/',
         title: c.title,
         text: c.body || '',
         image: c.image_url || FALLBACK_DIVISIONS[0].image,
+        sortOrder: c.sort_order ?? i,
       }))
     }
-    return FALLBACK_DIVISIONS
+    return FALLBACK_DIVISIONS.map((d, i) => ({ ...d, card: null, sortOrder: i }))
   }, [cardsByCollection])
 
   const workThumbs = useMemo(() => {
     const fromCms = cardsByCollection('home_work')
     if (fromCms.length) {
-      return fromCms
-        .map((c) => c.image_url)
-        .filter(Boolean)
+      return fromCms.map((c, i) => ({
+        card: c,
+        src: c.image_url,
+        title: c.title || `Work ${i + 1}`,
+        sortOrder: c.sort_order ?? i,
+      }))
     }
-    return FALLBACK_WORK
+    return FALLBACK_WORK.map((src, i) => ({
+      card: null,
+      src,
+      title: `Work ${i + 1}`,
+      sortOrder: i,
+    }))
   }, [cardsByCollection])
 
   useGSAP(
@@ -264,8 +266,8 @@ export default function Home() {
               <path d="M9 12l2 2 4-4" />
             </svg>
             <div>
-              <h3>One accountable team</h3>
-              <p>Cross-division coordination without agency sprawl.</p>
+              <EditableText contentKey="trust.1.title" as="h3" />
+              <EditableText contentKey="trust.1.body" as="p" multiline />
             </div>
           </div>
           <div className="trust-item">
@@ -283,8 +285,8 @@ export default function Home() {
               <path d="M4 19V5h4l2 4h10v10H4z" />
             </svg>
             <div>
-              <h3>Brand-safe creative</h3>
-              <p>Visual systems and campaigns that stay on-message.</p>
+              <EditableText contentKey="trust.2.title" as="h3" />
+              <EditableText contentKey="trust.2.body" as="p" multiline />
             </div>
           </div>
           <div className="trust-item">
@@ -293,8 +295,8 @@ export default function Home() {
               <circle cx="12" cy="8" r="2" />
             </svg>
             <div>
-              <h3>Golf hospitality</h3>
-              <p>Corporate days and activations planned to the tee.</p>
+              <EditableText contentKey="trust.3.title" as="h3" />
+              <EditableText contentKey="trust.3.body" as="p" multiline />
             </div>
           </div>
         </div>
@@ -318,8 +320,26 @@ export default function Home() {
           </div>
           <div className="division-grid">
             {divisions.map((d) => (
-              <DivisionCard key={`${d.to}-${d.title}`} {...d} />
+              <DivisionCard
+                key={d.card?.id || `${d.to}-${d.title}`}
+                to={d.to}
+                title={d.title}
+                text={d.text}
+                image={d.image}
+                card={d.card}
+                collection="home_divisions"
+                sortOrder={d.sortOrder}
+              />
             ))}
+            {editMode && (
+              <button
+                type="button"
+                className="cms-add-tile"
+                onClick={() => setAddingDivision(true)}
+              >
+                + Add division card
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -327,7 +347,7 @@ export default function Home() {
       <section className="story-pin" aria-label="Brand statement">
         <div className="story-pin-arts" aria-hidden="true">
           {storyPanels.map((panel) => (
-            <div className="story-art" key={`art-${panel.title}`}>
+            <div className="story-art" key={`art-${panel.titleKey}`}>
               <ArtDrawing variant={panel.art} />
             </div>
           ))}
@@ -337,17 +357,17 @@ export default function Home() {
           {storyPanels.map((panel, i) => (
             <div
               className={`story-panel${i === 0 ? ' is-first' : ''}`}
-              key={panel.title}
+              key={panel.titleKey}
             >
               <div>
-                <h2>{panel.title}</h2>
-                <p>{panel.text}</p>
+                <EditableText contentKey={panel.titleKey} as="h2" />
+                <EditableText contentKey={panel.bodyKey} as="p" multiline />
               </div>
             </div>
           ))}
           <div className="story-progress" aria-hidden="true">
             {storyPanels.map((panel) => (
-              <span key={panel.title}>
+              <span key={panel.titleKey}>
                 <i />
               </span>
             ))}
@@ -385,11 +405,33 @@ export default function Home() {
             />
           </Reveal>
           <div className="work-gallery">
-            {workThumbs.map((src) => (
-              <div key={src} className="work-thumb">
-                <img src={src} alt="" loading="lazy" />
+            {workThumbs.map((item) => (
+              <div
+                key={item.card?.id || item.src}
+                className={`work-thumb${editMode ? ' cms-editable' : ''}`}
+                role={editMode ? 'button' : undefined}
+                tabIndex={editMode ? 0 : undefined}
+                onClick={() => {
+                  if (!editMode) return
+                  setWorkEditor(item)
+                }}
+                onKeyDown={(e) => {
+                  if (editMode && e.key === 'Enter') setWorkEditor(item)
+                }}
+              >
+                <img src={item.src} alt="" loading="lazy" />
+                {editMode && <span className="cms-pencil cms-pencil--img">✎</span>}
               </div>
             ))}
+            {editMode && (
+              <button
+                type="button"
+                className="cms-add-tile work-thumb"
+                onClick={() => setAddingWork(true)}
+              >
+                + Add image
+              </button>
+            )}
           </div>
           <Reveal delay={0.1}>
             <EditableButton
@@ -404,6 +446,51 @@ export default function Home() {
       </section>
 
       <CTABand />
+
+      {workEditor && (
+        <CardEditor
+          kind="card"
+          record={workEditor.card?.id ? workEditor.card : null}
+          defaults={{
+            collection: 'home_work',
+            title: workEditor.title,
+            body: '',
+            image_url: workEditor.src,
+            sort_order: workEditor.sortOrder,
+            published: true,
+          }}
+          onClose={() => setWorkEditor(null)}
+        />
+      )}
+      {addingDivision && (
+        <CardEditor
+          kind="card"
+          defaults={{
+            collection: 'home_divisions',
+            title: 'New division',
+            body: '',
+            image_url: heroes.events,
+            link_url: '/',
+            sort_order: divisions.length,
+            published: true,
+          }}
+          onClose={() => setAddingDivision(false)}
+        />
+      )}
+      {addingWork && (
+        <CardEditor
+          kind="card"
+          defaults={{
+            collection: 'home_work',
+            title: 'Featured work',
+            body: '',
+            image_url: '',
+            sort_order: workThumbs.length,
+            published: true,
+          }}
+          onClose={() => setAddingWork(false)}
+        />
+      )}
     </div>
   )
 }

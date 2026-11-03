@@ -6,6 +6,9 @@ import CTABand from '../components/CTABand'
 import PageHero from '../components/PageHero'
 import ProgressiveArt from '../components/ProgressiveArt'
 import SplitHeadline from '../components/SplitHeadline'
+import CardEditor from '../cms/CardEditor'
+import EditableText from '../cms/EditableText'
+import { useCms } from '../cms/CmsContext'
 import { gallery, heroes } from '../lib/images'
 import { hardRefreshScroll, pinOptions } from '../lib/scroll'
 
@@ -13,54 +16,79 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const FILTERS = ['All', 'Events', 'Creative', 'Golf']
 
-const projects = [
+const FALLBACK_PROJECTS = [
   {
     title: 'Leadership Summit',
-    category: 'Events',
-    text: 'Stage, livestream, and hospitality for a two-day executive conference.',
-    image: gallery.work.summit,
+    division: 'Events',
+    summary: 'Stage, livestream, and hospitality for a two-day executive conference.',
+    image_url: gallery.work.summit,
   },
   {
     title: 'Product Reveal',
-    category: 'Events',
-    text: 'Controlled unveil sequence with press environment and guest journey.',
-    image: gallery.work.reveal,
+    division: 'Events',
+    summary: 'Controlled unveil sequence with press environment and guest journey.',
+    image_url: gallery.work.reveal,
   },
   {
     title: 'Integrated Campaign',
-    category: 'Creative',
-    text: 'Brand system, content, and experiential install working as one story.',
-    image: gallery.work.campaign,
+    division: 'Creative',
+    summary: 'Brand system, content, and experiential install working as one story.',
+    image_url: gallery.work.campaign,
   },
   {
     title: 'Business Interview Series',
-    category: 'Creative',
-    text: 'On-camera leadership content produced for always-on channels.',
-    image: gallery.work.interview,
+    division: 'Creative',
+    summary: 'On-camera leadership content produced for always-on channels.',
+    image_url: gallery.work.interview,
   },
   {
     title: 'Golf Hospitality Day',
-    category: 'Golf',
-    text: 'Corporate foursomes, course ops, and clubhouse hosting end to end.',
-    image: gallery.work.hospitality,
+    division: 'Golf',
+    summary: 'Corporate foursomes, course ops, and clubhouse hosting end to end.',
+    image_url: gallery.work.hospitality,
   },
   {
     title: 'Charity Auction Evening',
-    category: 'Golf',
-    text: 'Sunset auction and fundraising programme on the terrace.',
-    image: gallery.work.auction,
+    division: 'Golf',
+    summary: 'Sunset auction and fundraising programme on the terrace.',
+    image_url: gallery.work.auction,
   },
 ]
 
 export default function OurWork() {
   const [filter, setFilter] = useState('All')
+  const [editor, setEditor] = useState(null)
+  const [adding, setAdding] = useState(false)
   const pageRef = useRef(null)
   const gridRef = useRef(null)
+  const { projects, editMode } = useCms()
+
+  const allProjects = useMemo(() => {
+    if (projects?.length) {
+      return projects.map((p) => ({
+        ...p,
+        category: p.division || 'Events',
+        text: p.summary || '',
+        image: p.image_url,
+      }))
+    }
+    return FALLBACK_PROJECTS.map((p, i) => ({
+      ...p,
+      id: null,
+      category: p.division,
+      text: p.summary,
+      image: p.image_url,
+      sort_order: i,
+      published: true,
+    }))
+  }, [projects])
 
   const visible = useMemo(
     () =>
-      filter === 'All' ? projects : projects.filter((p) => p.category === filter),
-    [filter],
+      filter === 'All'
+        ? allProjects
+        : allProjects.filter((p) => p.category === filter),
+    [filter, allProjects],
   )
 
   useGSAP(
@@ -98,108 +126,59 @@ export default function OurWork() {
           scrollTrigger: { trigger: '.work-runway', start: 'top 82%' },
         })
 
-        gsap.fromTo(
-          track,
-          { x: 24 },
-          {
-            x: () => Math.min(0, -(track.scrollWidth - window.innerWidth + 64)),
-            ease: 'none',
-            scrollTrigger: {
-              trigger: '.work-runway',
-              start: 'top top',
-              end: () => `+=${Math.max(track.scrollWidth * 0.7, window.innerHeight)}`,
-              ...pinOptions({
-                scrub: 0.7,
-                onUpdate: (self) => {
-                  if (teaserBar) gsap.set(teaserBar, { scaleX: self.progress })
-                  if (teaser) {
-                    gsap.set(teaser, {
-                      opacity: 0.45 + self.progress * 0.55,
-                      y: (1 - self.progress) * 12,
-                    })
-                  }
-                },
-              }),
-            },
-          },
-        )
-      }
-
-      gsap.from('.work-chip', {
-        opacity: 0,
-        y: 18,
-        stagger: 0.06,
-        duration: 0.55,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: '.work-filter-bar', start: 'top 90%' },
-      })
-
-      const cases = gsap.utils.toArray('.work-case')
-      cases.forEach((card, i) => {
-        const media = card.querySelector('.work-case-media')
-        const img = card.querySelector('img')
-        const copy = card.querySelectorAll('.work-case-copy > *')
-        const line = card.querySelector('.work-case-line')
-        const fromLeft = i % 2 === 0
-
-        gsap.set(line, { scaleX: 0, transformOrigin: fromLeft ? 'left center' : 'right center' })
-
-        const tl = gsap.timeline({
+        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth)
+        gsap.to(track, {
+          x: () => -distance(),
+          ease: 'none',
           scrollTrigger: {
-            trigger: card,
-            start: 'top 84%',
-            end: 'top 42%',
-            scrub: 0.7,
+            trigger: '.work-runway',
+            start: 'top top',
+            end: () => `+=${distance() + window.innerHeight * 0.35}`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              if (teaserBar) teaserBar.style.transform = `scaleX(${self.progress})`
+              if (teaser) teaser.classList.toggle('is-done', self.progress > 0.92)
+            },
+            ...pinOptions,
           },
         })
-
-        tl.fromTo(
-          media,
-          {
-            clipPath: fromLeft ? 'inset(0 70% 0 0)' : 'inset(0 0 0 70%)',
-            opacity: 0.4,
-          },
-          { clipPath: 'inset(0 0% 0 0%)', opacity: 1, ease: 'none' },
-          0,
-        )
-          .fromTo(
-            img,
-            { scale: 1.18, xPercent: fromLeft ? -6 : 6 },
-            { scale: 1, xPercent: 0, ease: 'none' },
-            0,
-          )
-          .fromTo(
-            copy,
-            { y: 28, opacity: 0 },
-            { y: 0, opacity: 1, stagger: 0.05, ease: 'none' },
-            0.08,
-          )
-          .to(line, { scaleX: 1, ease: 'none' }, 0.12)
-
-        card.addEventListener('pointerenter', () => {
-          gsap.to(img, { scale: 1.06, duration: 0.55, ease: 'power2.out' })
-          gsap.to(card, { y: -6, duration: 0.35, ease: 'power2.out' })
-        })
-        card.addEventListener('pointerleave', () => {
-          gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' })
-          gsap.to(card, { y: 0, duration: 0.4, ease: 'power2.out' })
-        })
-      })
+      }
 
       hardRefreshScroll(pageRef.current)
     },
-    { scope: pageRef, dependencies: [filter], revertOnUpdate: true },
+    { scope: pageRef, dependencies: [allProjects, editMode] },
+  )
+
+  useGSAP(
+    () => {
+      const grid = gridRef.current
+      if (!grid) return
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reduced) {
+        gsap.set('.work-case', { clearProps: 'all', opacity: 1, y: 0, scale: 1 })
+        return
+      }
+      gsap.from('.work-case', {
+        opacity: 0,
+        y: 28,
+        stagger: 0.06,
+        duration: 0.55,
+        ease: 'power3.out',
+      })
+    },
+    { scope: gridRef, dependencies: [filter, visible] },
   )
 
   const onFilter = (next) => {
     if (next === filter) return
     const grid = gridRef.current
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!grid || reduced) {
+    if (!grid || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setFilter(next)
       return
     }
-
     const cards = grid.querySelectorAll('.work-case')
     gsap.to(cards, {
       opacity: 0,
@@ -212,34 +191,53 @@ export default function OurWork() {
     })
   }
 
+  const openProject = (project) => {
+    if (!editMode) return
+    setEditor(project)
+  }
+
   return (
     <div ref={pageRef} className="page-work">
       <PageHero
         image={heroes.work}
-        eyebrow={<p className="eyebrow">Portfolio</p>}
+        eyebrow={<EditableText contentKey="work.eyebrow" as="p" className="eyebrow">Portfolio</EditableText>}
         title={<SplitHeadline text="Our Work" as="h1" immediate />}
         body={
-          <p className="hero-lead">
+          <EditableText contentKey="work.hero_body" as="p" className="hero-lead" multiline>
             Selected engagements across events, creative, and golf — each delivered
             with one accountable team.
-          </p>
+          </EditableText>
         }
       />
 
       <section className="work-runway" aria-label="Featured work runway">
         <div className="container work-runway-head">
-          <p className="eyebrow">Featured</p>
-          <h2>A runway of recent delivery</h2>
+          <EditableText contentKey="work.runway_eyebrow" as="p" className="eyebrow">
+            Featured
+          </EditableText>
+          <EditableText contentKey="work.runway_title" as="h2">
+            A runway of recent delivery
+          </EditableText>
         </div>
         <div className="work-runway-track">
-          {projects.map((project, i) => (
-            <figure className="work-runway-card" key={`runway-${project.title}`}>
+          {allProjects.map((project, i) => (
+            <figure
+              className={`work-runway-card${editMode ? ' cms-editable' : ''}`}
+              key={project.id || `runway-${project.title}`}
+              onClick={() => openProject(project)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') openProject(project)
+              }}
+              role={editMode ? 'button' : undefined}
+              tabIndex={editMode ? 0 : undefined}
+            >
               <img src={project.image} alt="" loading="lazy" />
               <figcaption>
                 <span>{String(i + 1).padStart(2, '0')}</span>
                 <strong>{project.title}</strong>
                 <em>{project.category}</em>
               </figcaption>
+              {editMode && <span className="cms-pencil cms-pencil--img">✎</span>}
             </figure>
           ))}
         </div>
@@ -258,8 +256,12 @@ export default function OurWork() {
         <div className="container">
           <div className="work-filter-bar">
             <div>
-              <p className="eyebrow">Archive</p>
-              <h2>Filter the portfolio</h2>
+              <EditableText contentKey="work.archive_eyebrow" as="p" className="eyebrow">
+                Archive
+              </EditableText>
+              <EditableText contentKey="work.archive_title" as="h2">
+                Filter the portfolio
+              </EditableText>
             </div>
             <div className="chip-row" role="tablist" aria-label="Filter projects">
               {FILTERS.map((chip) => (
@@ -282,8 +284,9 @@ export default function OurWork() {
           <div className="work-cases" ref={gridRef}>
             {visible.map((project, i) => (
               <article
-                className={`work-case${i % 2 ? ' is-flip' : ''}`}
-                key={`${filter}-${project.title}`}
+                className={`work-case${i % 2 ? ' is-flip' : ''}${editMode ? ' cms-editable' : ''}`}
+                key={`${filter}-${project.id || project.title}`}
+                onClick={() => openProject(project)}
               >
                 <div className="work-case-media">
                   <img src={project.image} alt="" loading="lazy" />
@@ -295,13 +298,49 @@ export default function OurWork() {
                   <p>{project.text}</p>
                   <i className="work-case-line" aria-hidden="true" />
                 </div>
+                {editMode && <span className="cms-pencil">✎</span>}
               </article>
             ))}
+            {editMode && (
+              <button type="button" className="cms-add-tile" onClick={() => setAdding(true)}>
+                + Add project
+              </button>
+            )}
           </div>
         </div>
       </section>
 
       <CTABand />
+
+      {editor && (
+        <CardEditor
+          kind="project"
+          record={editor.id ? editor : null}
+          defaults={{
+            title: editor.title,
+            summary: editor.summary || editor.text,
+            image_url: editor.image_url || editor.image,
+            division: editor.division || editor.category,
+            sort_order: editor.sort_order || 0,
+            published: true,
+          }}
+          onClose={() => setEditor(null)}
+        />
+      )}
+      {adding && (
+        <CardEditor
+          kind="project"
+          defaults={{
+            title: 'New project',
+            summary: '',
+            image_url: '',
+            division: 'Events',
+            sort_order: allProjects.length,
+            published: true,
+          }}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </div>
   )
 }

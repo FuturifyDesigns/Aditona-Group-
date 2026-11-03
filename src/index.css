@@ -3084,8 +3084,96 @@ body.cms-edit-mode {
   color: rgba(255, 255, 255, 0.65);
 }
 
+.admin-live-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f4f4f4;
+  color: #1a1a1b !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.admin-live-edit-btn:hover {
+  background: #fff;
+}
+
+.admin-live-edit-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.admin-top-live {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .admin-logout {
   width: 100%;
+}
+
+.cms-popover--wide {
+  width: min(28rem, calc(100vw - 2rem));
+}
+
+.cms-editor-preview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 0.65rem;
+  background: #e8e8e8;
+}
+
+.cms-editor-preview.is-empty {
+  display: grid;
+  place-items: center;
+  color: #6d6c6c;
+  font-size: 0.85rem;
+}
+
+.cms-add-tile {
+  min-height: 10rem;
+  border: 1.5px dashed rgba(26, 26, 27, 0.35);
+  border-radius: 14px;
+  background: rgba(244, 244, 244, 0.7);
+  color: #1a1a1b;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.cms-add-tile:hover {
+  border-color: #1a1a1b;
+  background: #fff;
+}
+
+.section--dark .cms-add-tile,
+.work-gallery .cms-add-tile {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+body.cms-edit-mode .cms-editable {
+  outline: 1px dashed rgba(26, 26, 27, 0.35);
+  outline-offset: 2px;
+}
+
+body.cms-edit-mode .section--dark .cms-editable,
+body.cms-edit-mode .page-hero--dark .cms-editable {
+  outline-color: rgba(255, 255, 255, 0.45);
 }
 
 .admin-content {
@@ -3093,6 +3181,10 @@ body.cms-edit-mode {
 }
 
 .admin-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   background: #fff;
   border-bottom: 1px solid var(--ag-muted);
   padding: 1.15rem 1.25rem;
