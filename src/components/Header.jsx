@@ -9,6 +9,7 @@ const links = [
   { to: '/event-solutions', label: 'Events' },
   { to: '/creative-marketing', label: 'Creative' },
   { to: '/golf-solutions', label: 'Golf' },
+  { to: '/procurement', label: 'Procurement' },
   { to: '/our-work', label: 'Work' },
   { to: '/insights', label: 'Insights' },
   { to: '/contact', label: 'Contact' },

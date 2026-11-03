@@ -11,7 +11,8 @@ export default function Footer() {
           <h4>{config.brand}</h4>
           <p>
             A multi-disciplinary solutions company delivering events, creative &amp;
-            marketing, and golf experiences with vision, precision, and execution.
+            marketing, golf experiences, and sourcing &amp; procurement with vision,
+            precision, and execution.
           </p>
           <p style={{ marginTop: '0.75rem' }}>{config.tagline}</p>
         </div>
@@ -26,6 +27,9 @@ export default function Footer() {
           </p>
           <p>
             <Link to="/golf-solutions">Golf Solutions</Link>
+          </p>
+          <p>
+            <Link to="/procurement">Sourcing &amp; Procurement</Link>
           </p>
         </div>
 

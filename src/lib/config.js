@@ -1,7 +1,7 @@
 export const config = {
   brand: 'Aditona Group',
   tagline: 'VISION. PRECISION. EXECUTION.',
-  headline: 'One Group. Three Divisions. Multiple Solutions.',
+  headline: 'One Group. Multiple Solutions.',
   whatsapp: '26778691888',
   emails: {
     info: 'info@aditona.com',

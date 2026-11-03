@@ -10,6 +10,7 @@ import Home from './pages/Home'
 import Insights from './pages/Insights'
 import NotFound from './pages/NotFound'
 import OurWork from './pages/OurWork'
+import Procurement from './pages/Procurement'
 import RequestQuote from './pages/RequestQuote'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/AdminLogin'
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/event-solutions" element={<EventSolutions />} />
         <Route path="/creative-marketing" element={<CreativeMarketing />} />
         <Route path="/golf-solutions" element={<GolfSolutions />} />
+        <Route path="/procurement" element={<Procurement />} />
         <Route path="/our-work" element={<OurWork />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/contact" element={<Contact />} />

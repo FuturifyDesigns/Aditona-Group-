@@ -10,7 +10,7 @@ export const DEFAULTS = {
   'hero.cta_enquiry': 'Make an Enquiry',
   'hero.tagline': config.tagline,
   'home.divisions_eyebrow': 'Capabilities',
-  'home.divisions_title': 'Our Divisions',
+  'home.divisions_title': 'What we deliver',
   'home.divisions_link': 'How we work →',
   'home.work_eyebrow': 'Selected',
   'home.work_title': 'Featured Work',

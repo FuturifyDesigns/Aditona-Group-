@@ -13,6 +13,8 @@ const WA_BY_PATH = {
     'Hello Aditona Group — I am interested in Creative & Marketing.',
   '/golf-solutions':
     'Hello Aditona Group — I am interested in Golf Solutions.',
+  '/procurement':
+    'Hello Aditona Group — I am interested in Sourcing & Procurement.',
   '/request-quote':
     'Hello Aditona Group — I would like to request a quote.',
   '/enquiry': 'Hello Aditona Group — I would like to make an enquiry.',

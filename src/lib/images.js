@@ -8,6 +8,7 @@ export const heroes = {
   events: img('images/heroes/events.png'),
   creative: img('images/heroes/creative.png'),
   golf: img('images/heroes/golf.png'),
+  procurement: img('images/heroes/about.png'),
   work: img('images/heroes/work.png'),
   insights: img('images/heroes/insights.png'),
   contact: img('images/heroes/contact.png'),

@@ -42,6 +42,12 @@ const FALLBACK_DIVISIONS = [
     text: 'Corporate golf days, hospitality, and course activations planned with precision and polish.',
     image: heroes.golf,
   },
+  {
+    to: '/procurement',
+    title: 'Sourcing & Procurement',
+    text: 'Supplier sourcing, quotations, purchasing coordination, and budget-aligned procurement across projects.',
+    image: heroes.procurement,
+  },
 ]
 
 const FALLBACK_WORK = [
@@ -57,8 +63,8 @@ const storyPanels = [
     art: 'nodes',
   },
   {
-    title: 'Three divisions.',
-    text: 'Events, creative & marketing, and golf — each with specialist depth.',
+    title: 'Specialist depth.',
+    text: 'Events, creative & marketing, golf, and group-wide sourcing & procurement.',
     art: 'orbit',
   },
   {
@@ -230,9 +236,9 @@ export default function Home() {
         <div className="container stats-strip">
           <div className="stat-item">
             <span className="stat-num">
-              <CountUp to={3} />
+              <CountUp to={4} />
             </span>
-            <p>Specialist divisions</p>
+            <p>Service lines</p>
           </div>
           <div className="stat-item">
             <span className="stat-num">

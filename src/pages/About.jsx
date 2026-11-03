@@ -63,6 +63,13 @@ const divisions = [
     to: '/golf-solutions',
     image: gallery.about.quality,
   },
+  {
+    index: '04',
+    title: 'Sourcing & Procurement',
+    text: 'Supplier sourcing, quotations, purchasing coordination, and budget-aligned procurement across projects.',
+    to: '/procurement',
+    image: gallery.about.briefing,
+  },
 ]
 
 const values = [
@@ -393,10 +400,10 @@ export default function About() {
         <div className="container">
           <div className="about-divisions-head">
             <p className="eyebrow">Divisions</p>
-            <h2>Three specialist branches. One standard of delivery.</h2>
+            <h2>Specialist branches. Shared procurement. One standard of delivery.</h2>
             <p>
-              Each division runs with depth — and shares planning, brand discipline, and
-              on-the-day accountability with the rest of the group.
+              Each division runs with depth — supported by group-wide sourcing &amp;
+              procurement, planning, and on-the-day accountability.
             </p>
           </div>
 

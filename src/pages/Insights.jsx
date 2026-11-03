@@ -48,7 +48,7 @@ const articles = [
     tag: 'Creative',
   },
   {
-    title: 'One brief, three divisions',
+    title: 'One brief, one coordinated group',
     excerpt:
       'How multidisciplinary briefs save time when your launch needs a campaign, an event, and a hospitality day.',
     image: gallery.insights.brief,

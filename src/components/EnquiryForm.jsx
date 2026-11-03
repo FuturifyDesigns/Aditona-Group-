@@ -9,6 +9,7 @@ const DIVISIONS = [
   'Event Solutions',
   'Creative & Marketing',
   'Golf Solutions',
+  'Sourcing & Procurement',
   'Not sure / Multiple',
 ]
 
