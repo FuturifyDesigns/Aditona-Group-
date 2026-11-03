@@ -51,19 +51,12 @@ export default function Footer() {
 
         <div>
           <h4>Contact</h4>
-          <p>
-            <a href={`mailto:${config.emails.info}`}>{config.emails.info}</a>
-          </p>
-          <p>
-            <a href={`mailto:${config.emails.enquiries}`}>
-              {config.emails.enquiries}
-            </a>
-          </p>
-          <p>
-            <a href={`mailto:${config.emails.operations}`}>
-              {config.emails.operations}
-            </a>
-          </p>
+          {config.emailChannels.map((channel) => (
+            <p key={channel.email} className="footer-email">
+              <a href={`mailto:${channel.email}`}>{channel.email}</a>
+              <span>{channel.hint}</span>
+            </p>
+          ))}
           <p>
             <Link to="/enquiry">Make an Enquiry</Link>
           </p>

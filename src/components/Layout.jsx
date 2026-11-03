@@ -4,7 +4,9 @@ import EditModeBar from '../cms/EditModeBar'
 import { hardRefreshScroll, setupScrollDefaults, softRefreshScroll } from '../lib/scroll'
 import Footer from './Footer'
 import Header from './Header'
+import Seo from './Seo'
 import WhatsAppFab from './WhatsAppFab'
+import { PAGE_SEO } from '../lib/seo'
 
 const WA_BY_PATH = {
   '/event-solutions':
@@ -47,8 +49,11 @@ export default function Layout() {
 
   const waMessage = WA_BY_PATH[location.pathname]
 
+  const pageSeo = PAGE_SEO[location.pathname] || PAGE_SEO.default
+
   return (
     <>
+      <Seo title={pageSeo.title} description={pageSeo.description} />
       <EditModeBar />
       <Header />
       <main className="page" ref={mainRef}>

@@ -1,7 +1,11 @@
 export const config = {
   brand: 'Aditona Group',
+  shortName: 'Aditona',
   tagline: 'VISION. PRECISION. EXECUTION.',
   headline: 'One Group. Multiple Solutions.',
+  description:
+    'Aditona Group is a Botswana multi-disciplinary solutions company for events, creative & marketing, golf solutions, and sourcing & procurement.',
+  siteUrl: 'https://aditona.com',
   whatsapp: '26778691888',
   emails: {
     info: 'info@aditona.com',
@@ -10,6 +14,38 @@ export const config = {
     accounts: 'accounts@aditona.com',
     operations: 'operations@aditona.com',
   },
+  emailChannels: [
+    {
+      key: 'info',
+      label: 'General',
+      email: 'info@aditona.com',
+      hint: 'General company enquiries',
+    },
+    {
+      key: 'enquiries',
+      label: 'Enquiries',
+      email: 'enquiries@aditona.com',
+      hint: 'Service and business enquiries',
+    },
+    {
+      key: 'admin',
+      label: 'Admin',
+      email: 'admin@aditona.com',
+      hint: 'Administration and official correspondence',
+    },
+    {
+      key: 'accounts',
+      label: 'Accounts',
+      email: 'accounts@aditona.com',
+      hint: 'Invoices, payments and financial matters',
+    },
+    {
+      key: 'operations',
+      label: 'Operations',
+      email: 'operations@aditona.com',
+      hint: 'Project execution, supplier coordination and operational matters',
+    },
+  ],
   social: {
     linkedin: '#',
     instagram: '#',
@@ -26,4 +62,10 @@ export function waLink(message) {
       'Hello Aditona Group, I would like to enquire about your services.',
   )
   return `https://wa.me/${config.whatsapp}?text=${text}`
+}
+
+export function absoluteUrl(path = '/') {
+  const base = config.siteUrl.replace(/\/$/, '')
+  if (!path || path === '/') return `${base}/`
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`
 }

@@ -11,32 +11,12 @@ import { gallery, heroes } from '../lib/images'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const channels = [
-  {
-    label: 'General',
-    value: config.emails.info,
-    href: `mailto:${config.emails.info}`,
-    hint: 'Company questions and introductions',
-  },
-  {
-    label: 'Enquiries',
-    value: config.emails.enquiries,
-    href: `mailto:${config.emails.enquiries}`,
-    hint: 'New briefs and capability questions',
-  },
-  {
-    label: 'Operations',
-    value: config.emails.operations,
-    href: `mailto:${config.emails.operations}`,
-    hint: 'Live jobs, vendors, and day-of coordination',
-  },
-  {
-    label: 'Accounts',
-    value: config.emails.accounts,
-    href: `mailto:${config.emails.accounts}`,
-    hint: 'Invoices and payment follow-ups',
-  },
-]
+const channels = config.emailChannels.map((c) => ({
+  label: c.label,
+  value: c.email,
+  href: `mailto:${c.email}`,
+  hint: c.hint,
+}))
 
 export default function Contact() {
   const pageRef = useRef(null)
