@@ -10,38 +10,50 @@ export const supabase = createClient(config.supabaseUrl, config.supabaseAnon, {
 })
 
 export async function submitEnquiry(payload) {
-  const { data, error } = await supabase
-    .from('enquiries')
-    .insert([
-      {
-        form_type: payload.form_type,
-        full_name: payload.full_name,
-        company: payload.company || null,
-        email: payload.email,
-        phone: payload.phone || null,
-        division: payload.division || null,
-        service: payload.service || null,
-        message: payload.message,
-        project_date: payload.project_date || null,
-        budget: payload.budget || null,
-        page_source: payload.page_source || null,
-        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
-      },
-    ])
-    .select('id')
-    .single()
+  const row = {
+    form_type: payload.form_type,
+    full_name: payload.full_name,
+    company: payload.company || null,
+    email: payload.email,
+    phone: payload.phone || null,
+    division: payload.division || null,
+    service: payload.service || null,
+    message: payload.message,
+    project_date: payload.project_date || null,
+    budget: payload.budget || null,
+    page_source: payload.page_source || null,
+    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+  }
 
-  if (error) throw error
+  let data = null
+  let dbError = null
+  try {
+    const res = await supabase.from('enquiries').insert([row]).select('id').single()
+    data = res.data
+    dbError = res.error
+  } catch (err) {
+    dbError = err
+  }
 
-  // Best-effort email forward — never fail the public form if mail notify errors
+  // Always try email — forms must not soft-fail when RLS blocks the DB insert
+  let emailed = false
   try {
     const { notifyFormEmail } = await import('./notifyEmail')
     await notifyFormEmail(payload)
+    emailed = true
   } catch (err) {
     console.warn('[enquiry] email notify failed', err)
   }
 
-  return data
+  if (dbError && !emailed) {
+    throw dbError instanceof Error ? dbError : new Error(dbError.message || 'Submit failed')
+  }
+
+  if (dbError) {
+    console.warn('[enquiry] saved via email only (DB blocked):', dbError.message || dbError)
+  }
+
+  return data || { id: null, emailed: true }
 }
 
 export async function getContentMap() {
