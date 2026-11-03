@@ -512,6 +512,22 @@ ul {
   font-weight: 600;
 }
 
+/* Nav link color must not wash out the black CTA — keep label white */
+.mobile-nav a.btn-primary,
+.mobile-nav .btn-primary {
+  color: #fff;
+  border-bottom: none;
+  margin-top: 0.65rem;
+  width: 100%;
+}
+
+.mobile-nav a.btn-primary:hover,
+.mobile-nav .btn-primary:hover,
+.mobile-nav a.btn-primary span,
+.mobile-nav .btn-primary span {
+  color: #fff;
+}
+
 .not-found {
   min-height: min(70vh, 640px);
   display: grid;
