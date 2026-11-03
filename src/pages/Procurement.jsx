@@ -14,32 +14,32 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const journey = [
   {
-    image: gallery.about.briefing,
+    image: gallery.procurement.brief,
     title: 'Brief & requirements',
     text: 'Clarify what needs to be sourced, timelines, and approved project budgets.',
   },
   {
-    image: gallery.about.planning,
+    image: gallery.procurement.suppliers,
     title: 'Supplier identification',
     text: 'Find the right vendors and service providers for the scope — not just the cheapest option.',
   },
   {
-    image: gallery.about.quality,
+    image: gallery.procurement.quotes,
     title: 'Quotes & comparison',
     text: 'Request, compare, and coordinate quotations so decisions stay clear and documented.',
   },
   {
-    image: gallery.about.venue,
+    image: gallery.procurement.delivery,
     title: 'Purchase & delivery',
     text: 'Coordinate purchasing, supply scheduling, and delivery against the project plan.',
   },
   {
-    image: gallery.about.huddle,
+    image: gallery.procurement.oversight,
     title: 'Partner oversight',
     text: 'Keep suppliers aligned — communication, scheduling, and delivery monitoring.',
   },
   {
-    image: gallery.about.leadership,
+    image: gallery.procurement.budget,
     title: 'Budget control',
     text: 'Manage procurement within approved budgets with accountable close-out.',
   },

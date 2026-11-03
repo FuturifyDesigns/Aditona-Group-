@@ -68,7 +68,7 @@ const divisions = [
     title: 'Sourcing & Procurement',
     text: 'Supplier sourcing, quotations, purchasing coordination, and budget-aligned procurement across projects.',
     to: '/procurement',
-    image: gallery.about.briefing,
+    image: gallery.procurement.quotes,
   },
 ]
 

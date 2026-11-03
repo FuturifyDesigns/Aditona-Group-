@@ -8,7 +8,7 @@ export const heroes = {
   events: img('images/heroes/events.png'),
   creative: img('images/heroes/creative.png'),
   golf: img('images/heroes/golf.png'),
-  procurement: img('images/heroes/about.png'),
+  procurement: img('images/heroes/procurement.jpg'),
   work: img('images/heroes/work.png'),
   insights: img('images/heroes/insights.png'),
   contact: img('images/heroes/contact.png'),
@@ -71,5 +71,13 @@ export const gallery = {
     interview: img('images/work/04-business-interview.png'),
     hospitality: img('images/work/05-golf-hospitality.png'),
     auction: img('images/work/06-charity-auction.png'),
+  },
+  procurement: {
+    brief: img('images/procurement/01-brief-requirements.jpg'),
+    suppliers: img('images/procurement/02-supplier-identification.jpg'),
+    quotes: img('images/procurement/03-quotes-comparison.jpg'),
+    delivery: img('images/procurement/04-purchase-delivery.jpg'),
+    oversight: img('images/procurement/05-partner-oversight.jpg'),
+    budget: img('images/procurement/06-budget-control.jpg'),
   },
 }
