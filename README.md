@@ -45,9 +45,14 @@ Change the password in the Supabase Auth dashboard if needed. Do not commit pass
 4. Clickable fields and buttons show a pencil badge.
 5. Images can be replaced via file picker (uploads to the public `media` storage bucket).
 
-## Enquiries
+## Enquiries & quotes
 
-Public forms insert into Supabase `enquiries` (RLS: public insert). Track status in **Admin → Enquiries**.
+Public forms insert into Supabase `enquiries` and email `enquiries@aditona.com`.
+
+- **Admin → Enquiries** — enquiry + contact messages  
+- **Admin → Quotes** — quote requests only  
+
+If form submit returns **401**, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor (anon insert policy).
 
 ## Security notes
 
