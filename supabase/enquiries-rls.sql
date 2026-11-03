@@ -31,3 +31,13 @@ for update
 to authenticated
 using (true)
 with check (true);
+
+drop policy if exists "Authenticated can delete enquiries" on public.enquiries;
+
+create policy "Authenticated can delete enquiries"
+on public.enquiries
+for delete
+to authenticated
+using (true);
+
+grant delete on table public.enquiries to authenticated;

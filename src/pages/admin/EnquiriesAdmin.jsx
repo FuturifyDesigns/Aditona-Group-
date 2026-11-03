@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { listEnquiries, updateEnquiry } from '../../lib/supabase'
+import { deleteEnquiry, listEnquiries, updateEnquiry } from '../../lib/supabase'
 
 const STATUSES = ['new', 'contacted', 'quoted', 'follow_up', 'won', 'lost', 'closed']
 
@@ -26,6 +26,7 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
   const [editing, setEditing] = useState(null)
   const [draft, setDraft] = useState(emptyDraft)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -79,6 +80,23 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
     }
   }
 
+  const remove = async () => {
+    if (!editing) return
+    const label = editing.full_name || editing.email || noun
+    if (!window.confirm(`Delete this ${noun} from ${label}? This cannot be undone.`)) return
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteEnquiry(editing.id)
+      setEditing(null)
+      await load()
+    } catch (err) {
+      setError(err.message || 'Delete failed')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) return <p className="admin-muted">Loading {nounPlural}…</p>
 
   const newCount = rows.filter((r) => (r.status || 'new') === 'new').length
@@ -89,8 +107,8 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
         <strong>How to use this page</strong>
         <p>
           {isQuotes
-            ? 'Quote requests from /request-quote appear here. Each submission is also emailed to enquiries@aditona.com.'
-            : 'Enquiries and contact messages appear here. Quote requests are under Quotes. Submissions are also emailed to enquiries@aditona.com.'}
+            ? 'Quote requests from /request-quote appear here. New submissions are emailed to enquiries@aditona.com and listed below — open to update status or delete.'
+            : 'Enquiries and contact messages appear here. Quote requests are under Quotes. Open a row to update status or delete it.'}
         </p>
       </div>
 
@@ -153,9 +171,33 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                   </span>
                 </td>
                 <td>{row.follow_up_date || '—'}</td>
-                <td>
+                <td className="admin-row-actions">
                   <button type="button" className="btn btn-soft" onClick={() => openEdit(row)}>
                     Open
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-soft cms-btn-danger"
+                    onClick={async () => {
+                      const label = row.full_name || row.email || noun
+                      if (
+                        !window.confirm(
+                          `Delete this ${noun} from ${label}? This cannot be undone.`,
+                        )
+                      ) {
+                        return
+                      }
+                      setError('')
+                      try {
+                        await deleteEnquiry(row.id)
+                        if (editing?.id === row.id) setEditing(null)
+                        await load()
+                      } catch (err) {
+                        setError(err.message || 'Delete failed')
+                      }
+                    }}
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -223,10 +265,18 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
               />
             </label>
             <div className="cms-popover-actions">
+              <button
+                type="button"
+                className="btn btn-soft cms-btn-danger"
+                disabled={deleting || saving}
+                onClick={remove}
+              >
+                {deleting ? 'Deleting…' : 'Delete'}
+              </button>
               <button type="button" className="btn btn-soft" onClick={() => setEditing(null)}>
                 Cancel
               </button>
-              <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>
+              <button type="button" className="btn btn-primary" disabled={saving || deleting} onClick={save}>
                 {saving ? 'Saving…' : 'Save'}
               </button>
             </div>

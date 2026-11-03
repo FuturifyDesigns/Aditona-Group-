@@ -25,11 +25,16 @@ export async function submitEnquiry(payload) {
     user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
   }
 
-  // Fast path: save to Supabase only.
+  // Save to Supabase first (source of truth for admin).
   // Do not .select() after insert (anon INSERT is allowed; SELECT is not under RLS).
-  // Third-party FormSubmit was removed — it hung on CORS/522 and blocked the UI.
   const { error } = await supabase.from('enquiries').insert([row])
   if (error) throw error
+
+  // Email notify via Cloudflare Worker — do not block success on mail delivery.
+  void import('./notifyEmail')
+    .then(({ notifyFormEmail }) => notifyFormEmail(payload))
+    .catch((err) => console.warn('[enquiry] email notify failed', err))
+
   return { ok: true }
 }
 
@@ -120,6 +125,11 @@ export async function updateEnquiry(id, patch) {
     .single()
   if (error) throw error
   return data
+}
+
+export async function deleteEnquiry(id) {
+  const { error } = await supabase.from('enquiries').delete().eq('id', id)
+  if (error) throw error
 }
 
 export async function listProjects() {

@@ -47,12 +47,12 @@ Change the password in the Supabase Auth dashboard if needed. Do not commit pass
 
 ## Enquiries & quotes
 
-Public forms save into Supabase `enquiries` (fast). Check them in admin:
+Public forms save into Supabase `enquiries`, then a Cloudflare Worker emails `aditonagroup@gmail.com` (Reply-To = the submitter). Check them in admin:
 
-- **Admin → Enquiries** — enquiry + contact messages  
-- **Admin → Quotes** — quote requests only  
+- **Admin → Enquiries** — enquiry + contact messages (update / delete)  
+- **Admin → Quotes** — quote requests only (update / delete)  
 
-If insert returns **401**, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor.
+If insert or delete is blocked by RLS, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor.
 
 ## Security notes
 

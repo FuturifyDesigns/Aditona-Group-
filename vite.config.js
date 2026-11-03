@@ -14,7 +14,7 @@ const PRODUCTION_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.supabase.co",
   "font-src 'self'",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloudflareinsights.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloudflareinsights.com https://*.workers.dev",
   "worker-src 'self' blob:",
   'upgrade-insecure-requests',
 ].join('; ')

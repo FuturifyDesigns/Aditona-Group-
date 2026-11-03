@@ -3496,6 +3496,13 @@ body.cms-edit-mode .page-hero--dark .cms-editable {
   white-space: pre-wrap;
 }
 
+.admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
 .admin-edit-drawer {
   width: min(100%, 480px);
 }
