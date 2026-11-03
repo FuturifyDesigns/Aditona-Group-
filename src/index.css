@@ -3282,10 +3282,22 @@ body.cms-edit-mode .work-runway-track {
 .admin-top-live {
   flex-shrink: 0;
   white-space: nowrap;
+  min-height: 40px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.88rem;
 }
 
 .admin-logout {
   width: 100%;
+  min-height: 40px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.admin-logout:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 .cms-popover--wide {

@@ -72,7 +72,7 @@ export default function AdminLayout() {
             Turn on live edit to change text, cards, images, footer, and projects on
             the website itself.
           </p>
-          <button type="button" className="btn btn-soft admin-logout" onClick={logout}>
+          <button type="button" className="admin-btn admin-btn-ghost admin-logout" onClick={logout}>
             Log out
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function AdminLayout() {
           </div>
           <NavLink
             to="/?edit=1"
-            className="btn btn-primary admin-top-live"
+            className="admin-btn admin-btn-solid admin-top-live"
             onClick={() => setEditMode(true)}
           >
             Edit live site
