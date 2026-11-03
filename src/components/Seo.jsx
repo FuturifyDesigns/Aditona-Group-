@@ -94,15 +94,15 @@ export default function Seo({
     upsertMeta('name', 'twitter:image', image)
 
     upsertLink('canonical', url)
-    upsertLink('icon', absoluteUrl('/favicon-48.png'), {
+    upsertLink('icon', absoluteUrl('/favicon-48.png?v=3'), {
       type: 'image/png',
       sizes: '48x48',
     })
-    upsertLink('icon', absoluteUrl('/favicon-32.png'), {
+    upsertLink('icon', absoluteUrl('/favicon-32.png?v=3'), {
       type: 'image/png',
       sizes: '32x32',
     })
-    upsertLink('apple-touch-icon', absoluteUrl('/apple-touch-icon.png'), {
+    upsertLink('apple-touch-icon', absoluteUrl('/apple-touch-icon.png?v=3'), {
       sizes: '180x180',
     })
     upsertLink('manifest', absoluteUrl('/site.webmanifest'))
