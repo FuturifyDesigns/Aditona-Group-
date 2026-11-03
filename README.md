@@ -47,12 +47,12 @@ Change the password in the Supabase Auth dashboard if needed. Do not commit pass
 
 ## Enquiries & quotes
 
-Public forms insert into Supabase `enquiries` and email `enquiries@aditona.com`.
+Public forms save into Supabase `enquiries` (fast). Check them in admin:
 
 - **Admin → Enquiries** — enquiry + contact messages  
 - **Admin → Quotes** — quote requests only  
 
-If form submit returns **401**, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor (anon insert policy).
+If insert returns **401**, run `supabase/enquiries-rls.sql` in the Supabase SQL Editor.
 
 ## Security notes
 

@@ -25,37 +25,12 @@ export async function submitEnquiry(payload) {
     user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
   }
 
-  let data = null
-  let dbError = null
-  try {
-    // Do not .select() after insert — anon has INSERT but no SELECT under RLS,
-    // and Prefer: return=representation would otherwise 401.
-    const res = await supabase.from('enquiries').insert([row])
-    data = res.data
-    dbError = res.error
-  } catch (err) {
-    dbError = err
-  }
-
-  // Always try email — forms must not soft-fail when RLS blocks the DB insert
-  let emailed = false
-  try {
-    const { notifyFormEmail } = await import('./notifyEmail')
-    await notifyFormEmail(payload)
-    emailed = true
-  } catch (err) {
-    console.warn('[enquiry] email notify failed', err)
-  }
-
-  if (dbError && !emailed) {
-    throw dbError instanceof Error ? dbError : new Error(dbError.message || 'Submit failed')
-  }
-
-  if (dbError) {
-    console.warn('[enquiry] saved via email only (DB blocked):', dbError.message || dbError)
-  }
-
-  return data || { id: null, emailed: true }
+  // Fast path: save to Supabase only.
+  // Do not .select() after insert (anon INSERT is allowed; SELECT is not under RLS).
+  // Third-party FormSubmit was removed — it hung on CORS/522 and blocked the UI.
+  const { error } = await supabase.from('enquiries').insert([row])
+  if (error) throw error
+  return { ok: true }
 }
 
 export async function getContentMap() {
