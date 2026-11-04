@@ -3727,6 +3727,11 @@ body.cms-edit-mode .page-hero--dark .cms-editable {
   text-decoration: none;
 }
 
+.admin-reply-box {
+  display: grid;
+  gap: 0.75rem;
+}
+
 a.admin-btn {
   text-decoration: none;
 }

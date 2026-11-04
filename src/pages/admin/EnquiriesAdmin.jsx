@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { deleteEnquiry, listEnquiries, updateEnquiry } from '../../lib/supabase'
+import { buildReplyDraft, sendClientReply } from '../../lib/notifyEmail'
 
 const STATUSES = ['new', 'contacted', 'quoted', 'follow_up', 'won', 'lost', 'closed']
 
@@ -49,38 +50,6 @@ function formatFollowUp(value) {
   })
 }
 
-/** Opens the admin's mail app addressed to the form submitter. */
-function buildReplyMailto(row, noun) {
-  const to = String(row?.email || '').trim()
-  if (!to) return null
-
-  const name = String(row.full_name || 'there').trim()
-  const formType = String(row.form_type || noun || 'enquiry').trim()
-  const subject = `Re: Your Aditona ${formType} request`
-  const quote = String(row.message || '')
-    .trim()
-    .split(/\r?\n/)
-    .map((line) => `> ${line}`)
-    .join('\n')
-
-  const body = [
-    `Hi ${name},`,
-    '',
-    'Thank you for getting in touch with Aditona Group.',
-    '',
-    '',
-    '',
-    'Kind regards,',
-    'Aditona Group',
-    '',
-    '----------',
-    `Original ${formType}:`,
-    quote || '(no message)',
-  ].join('\n')
-
-  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-}
-
 /**
  * Shared inbox UI.
  * @param {'enquiries' | 'quotes'} mode
@@ -97,6 +66,10 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
   const [draft, setDraft] = useState(emptyDraft)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [replying, setReplying] = useState(false)
+  const [replySending, setReplySending] = useState(false)
+  const [replyStatus, setReplyStatus] = useState('')
+  const [replyDraft, setReplyDraft] = useState({ to: '', subject: '', body: '' })
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -120,6 +93,8 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
 
   const openEdit = (row) => {
     setEditing(row)
+    setReplying(false)
+    setReplyStatus('')
     setDraft({
       status: row.status || 'new',
       follow_up_date: row.follow_up_date ? String(row.follow_up_date).slice(0, 10) : '',
@@ -127,6 +102,13 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
       converted: Boolean(row.converted),
       notes: row.notes || '',
     })
+  }
+
+  const startReply = (row) => {
+    setEditing(row)
+    setReplying(true)
+    setReplyStatus('')
+    setReplyDraft(buildReplyDraft(row, noun))
   }
 
   const save = async () => {
@@ -180,6 +162,32 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
     }
   }
 
+  const sendReply = async () => {
+    if (!editing?.email) return
+    setReplySending(true)
+    setReplyStatus('')
+    try {
+      await sendClientReply({
+        to: replyDraft.to || editing.email,
+        client_name: editing.full_name,
+        subject: replyDraft.subject,
+        body: replyDraft.body,
+      })
+      if ((editing.status || 'new') === 'new') {
+        await updateEnquiry(editing.id, { status: 'contacted' })
+        setDraft((d) => ({ ...d, status: 'contacted' }))
+        setEditing((e) => (e ? { ...e, status: 'contacted' } : e))
+      }
+      setReplyStatus('Sent from enquiries@aditona.com')
+      setReplying(false)
+      await load()
+    } catch (err) {
+      setReplyStatus(err.message || 'Failed to send reply')
+    } finally {
+      setReplySending(false)
+    }
+  }
+
   if (loading) return <p className="admin-muted">Loading {nounPlural}…</p>
 
   const newCount = rows.filter((r) => (r.status || 'new') === 'new').length
@@ -191,8 +199,8 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
         <strong>How to use this page</strong>
         <p>
           {isQuotes
-            ? 'Quote requests from the website. Use Reply to email the client at the address they submitted, or Open to update status and notes.'
-            : 'Enquiry and contact messages. Quotes live under Quotes. Reply emails the submitter; Open updates status or deletes.'}
+            ? 'Quote requests from the website. Reply sends from enquiries@aditona.com via Brevo — clients will not see a Gmail address.'
+            : 'Enquiry and contact messages. Reply sends from enquiries@aditona.com via Brevo.'}
         </p>
       </div>
 
@@ -271,21 +279,13 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                   <td className="admin-cell-follow">{formatFollowUp(row.follow_up_date)}</td>
                   <td className="admin-row-actions">
                     {row.email ? (
-                      <a
+                      <button
+                        type="button"
                         className="admin-btn admin-btn-solid"
-                        href={buildReplyMailto(row, noun)}
-                        onClick={async () => {
-                          if ((row.status || 'new') !== 'new') return
-                          try {
-                            await updateEnquiry(row.id, { status: 'contacted' })
-                            await load()
-                          } catch {
-                            /* reply still works even if status update fails */
-                          }
-                        }}
+                        onClick={() => startReply(row)}
                       >
                         Reply
-                      </a>
+                      </button>
                     ) : null}
                     <button
                       type="button"
@@ -320,7 +320,9 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
           >
             <div className="cms-popover-scroll">
               <div className="admin-drawer-head">
-                <p className="admin-drawer-kicker">Update {noun}</p>
+                <p className="admin-drawer-kicker">
+                  {replying ? `Reply to ${noun}` : `Update ${noun}`}
+                </p>
                 <h2 id="admin-drawer-title">{editing.full_name || 'Untitled'}</h2>
                 <p className="admin-muted admin-drawer-meta">
                   {editing.email}
@@ -328,105 +330,168 @@ export default function EnquiriesAdmin({ mode = 'enquiries' }) {
                   {editing.service ? ` · ${editing.service}` : ''}
                   {editing.division ? ` · ${editing.division}` : ''}
                 </p>
-                {editing.email ? (
-                  <a
+                {!replying && editing.email ? (
+                  <button
+                    type="button"
                     className="admin-btn admin-btn-solid admin-reply-cta"
-                    href={buildReplyMailto(editing, noun)}
-                    onClick={async () => {
-                      if ((editing.status || 'new') !== 'new') return
-                      try {
-                        await updateEnquiry(editing.id, { status: 'contacted' })
-                        setDraft((d) => ({ ...d, status: 'contacted' }))
-                        setEditing((e) => (e ? { ...e, status: 'contacted' } : e))
-                        await load()
-                      } catch {
-                        /* ignore */
-                      }
-                    }}
+                    onClick={() => startReply(editing)}
                   >
-                    Reply by email
-                  </a>
+                    Reply from enquiries@aditona.com
+                  </button>
                 ) : null}
               </div>
-              {editing.message && (
-                <blockquote className="admin-quote">{editing.message}</blockquote>
+
+              {replying ? (
+                <div className="admin-reply-box">
+                  <p className="admin-muted">
+                    Sends as <strong>enquiries@aditona.com</strong> via Brevo — not Gmail.
+                  </p>
+                  <label className="cms-field">
+                    <span>To</span>
+                    <input
+                      value={replyDraft.to}
+                      onChange={(e) => setReplyDraft((d) => ({ ...d, to: e.target.value }))}
+                    />
+                  </label>
+                  <label className="cms-field">
+                    <span>Subject</span>
+                    <input
+                      value={replyDraft.subject}
+                      onChange={(e) => setReplyDraft((d) => ({ ...d, subject: e.target.value }))}
+                    />
+                  </label>
+                  <label className="cms-field">
+                    <span>Message</span>
+                    <textarea
+                      rows={10}
+                      value={replyDraft.body}
+                      onChange={(e) => setReplyDraft((d) => ({ ...d, body: e.target.value }))}
+                    />
+                  </label>
+                  {replyStatus ? (
+                    <p
+                      className={`form-msg ${replyStatus.startsWith('Sent') ? 'ok' : 'err'}`}
+                      role="status"
+                    >
+                      {replyStatus}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <>
+                  {editing.message && (
+                    <blockquote className="admin-quote">{editing.message}</blockquote>
+                  )}
+                  {replyStatus ? (
+                    <p className="form-msg ok" role="status">
+                      {replyStatus}
+                    </p>
+                  ) : null}
+                  <div className="admin-drawer-grid">
+                    <label className="cms-field">
+                      <span>Status</span>
+                      <select
+                        value={draft.status}
+                        onChange={(e) => setDraft((d) => ({ ...d, status: e.target.value }))}
+                      >
+                        {STATUSES.map((s) => (
+                          <option key={s} value={s}>
+                            {STATUS_LABELS[s] || s}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="cms-field">
+                      <span>Follow-up date</span>
+                      <input
+                        type="date"
+                        value={draft.follow_up_date}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, follow_up_date: e.target.value }))
+                        }
+                      />
+                    </label>
+                  </div>
+                  <div className="admin-drawer-checks">
+                    <label className="cms-check">
+                      <input
+                        type="checkbox"
+                        checked={draft.quotation_sent}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, quotation_sent: e.target.checked }))
+                        }
+                      />
+                      Quotation sent
+                    </label>
+                    <label className="cms-check">
+                      <input
+                        type="checkbox"
+                        checked={draft.converted}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, converted: e.target.checked }))
+                        }
+                      />
+                      Converted
+                    </label>
+                  </div>
+                  <label className="cms-field">
+                    <span>Notes</span>
+                    <textarea
+                      rows={4}
+                      value={draft.notes}
+                      onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))}
+                    />
+                  </label>
+                </>
               )}
-              <div className="admin-drawer-grid">
-                <label className="cms-field">
-                  <span>Status</span>
-                  <select
-                    value={draft.status}
-                    onChange={(e) => setDraft((d) => ({ ...d, status: e.target.value }))}
-                  >
-                    {STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {STATUS_LABELS[s] || s}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="cms-field">
-                  <span>Follow-up date</span>
-                  <input
-                    type="date"
-                    value={draft.follow_up_date}
-                    onChange={(e) => setDraft((d) => ({ ...d, follow_up_date: e.target.value }))}
-                  />
-                </label>
-              </div>
-              <div className="admin-drawer-checks">
-                <label className="cms-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.quotation_sent}
-                    onChange={(e) =>
-                      setDraft((d) => ({ ...d, quotation_sent: e.target.checked }))
-                    }
-                  />
-                  Quotation sent
-                </label>
-                <label className="cms-check">
-                  <input
-                    type="checkbox"
-                    checked={draft.converted}
-                    onChange={(e) => setDraft((d) => ({ ...d, converted: e.target.checked }))}
-                  />
-                  Converted
-                </label>
-              </div>
-              <label className="cms-field">
-                <span>Notes</span>
-                <textarea
-                  rows={4}
-                  value={draft.notes}
-                  onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))}
-                />
-              </label>
             </div>
             <div className="cms-popover-footer admin-drawer-actions">
-              <button
-                type="button"
-                className="admin-btn admin-btn-danger"
-                disabled={deleting || saving}
-                onClick={removeEditing}
-              >
-                {deleting ? 'Deleting…' : 'Delete'}
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-ghost"
-                onClick={() => setEditing(null)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-solid"
-                disabled={saving || deleting}
-                onClick={save}
-              >
-                {saving ? 'Saving…' : 'Save'}
-              </button>
+              {replying ? (
+                <>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-ghost"
+                    onClick={() => setReplying(false)}
+                    disabled={replySending}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-solid"
+                    disabled={replySending}
+                    onClick={sendReply}
+                  >
+                    {replySending ? 'Sending…' : 'Send reply'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger"
+                    disabled={deleting || saving}
+                    onClick={removeEditing}
+                  >
+                    {deleting ? 'Deleting…' : 'Delete'}
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-ghost"
+                    onClick={() => setEditing(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-solid"
+                    disabled={saving || deleting}
+                    onClick={save}
+                  >
+                    {saving ? 'Saving…' : 'Save'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
